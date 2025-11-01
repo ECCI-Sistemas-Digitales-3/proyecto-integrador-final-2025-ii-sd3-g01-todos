@@ -2,6 +2,8 @@
 
 ## Integrantes
 
+- [Michael Handrety Fonseca Arana](https://github.com/MichaelJF50)
+- [Laura Daniela Rincón Pinilla](https://github.com/Laura03rincon)
 
 ## Documentación
 
