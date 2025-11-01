@@ -1,9 +1,9 @@
 # Nombre de la etapa:
 
 ## Integrantes
--Heidy Nicol Sánchez Peña
--David Mora
--Federico Díaz Novoa
+- Heidy Nicol Sánchez Peña
+- David Mora
+- Federico Díaz Novoa
 
 ## Documentación
 
