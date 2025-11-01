@@ -1,7 +1,9 @@
 # Nombre de la etapa:
 
 ## Integrantes
-
+Steven Herrera monroy
+Carlos Medina
+Daniel Camacho
 
 ## Documentación
 
