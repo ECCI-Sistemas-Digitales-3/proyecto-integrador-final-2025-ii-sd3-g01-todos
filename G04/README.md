@@ -4,6 +4,8 @@
  [jesus Zuluaga]()
 
  [Kevin Vivas]()
+ [Sebastian Bonza]()
+
 
 ## Documentación
 
