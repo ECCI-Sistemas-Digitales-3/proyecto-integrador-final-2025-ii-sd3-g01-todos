@@ -55,16 +55,26 @@ Diseñar e implementar un sistema de control para las bombas peristálticas enca
 - El sistema muestra el estado de los sensores y la bomba en tiempo real.  
 - Esto permite verificar si la mezcla de colores y la cantidad dosificada son correctas.
 
+## 🔩 Variables Principales
+
+| Variable        | Descripción                                       |
+|-----------------|---------------------------------------------------|
+| `sensor1`, `sensor2` | Entradas digitales conectadas al nivel del tanque |
+| `bomba`         | Salida digital para el control de la bomba        |
+| `led`           | LED indicador de estado de la bomba               |
+| `modo_manual`   | Indica si el control es manual o automático       |
+| `bomba_estado`  | Estado actual de la bomba (ON / OFF)              |
+
 ## 📸 Evidencias del Montaje
 
 <p align="center">
-  <img src="./G01/Thonny.jpeg" alt="Logo" width="800"/>
+  <img src="./Thonny.jpeg" alt="Logo" width="800"/>
 </p>
 
 <p align="center">
-  <img src="./G01/Node Red.jpeg" alt="Logo" width="800"/>
+  <img src="./Node Red.jpeg" alt="Logo" width="800"/>
 </p>
 
 <p align="center">
-  <img src="./G01/Control bomba.jpeg" alt="Logo" width="800"/>
+  <img src="./Control bomba.jpeg" alt="Logo" width="800"/>
 </p>
