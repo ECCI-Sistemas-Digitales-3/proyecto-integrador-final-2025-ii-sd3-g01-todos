@@ -1,13 +1,18 @@
 
-
 # DOCUMENTACIÓN DEL AVANCE DEL PROYECTO INTEGRADOR
 ## Integrantes
 
+[Jesus Zuluaga]()
+[Kevin Vivas]()
+[Sebastian Bonza]()
 
 ## Objetivo
-El objetivo del avance del proyecto es configurar una Raspberry Pi como nodo publicador MQTT, capaz de capturar imágenes en tiempo real mediante una cámara (CSI o USB) y transmitirlas mediante el protocolo MQTT hacia un cliente Node-RED, donde se visualizarán y podrán procesarse para tareas de monitoreo, análisis o automatización.
+El objetivo de este avance del proyecto es configurar una Raspberry Pi como nodo publicador MQTT, capaz de capturar imágenes en tiempo real mediante una cámara (CSI o USB) para realizar la lectura y análisis de los colores generados por una mezcladora de pinturas.
 
-Esta integración combina tecnologías de IoT (Internet of Things), procesamiento de imágenes y mensajería ligera, fortaleciendo la comprensión práctica de los conceptos de comunicación entre dispositivos inteligentes.
+Las imágenes capturadas se transmitirán mediante el protocolo MQTT hacia un cliente Node-RED, donde serán visualizadas y procesadas para identificar tonalidades, realizar comparaciones y facilitar tareas de monitoreo y control automatizado del proceso de mezcla.
+
+Este desarrollo integra tecnologías de IoT (Internet of Things), procesamiento de imágenes y mensajería ligera, fortaleciendo la comprensión práctica de la comunicación entre dispositivos inteligentes y su aplicación en sistemas de control y análisis de color.
+
 
 ## Herramientas
 
@@ -23,13 +28,13 @@ Esta integración combina tecnologías de IoT (Internet of Things), procesamient
 
 
 ## Configuración inicial de la Raspberry Pi
-1. Conectar la Raspberry Pi a la fuente de alimentación y a la red (WiFi o cable Ethernet).
+1. Conectar la Raspberry Pi 3 a la fuente de alimentación y establecer la conexión a la red, ya sea mediante WiFi o cable Ethernet.
 
-2. Acceder al sistema operativo desde un terminal local o mediante SSH desde otro equipo:
+2. Acceder al sistema operativo desde un terminal local o de forma remota mediante SSH desde otro equipo utilizando el siguiente comando:
 ```
 ssh pi@192.168.7.217 (Esta direccion IP varia)
 ```
-Ingresar la contraseña correspondiente al usuario pi o la establecida previamente.
+Ingresar la contraseña del usuario “pi” o la que se haya configurado previamente.
 
 
 ## Actualización del sistema
@@ -44,11 +49,12 @@ Este procedimiento mantiene los repositorios actualizados, elimina paquetes inne
 
 ## Habilitación de la cámara
 
-1. Abrir el panel de configuración de la Raspberry Pi:
+1. Abrir el panel de configuración de la Raspberry Pi ejecutando el siguiente comando:
 ```
 sudo raspi-config
 ```
-2. Habilitar también el acceso remoto SSH (si aún no está activo):
+2. En el menú de configuración, dirigirse a Interface Options → Camera → Enable para habilitar la cámara integrada.
+
 **Interface Options → SSH → Enable**
 
 3. Guardar los cambios y reiniciar la Raspberry Pi para aplicar la configuración:
@@ -73,8 +79,8 @@ La imagen presenta un flujo en Node-RED donde el nodo de cámara Raspberry Pi en
 
 ## Instalación de dependencias necesarias
 
-Una vez actualizado el sistema, se procede a instalar las herramientas básicas, las utilidades para la cámara.
-Los siguientes comandos deben ejecutarse en orden:
+Una vez actualizado el sistema, se procede a instalar las dependencias esenciales para garantizar el correcto funcionamiento de la cámara y las herramientas de procesamiento de imágenes.
+Ejecutar los siguientes comandos en el orden indicado:
 ```
 sudo apt update
 sudo apt install imagemagick -y
@@ -82,21 +88,32 @@ sudo apt install python3-pip -y
 ```
 **Descripción de cada instalación:**
 
-imagemagick: Permite manipular imágenes (redimensionar, convertir formato, etc.).
+**ImageMagick:** Utilidad de línea de comandos que permite manipular y procesar imágenes (por ejemplo, redimensionar, recortar, convertir formatos o ajustar parámetros visuales).
 
-python3-pip: Instala el gestor de paquetes Python, necesario para las siguientes librerías.
+**Python3-pip:** Gestor de paquetes de Python que facilita la instalación de librerías adicionales, necesarias para el desarrollo y comunicación entre la Raspberry Pi y el entorno Node-RED.
+
+Estas herramientas son fundamentales para habilitar el procesamiento local de imágenes capturadas y permitir la integración fluida con los módulos de análisis y envío de datos mediante el protocolo MQTT.
 
 ## Verificación del broker MQTT
-Nos conectamos al laboratorio de mosquito, 
-enlace:
+Para comprobar la correcta comunicación entre la Raspberry Pi (publicador) y el cliente Node-RED (suscriptor), se realizó una prueba de conexión al broker MQTT.
+Esta verificación permite confirmar que los mensajes pueden transmitirse y recibirse correctamente a través del protocolo MQTT, garantizando la funcionalidad del sistema IoT, disponible en el siguiente enlace:
 
 [Instalación Mosquitto](https://github.com/ECCI-Sistemas-Digitales-3/lab05-mqtt-2025-ii-sd3-g04)
 
 
 ## Flujo práctico de comunicacion 
-En la siguiente imagen se observan los principales componentes del montaje: la cámara, la Raspberry Pi 3, el entorno Node-RED y el módulo ESP32.
+En la siguiente imagen se muestran los componentes principales del montaje experimental, conformado por la cámara, la Raspberry Pi 3, el entorno de desarrollo Node-RED y el módulo ESP32.
+Este conjunto representa la arquitectura funcional del sistema IoT, donde la Raspberry Pi desempeña el rol de nodo publicador, encargado de capturar y enviar los datos obtenidos por la cámara, mientras que el ESP32 y Node-RED se encargan del procesamiento, visualización y control de la información transmitida a través del protocolo MQTT.
 
 ![Texto alternativo](./Img/1.png)
 
+## Flujo de operación del sistema de mezcla automatizada de pintura
+
+El diagrama representa la secuencia de operaciones del sistema desarrollado para la detección y mezcla automática de colores. El proceso inicia con la captura de una imagen mediante la Raspberry Pi y su cámara, a partir de la cual el usuario selecciona un punto para obtener el valor RGB del color objetivo. Con esta información, el sistema calcula las proporciones necesarias de cada color base (C, M, Y, K, W).
+
+A continuación, se verifican las condiciones de operación: la disponibilidad de pintura en los recipientes y la temperatura adecuada (entre 25 °C y 27 °C). Si ambas son correctas, el sistema activa las bombas para dosificar las pinturas según las proporciones calculadas y enciende el rodillo mezclador para lograr una mezcla homogénea. Finalmente, el color resultante se compara con el color objetivo; si coincide, el proceso finaliza, y si no, se calcula el error para ajustar la mezcla.
+
+![Texto alternativo](./Img/Diagrama_flujo.png)
+
 ## Conclusiones
-Este documento presenta un adelanto del proyecto de integración de cámara y Raspberry Pi mediante Node-RED, donde se comprobó la comunicación entre el hardware y la plataforma de automatización. Se logró habilitar la cámara y ejecutar el comando rpicam-vid -t 0 -o video.h264 desde un fluj, demostrando la capacidad del sistema para capturar video de forma remota. Este avance sienta las bases para futuras etapas orientadas a la transmisión y procesamiento de imágenes en proyectos de monitoreo y análisis para captar colores en la mezcladora.
+Durante esta etapa se logró la integración funcional entre la cámara y la Raspberry Pi a través de Node-RED, verificando la comunicación entre el hardware y la plataforma de automatización. Se consiguió habilitar la cámara y ejecutar el comando rpicam-vid -t 0 -o video.h264 desde un flujo, confirmando la capacidad del sistema para capturar video de manera remota. Estos resultados representan un avance importante dentro del proyecto, que permitirá en futuras fases implementar la transmisión en tiempo real y el procesamiento de imágenes para la detección de colores en la mezcladora
