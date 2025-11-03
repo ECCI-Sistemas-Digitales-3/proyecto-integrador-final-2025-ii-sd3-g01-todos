@@ -50,8 +50,8 @@ Fin del proceso.
 
 ### 3. Diseño digital montaje final
 
-![Periféricos del sistema](Diseño final.jpg)
-![Periféricos del sistema](Diseño final1.jpg)
-![Periféricos del sistema](Diseño final2.jpg)
-![Periféricos del sistema](Diseño final3.jpg)
+![Diseño final](Diseño final.jpg)
+![Diseño final 1](Diseño final1.jpg)
+![Diseño final 2](Diseño final2.jpg)
+
 
