@@ -36,7 +36,23 @@ El sensor **TCS34725** se conecta al ESP32 mediante el protocolo de comunicació
 
 ---
 
+### ⚙️ Proceso de calibración del sensor
 
+Para poder realizar la calibración del sensor:
+
+1. Se colocó una superficie **blanca** frente al sensor, registrando los valores RGB como referencia máxima.  
+2. Luego se colocó una superficie **negra**, registrando los valores mínimos.  
+3. Finalmente, se usaron esos valores como límites para ajustar las lecturas y obtener una medición más precisa de cualquier color intermedio.
+
+---
+
+#### Figura 1. Distribución de pines del sensor TCS34725
+
+<img width="600" alt="Distribución de pines del sensor TCS34725" src="https://github.com/user-attachments/assets/99e27d8b-741d-4262-a29c-fb898426a1cf" />
+
+**Fuente:** [TCS34725 Datasheet – ams OSRAM](https://electronilab.co/wp-content/uploads/2021/06/TCS34725.pdf)
+
+## Avances
 ### 1. [Flujos](/G03/flujos/flows.json)
 
 ### 2. [Programación micropython](/G03/micropython/test.py)
