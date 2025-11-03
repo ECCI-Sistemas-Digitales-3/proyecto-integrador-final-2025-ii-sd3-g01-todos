@@ -136,44 +136,38 @@ Sirve para lanzar otro proceso cuando ocurre una interrupción o error, útil co
 
  ## [Funcionamiento y funciones Especiales del Código MqttValvula.py](/G09/micropython/MqttValvula.py)
 
-Este código **“ MQTT VALVULAS”** hace que la ESP32 funcione como un dispositivo inteligente que controla 5 válvulas por medio de mensajes enviados por internet, usando el protocolo MQTT.
+Este código **“ MQTT VALVULAS”** hace que la ESP32 funcione como un dispositivo inteligente que controla 5 válvulas usando el protocolo MQTT.
 
 Explicación código 
-1.	Conexión WiFi
-El ESP32 se conecta primero a tu red WiFi usando la información que está en el archivo wifi.py.
-Si no se conecta, se queda esperando, porque sin internet no puede hablar con el servidor MQTT.
-2.	Configuración MQTT
-Luego, se define el broker MQTT (que es el servidor que reparte los mensajes) y se indican los nombres de los topics donde el ESP32 va a escuchar las órdenes para las válvulas.
+1.	Configuración MQTT
+Se define el broker MQTT (es el servidor que reparte los mensajes) y se indican los nombres de los topics donde el ESP32 va a recibir las órdenes para las válvulas.
 En este caso son:
 micro/pintura/valvula1
 micro/pintura/valvula2 , etc… 
-3.	Definición de pines
-El ESP32 tiene pines digitales que pueden activar o desactivar cosas.
+2.	Definición de pines
+Difinimos los pines digitales para activar o desactivar las valvulas.
 Aquí se asocia cada válvula a un pin físico (por ejemplo, el pin 15 controla la válvula 1, el 16 la válvula 2, etc.).
-Así, cuando llegue un mensaje para “valvula3”, el programa sabrá que debe encender o apagar el pin 17.
-4.	Recepción de mensajes
-El código tiene una función llamada on_message() que se ejecuta automáticamente cada vez que llega un mensaje nuevo desde el servidor MQTT.
+Así cuando llegue un mensaje para “valvula3”, el programa sabrá que debe encender o apagar el pin 17.
+3.	Recepción de mensajes
+Tenemos la función llamada on_message() que se ejecuta automáticamente cada vez que llega un mensaje nuevo desde el servidor MQTT.
 Si el mensaje dice "ON", el pin correspondiente se activa (enciende la válvula).
 Si dice "OFF", se apaga.
-5.	Suscripción a los topics
-El ESP32 se “suscribe” a los cinco topics.
-Esto significa que el servidor MQTT le avisará cada vez que llegue un mensaje nuevo a esos canales.
-6.	Bucle principal
+4.	Bucle principal
 El programa entra en un ciclo infinito donde constantemente revisa si hay mensajes nuevos.
 Si los hay, llama a la función on_message() y ejecuta la acción correspondiente.
 
 Términos nuevos o importantes
  
 
-- "Callback": "Una función que se ejecuta automáticamente cuando ocurre un evento (por ejemplo, cuando llega un mensaje)."
+- **Callback:** "Una función que se ejecuta automáticamente cuando ocurre un evento (por ejemplo, cuando llega un mensaje)."
 
-- "check_msg()": "Método que revisa si hay nuevos mensajes MQTT."
+- **check_msg():** "Método que revisa si hay nuevos mensajes MQTT."
 
-- "subscribe()": "Indica al broker que quieres recibir los mensajes de un topic."
+- **subscribe():** "Indica al broker que quieres recibir los mensajes de un topic."
 
-- "decode()": "Convierte un dato en bytes a texto normal."
+- **decode():** "Convierte un dato en bytes a texto normal."
 
-- "value(1) / value(0)": "Enciende (1) o apaga (0) el pin del ESP32."
+- **value(1) / value(0):** "Enciende (1) o apaga (0) el pin del ESP32."
 
 
 <p align="center">
@@ -184,35 +178,35 @@ Términos nuevos o importantes
 
  ## Funcionamiento y funciones Especiales del Código FuncionSensores
 
-Este código “Función sensor” sirve para tomar la lectura de temperatura de un sensor y, dependiendo del valor, decidir si una válvula debe encenderse o apagarse.
-Además, envía tres tipos de información hacia distintos destinos de Node-RED.
+El código “Función sensor” funciona para tomar la lectura de temperatura de un sensor y dependiendo del valor, decide si una válvula debe encenderse o apagarse.
+Además envía tres tipos de información hacia distintos destinos de Node-RED.
  Funciones principales
-1.	Lee la temperatura
+1.	**Lee la temperatura**
 -	El código recibe la temperatura desde el sensor (en msg.payload).
 -	La convierte en número para poder compararla.
-2.	Compara con un valor límite (umbral)
+2.	**Compara con un valor límite (umbral)**
 -	Tiene un valor de referencia (por ejemplo, 30 °C).
 -   Si la temperatura es mayor o igual a ese límite → el estado es "ON".
 -	Si es menor → el estado es "OFF".
-3.	Define los destinos (topics)
+3.	**Define los destinos (topics)**
 -	Un topic es como la dirección del mensaje dentro del sistema MQTT.
 -	En este caso se usan dos:
-- esp1/temperatura/sensor1 → donde se envía el valor de la temperatura.
+-   esp1/temperatura/sensor1 → donde se envía el valor de la temperatura.
 -	esp2/pintura/valvula1 → donde se envía la orden para encender o apagar la válvula.
-4.	Crea los mensajes
+4.	**Crea los mensajes**
 -	Uno con el valor de temperatura (para visualizarlo).
 -	Otro con el estado "ON" o "OFF" (para activar la válvula).
 -	Y un tercero para un LED o indicador visual en el panel (Dashboard).
-5.	Envía los mensajes
--	El return [msgValve, msgSensor, msgLed] manda los tres mensajes, cada uno por una salida diferente del nodo Function.
+5.	**Envía los mensajes**
+-	El return [msgValve, msgSensor, msgLed] manda los tres mensajes, cada uno por una salida        diferente del nodo Function.
 Así, Node-RED puede enviar cada dato al destino que corresponde.
 
-Terminos Nuevos
+**Terminos Nuevos**
 
- - "payload		Es el “contenido” del mensaje que viaja entre los nodos.
- - parseFloat()	Convierte un texto en número decimal.
- - isNaN()	Revisa si un valor no es un número.
- - const / let	Formas de crear variables en JavaScript.
+ - **payload**: Es el “contenido” del mensaje que viaja entre los nodos.
+ - **parseFloat():** Convierte un texto en número decimal.
+ - **isNaN():**	Revisa si un valor no es un número.
+ - **const / let:**	Formas de crear variables en JavaScript.
 
 
 ## Retos Encontrados
