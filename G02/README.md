@@ -12,6 +12,8 @@ Nicolas Quiroga 109393
 
 ### 1. [Flujos](/G02/flujos/flows.json)
 
+![Periféricos del sistema](Flujo_mezclador.pdf)
+
 ### 2. [Programación micropython](/G02/micropython/test.py)
 
 
