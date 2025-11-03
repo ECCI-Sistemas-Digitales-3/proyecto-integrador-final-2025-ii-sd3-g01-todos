@@ -34,18 +34,21 @@ Software: Thonny IDE (para programación de la Pico y ESP32) y Node-RED o MQTT B
 
 El sistema sigue la siguiente secuencia de funcionamiento:  
 
-Inicio: el proceso comienza una vez se detecta la desactivación de las válvulas de pintura.
-Retraso de seguridad (5 segundos) para asegurar que no haya residuos líquidos en movimiento.
-Activación del Motor 1: el aspa desciende hasta llegar a la posición inferior.
-Verificación de posición “Aspa abajo”.
-Activación del Motor 2: se inicia la agitación de la pintura durante 10 segundos.
-Desactivación del Motor 2.
-Retraso de seguridad (5 segundos).
-Activación del Motor 1 en sentido inverso: el aspa asciende a su posición inicial.
-Fin del proceso.
+Inicio: el proceso comienza una vez se detecta la desactivación de las válvulas de pintura.  
+Retraso de seguridad (5 segundos) para asegurar que no haya residuos líquidos en movimiento.  
+Activación del Motor 1: el aspa desciende hasta llegar a la posición inferior.  
+Verificación de posición “Aspa abajo”.  
+Activación del Motor 2: se inicia la agitación de la pintura durante 10 segundos.  
+Desactivación del Motor 2.  
+Retraso de seguridad (5 segundos).  
+Activación del Motor 1 en sentido inverso: el aspa asciende a su posición inicial.  
+Fin del proceso.  
 
 ![Periféricos del sistema](Flujo_motoagitador.jpg)
 
 ### 2. [Programación micropython](/G02/micropython/test.py)
 
+### 3. [Diseño digital montaje final]
+
+![Periféricos del sistema](Flujo_motoagitador.jpg)
 
