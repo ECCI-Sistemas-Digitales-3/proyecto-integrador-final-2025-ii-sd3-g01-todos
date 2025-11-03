@@ -90,6 +90,33 @@ El formato JSON permite analizar tendencias o generar reportes posteriores.
 
 ## Pruebas ESP32 y Node Red
 
+<p align="center">
+  <img src="flujos/PruebasDashboard.png" alt="Prueba de funcionamiento MQTT" width="450">
+  <br>
+  <b>Figura 3.</b> Prueba de funcionamiento del sistema MQTT en Node-RED.
+</p>
+
+### Funcionamiento MQTT
+
+En esta etapa se verifica la comunicación entre el **ESP32** y **Node-RED** mediante **MQTT**.  
+Cada sensor **DS18B20** envía su temperatura a un tópico específico, y el **ESP32** publica el estado **ON/OFF** de las válvulas según el umbral configurado.
+
+En el panel se muestran cinco termómetros con sus indicadores de **LED** y **válvula**.  
+Solo el **Sensor 5**, con **32 °C**, supera el umbral de **30 °C**, activando su válvula correspondiente, mientras las demás permanecen apagadas.
+
+
+<p align="center">
+  <img src="flujos/PruebasMycroPython.png" alt="Prueba de funcionamiento del script en Thonny" width="450">
+  <br>
+  <b>Figura 4.</b> Prueba de funcionamiento del sistema en Thonny con ESP32 y sensores DS18B20.
+</p>
+
+### Funcionamiento en Thonny (ESP32 - MicroPython)
+
+En esta etapa se programa y prueba el **ESP32** en **Thonny** usando **MicroPython**.  
+Durante las pruebas, las lecturas se muestran en tiempo real entre **21.0 °C y 21.5 °C**, confirmando el correcto funcionamiento de los sensores **DS18B20** y el guardado de datos.  
+Esta verificación garantiza la comunicación estable del hardware antes de integrar el envío de datos por **MQTT** hacia **Node-RED**.
+
 
 
  ## [Funciones Especiales del Código SensoresValvulas.py](/G09/micropython/SensoresValvulas.py)
@@ -149,9 +176,11 @@ Términos nuevos o importantes
 - "value(1) / value(0)": "Enciende (1) o apaga (0) el pin del ESP32."
 
 
-
-![alt text](flujos/NodeRed_Valvula.png)
-
+<p align="center">
+  <img src="flujos/NodeRed_Valvula.png" alt="Visualización de válvulas en Node-RED" width="450">
+  <br>
+  <b>Figura 5.</b> Visualización del control de válvulas en Node-RED.
+</p>
 
  ## Funcionamiento y funciones Especiales del Código FuncionSensores
 
