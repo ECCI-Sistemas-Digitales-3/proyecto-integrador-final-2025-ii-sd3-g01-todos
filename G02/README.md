@@ -48,7 +48,7 @@ Fin del proceso.
 
 ### 2. [Programación micropython](/G02/micropython/test.py)
 
-### 3. [Diseño digital montaje final]
+### 3. Diseño digital montaje final
 
 ![Periféricos del sistema](Flujo_motoagitador.jpg)
 
