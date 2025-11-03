@@ -136,8 +136,8 @@ El programa entra en un ciclo infinito donde constantemente revisa si hay mensaj
 Si los hay, llama a la función on_message() y ejecuta la acción correspondiente.
 
 Términos nuevos o importantes
-terminos_mqtt = 
-{
+ 
+
     "Callback": "Una función que se ejecuta automáticamente cuando ocurre un evento (por ejemplo, cuando llega un mensaje)."
 
     "check_msg()": "Método que revisa si hay nuevos mensajes MQTT."
@@ -147,7 +147,7 @@ terminos_mqtt =
     "decode()": "Convierte un dato en bytes a texto normal."
 
     "value(1) / value(0)": "Enciende (1) o apaga (0) el pin del ESP32."
-}
+
 
 
 ![alt text](flujos/NodeRed_Valvula.png)
