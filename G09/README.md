@@ -138,15 +138,15 @@ Si los hay, llama a la función on_message() y ejecuta la acción correspondient
 Términos nuevos o importantes
  
 
-    "Callback": "Una función que se ejecuta automáticamente cuando ocurre un evento (por ejemplo, cuando llega un mensaje)."
+- "Callback": "Una función que se ejecuta automáticamente cuando ocurre un evento (por ejemplo, cuando llega un mensaje)."
 
-    "check_msg()": "Método que revisa si hay nuevos mensajes MQTT."
+- "check_msg()": "Método que revisa si hay nuevos mensajes MQTT."
 
-    "subscribe()": "Indica al broker que quieres recibir los mensajes de un topic."
+- "subscribe()": "Indica al broker que quieres recibir los mensajes de un topic."
 
-    "decode()": "Convierte un dato en bytes a texto normal."
+- "decode()": "Convierte un dato en bytes a texto normal."
 
-    "value(1) / value(0)": "Enciende (1) o apaga (0) el pin del ESP32."
+- "value(1) / value(0)": "Enciende (1) o apaga (0) el pin del ESP32."
 
 
 
@@ -179,13 +179,12 @@ Además, envía tres tipos de información hacia distintos destinos de Node-RED.
 Así, Node-RED puede enviar cada dato al destino que corresponde.
 
 Terminos Nuevos
-{
+
  - "payload		Es el “contenido” del mensaje que viaja entre los nodos.
  - parseFloat()	Convierte un texto en número decimal.
  - isNaN()	Revisa si un valor no es un número.
  - const / let	Formas de crear variables en JavaScript.
 
-}
 
 ## Retos Encontrados
 
