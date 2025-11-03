@@ -45,6 +45,21 @@ Para poder realizar la calibración del sensor:
 3. Finalmente, se usaron esos valores como límites para ajustar las lecturas y obtener una medición más precisa de cualquier color intermedio.
 
 ---
+### 🔧 Características técnicas
+- **Voltaje de entrada:** 3.0 V a 5.0 V  
+- **Corriente de entrada:** hasta 20 mA  
+- **Chip base:** TCS3472   
+- **Interfaz de comunicación:** I2C (SDA y SCL)  
+- **Filtro IR:** integrado, mejora la precisión del color  
+
+---
+
+### 📷 Aplicaciones
+- Detección y reconocimiento de color  
+- Control automático de iluminación RGB  
+- Clasificación de objetos por color  
+- Sensado ambiental o corrección de balance de blancos en cámaras  
+
 
 #### Figura 1. Distribución de pines del sensor TCS34725
 
