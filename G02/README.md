@@ -15,7 +15,7 @@ Los motores son controlados a través de los pines GPIO2 y GPIO4 de la ESP32, co
 
 ![Periféricos del sistema](ESP1.jpg)
 
-Herramientas utilizadas
+## Herramientas utilizadas
 
 Raspberry Pi Pico 2: microcontrolador principal encargado de gestionar la lógica de control y los tiempos de activación de los motores.
 
