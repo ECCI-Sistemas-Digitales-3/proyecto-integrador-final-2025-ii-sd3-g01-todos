@@ -1,7 +1,11 @@
 # Nombre de la etapa:
 
 ## Integrantes
+Maria Paula Fierro Barrios
 
+Astrid Catalina Ortiz Lopez
+
+Camilo Suarez Camacho
 
 ## Documentación
 
