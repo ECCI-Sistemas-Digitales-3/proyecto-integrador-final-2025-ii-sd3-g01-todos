@@ -1,11 +1,11 @@
 # Nombre de la etapa:
 
 ## Integrantes
-Maria Paula Fierro Barrios
+Maria Paula Fierro Barrios (@fierrobarriosmariapaula-blip)
 
-Astrid Catalina Ortiz Lopez
+Astrid Catalina Ortiz Lopez (@astridcortizl-del)
 
-Camilo Suarez Camacho
+Camilo Suarez Camacho (@camilosc13)
 
 ## Documentación
 
