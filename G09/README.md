@@ -1,11 +1,11 @@
 # Nombre de la etapa:
 
 ## Integrantes
-Maria Paula Fierro Barrios (@fierrobarriosmariapaula-blip)
+Maria Paula Fierro Barrios (https://github.com/fierrobarriosmariapaula-blip)
 
-Astrid Catalina Ortiz Lopez (@astridcortizl-del)
+Astrid Catalina Ortiz Lopez (https://github.com/astridcortizl-del)
 
-Camilo Suarez Camacho (@camilosc13)
+Camilo Suarez Camacho (https://github.com/Camilosc13)
 
 ## Documentación
 
