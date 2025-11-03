@@ -50,5 +50,8 @@ Fin del proceso.
 
 ### 3. Diseño digital montaje final
 
-![Periféricos del sistema](Flujo_motoagitador.jpg)
+![Periféricos del sistema](Diseño final.jpg)
+![Periféricos del sistema](Diseño final1.jpg)
+![Periféricos del sistema](Diseño final2.jpg)
+![Periféricos del sistema](Diseño final3.jpg)
 
