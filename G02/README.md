@@ -50,9 +50,9 @@ Fin del proceso.
 
 ### 3. Diseño digital montaje final
 
-![Diseño final](Diseno_final.jpg)
-![Diseño final 1](Diseno_final1.jpg)
-![Diseño final 2](Diseno_final2.jpg)
+![Diseño final](Diseño_final.jpg)
+![Diseño final 1](Diseño_final1.jpg)
+![Diseño final 2](Diseño_final2.jpg)
 
 
 
