@@ -8,7 +8,7 @@ Nicolas Quiroga 109393
 
 ## Documentación
 
-![Periféricos del sistema](ESP1.jpeg)
+![Periféricos del sistema](ESP1.jpg)
 
 ### 1. [Flujos](/G02/flujos/flows.json)
 
