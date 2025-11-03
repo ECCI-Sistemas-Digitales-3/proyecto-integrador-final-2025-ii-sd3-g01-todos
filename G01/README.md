@@ -65,6 +65,12 @@ Diseñar e implementar un sistema de control para las bombas peristálticas enca
 | `modo_manual`   | Indica si el control es manual o automático       |
 | `bomba_estado`  | Estado actual de la bomba (ON / OFF)              |
 
+
+
+## 📹 Video del funcionamiento
+
+[![Ver video en YouTube](https://youtube.com/shorts/XyB3JLqUIzM)
+
 ## 📸 Evidencias del Montaje
 
 <p align="center">
