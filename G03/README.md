@@ -10,7 +10,7 @@
 El objetivo del avance del proyecto es implementar un sistema de reconocimiento de colores mediante el sensor TCS34725 y el módulo ESP32, capaz de detectar automáticamente los colores dentro de la cabina de pintura y enviar los valores RGB a Raspberry Pi mediante comunicación MQTT.
 La información es procesada y visualizada en Node-RED, permitiendo monitorear los colores captados por el sensor en tiempo real.
 
-El avance busca fortalecer los conocimientos relacionados con el uso de sensores ópticos, microcontroladores y comunicación IoT (Internet de las Cosas) aplicados a procesos de automatización y control.
+Este avance busca establecer un reconocimiento de colores preciso y rápido, garantizando una integración adecuada dentro del sistema general del proyecto y contribuyendo al cumplimiento del objetivo final.
 ---
 
 ## Herramientas utilizadas  
