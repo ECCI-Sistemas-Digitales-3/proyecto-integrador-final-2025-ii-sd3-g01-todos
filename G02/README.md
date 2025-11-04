@@ -54,5 +54,10 @@ Fin del proceso.
 ![Diseño final 1](Diseño%20final1.jpg)
 ![Diseño final 2](Diseño%20final2.jpg)
 
+## 4. Diseño moto agitador fisico
+
+![Montaje inicial](Montaje_inicial.jpg)
+
+
 
 
