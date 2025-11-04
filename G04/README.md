@@ -230,6 +230,11 @@ Evidencia Fotográfica :
 
 ![](2.Image/pp.png)
 
+# Visualización del Panel en Node-RED
+
+![](2.Image/Screenshot.png)
+
+
 # Aspectos importantes a tomar en consideración
 
 - 📸 Para la captura con la cámara, es imprescindible contar con una buena iluminación 💡, ya que esto garantiza una detección correcta de los colores.  
