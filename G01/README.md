@@ -42,6 +42,70 @@ Diseñar e implementar un sistema de control para las bombas peristálticas enca
 - El controlador evalúa las señales recibidas y ajusta el tiempo de activación de la bomba.  
 - En caso de error o lectura fuera del rango esperado, se detiene el proceso automáticamente.
 
+## 🧭 Diagrama de Flujo del Sistema
+
+A continuación se presenta el diagrama de flujo que describe el proceso completo de dosificación automática de tintas mediante bombas peristálticas.  
+El objetivo de este diagrama es representar de forma visual la **secuencia lógica de control**, desde la lectura de temperatura y peso, hasta la mezcla final de los colores base.
+
+<p align="center">
+  <img src="./Flujo_mezclador-Bombas.drawio.png" alt="Diagrama de flujo del sistema" width="800"/>
+</p>
+
+### 🧩 Descripción del funcionamiento
+
+1. **Inicio del proceso:**  
+   El sistema inicia asignando el valor del color actual en 1, lo que corresponde al primer color base (por ejemplo, Cian).
+
+2. **Lectura de temperatura de tinta:**  
+   Se mide la temperatura del tanque de tinta correspondiente. Esta variable garantiza que la tinta tenga la viscosidad adecuada antes de ser bombeada.
+
+3. **Verificación del rango de temperatura:**  
+   - Si la temperatura **no está dentro del rango**, el sistema espera hasta que la tinta alcance la temperatura adecuada.  
+   - Si la temperatura es correcta, continúa el proceso.
+
+4. **Activación de la bomba:**  
+   Una vez que la tinta está lista, se activa la **bomba peristáltica** asociada al color actual. El líquido comienza a fluir hacia el tanque principal.
+
+5. **Lectura del peso del tanque principal:**  
+   La galga de carga mide constantemente el peso del tanque principal para verificar el volumen transferido de tinta.
+
+6. **Control por peso objetivo:**  
+   - Si el peso **no ha alcanzado** el valor objetivo, el sistema mantiene activa la bomba.  
+   - Si el peso **alcanza el valor esperado**, la bomba se detiene automáticamente.
+
+7. **Cambio de color:**  
+   El sistema incrementa el contador (`color actual = color actual + 1`) para continuar con el siguiente color base.
+
+8. **Verificación del número total de colores:**  
+   - Si aún quedan colores por dosificar (`color actual < 5`), el proceso se repite desde el paso 2.  
+   - Si se han completado los cinco colores (C, M, Y, K, W), el proceso termina.
+
+9. **Fin del proceso:**  
+   El sistema detiene todas las bombas y finaliza el ciclo de mezcla.  
+   En este punto, el tanque principal contiene la proporción deseada de los cinco colores base, lista para el uso o empaquetado.
+
+---
+
+### ⚙️ Funcionalidad clave representada
+- **Control de temperatura:** asegura una mezcla estable y homogénea.  
+- **Medición de peso en tiempo real:** permite detener el flujo con precisión.  
+- **Secuencia automática:** cada bomba se activa solo cuando la anterior finaliza.  
+- **Verificación cíclica:** el proceso continúa hasta completar todas las tintas configuradas.  
+
+---
+
+## 📊 Resumen del ciclo de control
+
+| Etapa | Descripción | Acción del sistema |
+|--------|--------------|--------------------|
+| Inicialización | Se define el color inicial (C) | Color actual = 1 |
+| Lectura de temperatura | Sensor lee el tanque de tinta | Verifica rango de temperatura |
+| Bombeo | Bomba activa según color | Transfiere tinta al tanque principal |
+| Control por peso | Galga monitorea peso objetivo | Detiene bomba al alcanzar el valor |
+| Cambio de color | Incremento de variable de color | Repite proceso para siguiente tinta |
+| Finalización | Último color completado | Proceso de mezcla finalizado |
+
+
 ## 🔴 Comunicación MQTT
 - El ESP32 se comunica con un servidor MQTT que recibe y envía los datos en tiempo real.  
 - Los tópicos principales utilizados son:  
@@ -70,6 +134,9 @@ Diseñar e implementar un sistema de control para las bombas peristálticas enca
 ## 📹 Video del funcionamiento
 
 [![Ver video en YouTube](https://youtube.com/shorts/XyB3JLqUIzM)
+
+[![Ver video en YouTube](https://youtube.com/shorts/PtICswtYfNs)
+
 
 ## 📸 Evidencias del Montaje
 
