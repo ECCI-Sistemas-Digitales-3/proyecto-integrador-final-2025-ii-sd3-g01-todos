@@ -129,7 +129,104 @@ El objetivo de este diagrama es representar de forma visual la **secuencia lógi
 | `modo_manual`   | Indica si el control es manual o automático       |
 | `bomba_estado`  | Estado actual de la bomba (ON / OFF)              |
 
+## 💻 Explicación del código
+El código está dividido en bloques principales:
 
+1. Configuración de red WiFi y MQTT
+2. Definición de pines y variables
+3. Funciones de conexión WiFi y MQTT
+4. Funciones de control de la bomba
+5. Bucle principal de ejecución
+
+### 📶 Conexión WiFi
+
+```python
+SSID = "TIGO-E325"
+PASSWORD = "7989956371"
+```
+Estas líneas almacenan las credenciales de la red WiFi a la que se conectará el ESP32.
+La función conectar_wifi() activa el modo estación (network.STA_IF), inicia la conexión y espera hasta que el dispositivo obtenga una dirección IP válida:
+
+```
+def conectar_wifi():
+    wlan = network.WLAN(network.STA_IF)
+    wlan.active(True)
+    wlan.connect(SSID, PASSWORD)
+    while not wlan.isconnected():
+        time.sleep(0.5)
+```
+Una vez conectado, imprime la IP asignada. Esto permite la comunicación posterior con el broker MQTT.
+
+### Configuración del broker MQTT
+```
+BROKER = "192.168.1.9"
+CLIENT_ID = "esp32_bomba"
+TOPIC_BOMBA_CONTROL = b'bomba/control'
+TOPIC_BOMBA_ESTADO = b'bomba/estado'
+```
+El broker MQTT (en este caso la Raspberry Pi) actúa como el servidor de mensajería.
+El ESP32 se conecta a él y se suscribe al tema bomba/control, donde recibe los comandos desde Node-RED.
+También publica su estado (encendido o apagado) en el tema bomba/estado.
+
+La conexión y suscripción se realizan mediante la función:
+
+```
+def conectar_mqtt():
+    client = MQTTClient(CLIENT_ID, BROKER)
+    client.set_callback(callback_mqtt)
+    client.connect()
+    client.subscribe(TOPIC_BOMBA_CONTROL)
+```
+## Callback MQTT
+
+La función callback_mqtt() recibe los mensajes enviados al ESP32.
+Dependiendo del comando (ON, OFF o AUTO), se activa o desactiva la bomba, o se cambia el modo de control:
+```
+def callback_mqtt(topic, msg):
+    comando = msg.decode().strip().upper()
+
+    if topic == TOPIC_BOMBA_CONTROL:
+        if comando == "ON":
+            encender_bomba()
+        elif comando == "OFF":
+            apagar_bomba()
+        elif comando == "AUTO":
+            modo_manual = False
+```
+Esto permite controlar el dispositivo directamente desde el dashboard en Node-RED.
+
+## Control de la bomba
+
+Las funciones encender_bomba() y apagar_bomba() controlan la salida GPIO25 (donde está conectada la bomba) y un LED indicador.
+Además, publican el estado actual al broker para mantener sincronizado el panel de control.
+
+```
+def encender_bomba():
+    bomba.value(1)
+    led.value(1)
+    client.publish(TOPIC_BOMBA_ESTADO, b"ON")
+
+def apagar_bomba():
+    bomba.value(0)
+    led.value(0)
+    client.publish(TOPIC_BOMBA_ESTADO, b"OFF")
+```
+
+## Lógica del modo automático
+
+En el bucle principal main(), el ESP32 revisa continuamente el estado de los sensores (sensor1, sensor2).
+Si ambos sensores están activos, se enciende la bomba; si alguno cambia, se apaga.
+
+```
+if not modo_manual:
+    if sensor1.value() == 1 and sensor2.value() == 1:
+        if not bomba_estado:
+            encender_bomba()
+    else:
+        if bomba_estado:
+            apagar_bomba()
+```
+Esto permite automatizar el proceso según las condiciones físicas del sistema (por ejemplo, el nivel o peso del tanque).
 
 ## 📹 Video del funcionamiento
 
