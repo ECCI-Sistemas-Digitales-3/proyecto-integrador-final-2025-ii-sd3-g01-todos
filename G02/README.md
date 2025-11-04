@@ -56,7 +56,8 @@ Fin del proceso.
 
 ## 4. Diseño moto agitador fisico
 
-![Montaje inicial](Montaje_inicial.jpg)
+![Montaje inicial](Montaje%20inicial.jpg)
+
 
 
 
