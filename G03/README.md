@@ -88,14 +88,14 @@ Para calibrar el sensor se realizaron tres pasos sencillos:
 
 ---
  
-# 🧠 Explicación del código del sistema de reconocimiento de color
+# Explicación del código del sistema de reconocimiento de color
 
 Este programa permite que el **ESP32** lea los valores de color detectados por el **sensor TCS34725**, los convierta a una escala RGB de 0 a 255 y los envíe mediante **MQTT** hacia una **Raspberry Pi** para su visualización en **Node-RED**.  
 A continuación se explica paso a paso cómo funciona.
 
 ---
 
-## 🌐 1. Conexión WiFi
+## 1. Conexión WiFi
 
 WIFI_SSID = "TU_SSID"
 WIFI_PASS = "TU_PASSWORD"
@@ -105,7 +105,7 @@ Esto permite que más adelante pueda enviar los datos del sensor a través del p
 
 ---
 
-## ☁️ 2. Configuración MQTT
+## 2. Configuración MQTT
 
 BROKER = "192.168.153.216"
 PORT = 1883
@@ -119,7 +119,7 @@ En resumen, esta parte configura el medio de comunicación entre el ESP32 y Node
 
 ---
 
-## 🎨 3. Configuración del sensor TCS34725
+## 3. Configuración del sensor TCS34725
 
 i2c = I2C(1, scl=Pin(22), sda=Pin(21))
 ADDR = 0x29
@@ -137,7 +137,7 @@ Esta parte prepara al sensor para empezar a tomar lecturas precisas de color.
 
 ---
 
-## 🔢 4. Conversión a escala RGB (0–255)
+## 4. Conversión a escala RGB (0–255)
 
 def convertir_255(r, g, b, coef):
 
@@ -147,7 +147,7 @@ Así, el color detectado es más real y proporcional a la luz del entorno.
 
 ---
 
-## 📶 5. Conexión a WiFi
+## 5. Conexión a WiFi
 
 def conectar_wifi():
 
@@ -157,7 +157,7 @@ Esto es esencial para que luego el ESP32 pueda comunicarse con el broker MQTT.
 
 ---
 
-## ⚙️ 6. Calibración del sensor
+## 6. Calibración del sensor
 
 def calibrar():
 
@@ -171,7 +171,7 @@ Gracias a esto, el sensor puede dar lecturas más precisas sin depender de la lu
 
 ---
 
-## 🚀 7. Programa principal
+## 7. Programa principal
 
 El flujo principal del programa hace lo siguiente:
 
@@ -190,7 +190,7 @@ El envío se realiza cada medio segundo.
 
 ---
 
-## 🔄 8. Flujo completo del sistema
+## 8. Flujo completo del sistema
 
 Sensor TCS34725 → ESP32 (lectura I2C)
 → WiFi → MQTT (broker en Raspberry Pi)
