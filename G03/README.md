@@ -87,6 +87,116 @@ Para calibrar el sensor se realizaron tres pasos sencillos:
 **Fuente:** [TCS34725 Datasheet – ams OSRAM](https://electronilab.co/wp-content/uploads/2021/06/TCS34725.pdf)  
 
 ---
+ 
+# 🧠 Explicación del código del sistema de reconocimiento de color
+
+Este programa permite que el **ESP32** lea los valores de color detectados por el **sensor TCS34725**, los convierta a una escala RGB de 0 a 255 y los envíe mediante **MQTT** hacia una **Raspberry Pi** para su visualización en **Node-RED**.  
+A continuación se explica paso a paso cómo funciona.
+
+---
+
+## 🌐 1. Conexión WiFi
+
+WIFI_SSID = "TU_SSID"
+WIFI_PASS = "TU_PASSWORD"
+
+El ESP32 se conecta a una red WiFi usando el nombre y la contraseña definidos aquí.  
+Esto permite que más adelante pueda enviar los datos del sensor a través del protocolo MQTT hacia la Raspberry Pi.
+
+---
+
+## ☁️ 2. Configuración MQTT
+
+BROKER = "192.168.153.216"
+PORT = 1883
+TOPIC = b"in/micro/sensor/color"
+
+- **BROKER:** es la dirección IP de la Raspberry Pi, donde está instalado Node-RED y el servidor MQTT.  
+- **PORT:** es el puerto de comunicación (1883 es el estándar de MQTT).  
+- **TOPIC:** es el canal por el cual el ESP32 envía los valores RGB que detecta el sensor.
+
+En resumen, esta parte configura el medio de comunicación entre el ESP32 y Node-RED.
+
+---
+
+## 🎨 3. Configuración del sensor TCS34725
+
+i2c = I2C(1, scl=Pin(22), sda=Pin(21))
+ADDR = 0x29
+
+El sensor TCS34725 se comunica mediante el bus **I2C**, usando los pines GPIO 21 (SDA) y GPIO 22 (SCL) del ESP32.  
+La dirección **0x29** identifica al sensor dentro del bus I2C.
+
+### Funciones principales:
+- **write_reg():** escribe datos en un registro del sensor.  
+- **read_reg16():** lee un valor de 16 bits desde un registro.  
+- **init_tcs34725():** inicializa el sensor, lo enciende y configura el tiempo de integración y la ganancia.  
+- **leer_rgbc():** obtiene los valores crudos de los cuatro canales del sensor: rojo, verde, azul y claro (intensidad de luz).
+
+Esta parte prepara al sensor para empezar a tomar lecturas precisas de color.
+
+---
+
+## 🔢 4. Conversión a escala RGB (0–255)
+
+def convertir_255(r, g, b, coef):
+
+El sensor entrega valores altos (por ejemplo, entre 0 y 30000).  
+Esta función los convierte al formato RGB estándar (de 0 a 255), usando los **valores máximos y mínimos obtenidos durante la calibración**.  
+Así, el color detectado es más real y proporcional a la luz del entorno.
+
+---
+
+## 📶 5. Conexión a WiFi
+
+def conectar_wifi():
+
+Activa el WiFi del ESP32 y lo conecta a la red configurada.  
+Muestra por consola el proceso de conexión y la dirección IP obtenida.  
+Esto es esencial para que luego el ESP32 pueda comunicarse con el broker MQTT.
+
+---
+
+## ⚙️ 6. Calibración del sensor
+
+def calibrar():
+
+Este proceso se hace una vez para obtener los límites de color:
+
+1. Se coloca una superficie **blanca**, se leen los valores RGB y se guardan como máximos.  
+2. Luego una superficie **negra**, para registrar los valores mínimos.  
+3. Con estos datos se crea un archivo llamado **calib_rgb.json**, que guarda los coeficientes de calibración.
+
+Gracias a esto, el sensor puede dar lecturas más precisas sin depender de la luz ambiente.
+
+---
+
+## 🚀 7. Programa principal
+
+El flujo principal del programa hace lo siguiente:
+
+1. Inicializa el sensor con init_tcs34725().  
+2. Conecta el ESP32 al WiFi con conectar_wifi().  
+3. Carga la calibración guardada (o realiza una nueva si no existe).  
+4. Se conecta al **broker MQTT**.  
+5. Entra en un bucle infinito donde:
+   - Lee los valores de color del sensor.  
+   - Los convierte a escala 0–255.  
+   - Crea un mensaje en formato JSON, por ejemplo:
+     {"R": 120, "G": 85, "B": 60}
+   - Envía ese mensaje al **topic MQTT** para que Node-RED lo reciba y visualice.
+
+El envío se realiza cada medio segundo.
+
+---
+
+## 🔄 8. Flujo completo del sistema
+
+Sensor TCS34725 → ESP32 (lectura I2C)
+→ WiFi → MQTT (broker en Raspberry Pi)
+→ Node-RED → Visualización de color en tiempo real
+
+---
 
 ## Avances  
 
