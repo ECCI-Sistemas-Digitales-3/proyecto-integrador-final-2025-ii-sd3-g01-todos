@@ -1,82 +1,95 @@
-# Nombre de la etapa:
+# Nombre de la etapa
 
-## Integrantes
-- Heidy Nicol Sánchez Peña
-- David Mora
-- Federico Díaz Novoa
+## Integrantes  
+- Heidy Nicol Sánchez Peña  
+- David Mora  
+- Federico Díaz Novoa  
 
-## Documentación
+---
 
-El objetivo del avance del proyecto es implementar un sistema de reconocimiento de colores mediante el sensor TCS34725 y el módulo ESP32, capaz de detectar automáticamente los colores dentro de la cabina de pintura y enviar los valores RGB a Raspberry Pi mediante comunicación MQTT.
-La información es procesada y visualizada en Node-RED, permitiendo monitorear los colores captados por el sensor en tiempo real.
+## Documentación  
 
-Este avance busca establecer un reconocimiento de colores preciso y rápido, garantizando una integración adecuada dentro del sistema general del proyecto y contribuyendo al cumplimiento del objetivo final.
+El objetivo de este avance es implementar un sistema de reconocimiento de colores usando el sensor TCS34725 y el módulo ESP32. El sistema detecta los colores dentro de la cabina de pintura y envía los valores RGB a la Raspberry Pi mediante comunicación MQTT.  
+Toda la información se procesa y se muestra en Node-RED, lo que permite ver en tiempo real los colores captados por el sensor.  
+
+Este avance busca lograr una lectura rápida y precisa de los colores, garantizando que la integración con el resto del sistema funcione correctamente y cumpla con el propósito general del proyecto.  
+
 ---
 
 ## Herramientas utilizadas  
 
-- **Sensor TCS34725:** sensor óptico RGB + Clear con comunicación I2C, utilizado para la detección precisa de colores.  
-- **ESP32:** microcontrolador encargado de realizar la lectura de los valores RGB del sensor y enviar los datos por WiFi.  
-- **Raspberry Pi:** dispositivo que actúa como nodo receptor MQTT para recibir y visualizar los datos enviados por el ESP32.  
-- **Node-RED:** entorno para la visualización y procesamiento de los valores captados por el sensor.  
+- **Sensor TCS34725:** detecta los componentes de color rojo, verde y azul (RGB) con alta precisión usando comunicación I2C.  
+- **ESP32:** se encarga de leer los datos del sensor y enviarlos por WiFi.  
+- **Raspberry Pi:** recibe los datos enviados por el ESP32 a través de MQTT y los muestra en Node-RED.  
+- **Node-RED:** permite visualizar los valores RGB de forma ordenada y monitorear los resultados en tiempo real.  
 
 ---
 
-## Configuración inicial del sensor TCS34725  
-Para configruar el sensor es necesario conocer su funcionamiento 
+## Configuración del sensor TCS34725  
 
-### Funcionamiento del Sensor TCS34725  
+Antes de usarlo, fue necesario entender cómo trabaja este sensor y cómo se comunica con el ESP32.  
 
-El sensor **TCS34725** es un dispositivo digital de detección de color que permite identificar la intensidad de los componentes rojo, verde y azul (RGB) presentes en la luz reflejada por un objeto. Integra un filtro infrarrojo (IR) que elimina interferencias no visibles, garantizando mediciones más precisas. El módulo incorpora un **convertidor analógico-digital (ADC)** que transforma las señales ópticas en valores digitales, los cuales se comunican con el microcontrolador mediante el protocolo I2C, utilizando solo las líneas SDA y SCL.  
-Para mejorar la detección, dispone de cuatro LEDs blancos que proporcionan iluminación constante sobre la superficie medida, lo que permite trabajar sin depender de fuentes de luz externas.  
-El sensor mide simultáneamente los valores de los tres colores primarios (**R**, **G** y **B**) y un canal adicional denominado **Clear**, que representa la intensidad total de luz. Con estos datos, el sistema puede determinar el color predominante en tiempo real.  Su funcionamiento es estable tanto con 3.3 V como con 5 V, gracias a su regulador de voltaje integrado. Además, permite ajustar la ganancia y el tiempo de integración por software, adaptándose a diferentes niveles de iluminación.  El **TCS34725** también incluye un pin de interrupción configurable, útil para activar acciones automáticas cuando los valores de color superan un umbral determinado.  
-Este sensor es ampliamente utilizado en sistemas de clasificación, control de iluminación, robótica e IoT**, donde se requiere un reconocimiento de color confiable y rápido.  
+### Funcionamiento del sensor TCS34725  
 
-El sensor **TCS34725** se conecta al ESP32 mediante el protocolo de comunicación I2C, siguiendo la siguiente distribución de conexiones:  
+El TCS34725 detecta el color de la luz que refleja un objeto. Mide la intensidad del rojo, verde y azul (RGB) y también calcula un valor adicional llamado Clear, que representa la cantidad total de luz.  
+Tiene un filtro infrarrojo que bloquea la luz no visible para hacer las mediciones más precisas, y un conversor interno que convierte esas señales de luz en datos digitales que el ESP32 puede leer fácilmente mediante I2C, usando los pines SDA y SCL.  
 
-- **VDD → 3.3V:** alimentación del sensor.  
-- **SCL → GPIO 22:** línea de reloj del bus I2C.  
-- **GND → GND:** referencia de tierra.  
-- **NC:** pin sin conexión.  
-- **INT:** pin de interrupción no utilizado.  
-- **SDA → GPIO 21:** línea de datos del bus I2C.  
+Cuenta con cuatro LEDs blancos que iluminan el objeto mientras se mide, lo que evita depender de la luz ambiental y mejora la estabilidad de las lecturas.  
+Además, permite ajustar la ganancia y el tiempo de integración desde el software, lo que ayuda a adaptarse a diferentes niveles de iluminación.  
 
----
+También dispone de un pin de interrupción que puede configurarse para ejecutar acciones automáticas si se detecta un color fuera de un rango específico.  
+En general, es un sensor muy versátil y confiable, ampliamente usado en robótica, control de iluminación y sistemas IoT que requieren un reconocimiento de color rápido y preciso.  
 
-### ⚙️ Proceso de calibración del sensor
+El sensor se conectó al ESP32 mediante el protocolo I2C con la siguiente distribución de pines:
 
-Para poder realizar la calibración del sensor:
-
-1. Se colocó una superficie **blanca** frente al sensor, registrando los valores RGB como referencia máxima.  
-2. Luego se colocó una superficie **negra**, registrando los valores mínimos.  
-3. Finalmente, se usaron esos valores como límites para ajustar las lecturas y obtener una medición más precisa de cualquier color intermedio.
-
----
-### 🔧 Características técnicas
-- **Voltaje de entrada:** 3.0 V a 5.0 V  
-- **Corriente de entrada:** hasta 20 mA  
-- **Chip base:** TCS3472   
-- **Interfaz de comunicación:** I2C (SDA y SCL)  
-- **Filtro IR:** integrado, mejora la precisión del color  
+- **VDD → 3.3V:** alimentación del sensor  
+- **SCL → GPIO 22:** línea de reloj  
+- **GND → GND:** referencia de tierra  
+- **NC:** sin conexión  
+- **INT:** no se utilizó  
+- **SDA → GPIO 21:** línea de datos  
 
 ---
 
-### 📷 Aplicaciones
+### ⚙️ Proceso de calibración del sensor  
+
+Para calibrar el sensor se realizaron tres pasos sencillos:  
+
+1. Se colocó una superficie **blanca** frente al sensor para registrar los valores RGB más altos.  
+2. Luego, se midió una superficie **negra** para obtener los valores más bajos.  
+3. Con esos límites, se ajustaron las lecturas para lograr una medición más precisa de cualquier color intermedio.  
+
+---
+
+### 🔧 Características técnicas  
+
+- Voltaje de entrada: 3.0 V a 5.0 V  
+- Corriente de entrada: hasta 20 mA  
+- Chip base: TCS3472  
+- Interfaz de comunicación: I2C (SDA y SCL)  
+- Filtro IR integrado para mejorar la precisión  
+
+---
+
+### 📷 Aplicaciones  
+
 - Detección y reconocimiento de color  
 - Control automático de iluminación RGB  
 - Clasificación de objetos por color  
-- Sensado ambiental o corrección de balance de blancos en cámaras  
+- Sensado ambiental o ajuste de balance de blancos en cámaras  
 
+---
 
-#### Figura 1. Distribución de pines del sensor TCS34725
+#### Figura 1. Distribución de pines del sensor TCS34725  
 
-<img width="600" alt="Distribución de pines del sensor TCS34725" src="https://github.com/user-attachments/assets/99e27d8b-741d-4262-a29c-fb898426a1cf" />
+<img width="600" alt="Distribución de pines del sensor TCS34725" src="https://github.com/user-attachments/assets/99e27d8b-741d-4262-a29c-fb898426a1cf" />  
 
-**Fuente:** [TCS34725 Datasheet – ams OSRAM](https://electronilab.co/wp-content/uploads/2021/06/TCS34725.pdf)
+**Fuente:** [TCS34725 Datasheet – ams OSRAM](https://electronilab.co/wp-content/uploads/2021/06/TCS34725.pdf)  
 
-## Avances
-### 1. [Flujos](/G03/flujos/flows.json)
+---
 
-### 2. [Programación micropython](/G03/micropython/test.py)
+## Avances  
 
+### 1. [Flujos](/G03/flujos/flows.json)  
 
+### 2. [Programación Micropython](/G03/micropython/test.py)  
