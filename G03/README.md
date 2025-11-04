@@ -1,5 +1,5 @@
 # Nombre de la etapa
-
+<div align="justify">
 ## Integrantes  
 - Heidy Nicol Sánchez Peña  
 - David Mora  
@@ -93,3 +93,4 @@ Para calibrar el sensor se realizaron tres pasos sencillos:
 ### 1. [Flujos](/G03/flujos/flows.json)  
 
 ### 2. [Programación Micropython](/G03/micropython/test.py)  
+</div>
