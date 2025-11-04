@@ -66,6 +66,22 @@ Para poder realizar la calibración del sensor:
 
 **Fuente:** [TCS34725 Datasheet – ams OSRAM](https://electronilab.co/wp-content/uploads/2021/06/TCS34725.pdf)
 
+### Funcionamiento del Sensor TCS34725  
+
+El sensor **TCS34725** es un dispositivo digital de detección de color que permite identificar la intensidad de los componentes rojo, verde y azul (RGB) presentes en la luz reflejada por un objeto. Integra un **filtro infrarrojo (IR)** que elimina interferencias no visibles, garantizando mediciones más precisas.  
+
+El módulo incorpora un **convertidor analógico-digital (ADC)** que transforma las señales ópticas en valores digitales, los cuales se comunican con el microcontrolador mediante el protocolo **I2C**, utilizando solo las líneas SDA y SCL.  
+
+Para mejorar la detección, dispone de **cuatro LEDs blancos** que proporcionan iluminación constante sobre la superficie medida, lo que permite trabajar sin depender de fuentes de luz externas.  
+
+El sensor mide simultáneamente los valores de los tres colores primarios (**R**, **G** y **B**) y un canal adicional denominado **Clear**, que representa la intensidad total de luz. Con estos datos, el sistema puede determinar el color predominante en tiempo real.  
+
+Su funcionamiento es estable tanto con **3.3 V** como con **5 V**, gracias a su regulador de voltaje integrado. Además, permite ajustar la **ganancia y el tiempo de integración** por software, adaptándose a diferentes niveles de iluminación.  
+
+El **TCS34725** también incluye un **pin de interrupción configurable**, útil para activar acciones automáticas cuando los valores de color superan un umbral determinado.  
+
+Este sensor es ampliamente utilizado en **sistemas de clasificación, control de iluminación, robótica e IoT**, donde se requiere un reconocimiento de color confiable y rápido.  
+
 ## Avances
 ### 1. [Flujos](/G03/flujos/flows.json)
 
