@@ -97,8 +97,8 @@ A continuación se explica paso a paso cómo funciona.
 
 ## 1. Conexión WiFi
 
-WIFI_SSID = "TU_SSID"
-WIFI_PASS = "TU_PASSWORD"
+**WIFI_SSID = "TU_SSID"**
+**WIFI_PASS = "TU_PASSWORD"**
 
 El ESP32 se conecta a una red WiFi usando el nombre y la contraseña definidos aquí.  
 Esto permite que más adelante pueda enviar los datos del sensor a través del protocolo MQTT hacia la Raspberry Pi.
@@ -107,9 +107,9 @@ Esto permite que más adelante pueda enviar los datos del sensor a través del p
 
 ## 2. Configuración MQTT
 
-BROKER = "192.168.153.216"
-PORT = 1883
-TOPIC = b"in/micro/sensor/color"
+**BROKER = "192.168.153.216"**
+**PORT = 1883**
+**TOPIC = b"in/micro/sensor/color"**
 
 - **BROKER:** es la dirección IP de la Raspberry Pi, donde está instalado Node-RED y el servidor MQTT.  
 - **PORT:** es el puerto de comunicación (1883 es el estándar de MQTT).  
@@ -121,8 +121,8 @@ En resumen, esta parte configura el medio de comunicación entre el ESP32 y Node
 
 ## 3. Configuración del sensor TCS34725
 
-i2c = I2C(1, scl=Pin(22), sda=Pin(21))
-ADDR = 0x29
+**i2c = I2C(1, scl=Pin(22), sda=Pin(21))**
+**ADDR = 0x29**
 
 El sensor TCS34725 se comunica mediante el bus **I2C**, usando los pines GPIO 21 (SDA) y GPIO 22 (SCL) del ESP32.  
 La dirección **0x29** identifica al sensor dentro del bus I2C.
@@ -139,7 +139,7 @@ Esta parte prepara al sensor para empezar a tomar lecturas precisas de color.
 
 ## 4. Conversión a escala RGB (0–255)
 
-def convertir_255(r, g, b, coef):
+**def convertir_255(r, g, b, coef):**
 
 El sensor entrega valores altos (por ejemplo, entre 0 y 30000).  
 Esta función los convierte al formato RGB estándar (de 0 a 255), usando los **valores máximos y mínimos obtenidos durante la calibración**.  
@@ -149,7 +149,7 @@ Así, el color detectado es más real y proporcional a la luz del entorno.
 
 ## 5. Conexión a WiFi
 
-def conectar_wifi():
+**def conectar_wifi():**
 
 Activa el WiFi del ESP32 y lo conecta a la red configurada.  
 Muestra por consola el proceso de conexión y la dirección IP obtenida.  
@@ -159,7 +159,7 @@ Esto es esencial para que luego el ESP32 pueda comunicarse con el broker MQTT.
 
 ## 6. Calibración del sensor
 
-def calibrar():
+**def calibrar():**
 
 Este proceso se hace una vez para obtener los límites de color:
 
