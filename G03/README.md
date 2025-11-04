@@ -19,7 +19,6 @@ Este avance busca establecer un reconocimiento de colores preciso y rápido, gar
 - **ESP32:** microcontrolador encargado de realizar la lectura de los valores RGB del sensor y enviar los datos por WiFi.  
 - **Raspberry Pi:** dispositivo que actúa como nodo receptor MQTT para recibir y visualizar los datos enviados por el ESP32.  
 - **Node-RED:** entorno para la visualización y procesamiento de los valores captados por el sensor.  
-- **Software:** uso de Python, Thonny IDE y MQTT Broker (Mosquitto) para la ejecución, conexión y transferencia de datos.  
 
 ---
 
