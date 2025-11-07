@@ -36,7 +36,7 @@ LECTURA SENSOR COLOR
 
 ---
 
-## 9. Conexión del Sensor y pruebas
+## 1. Conexión del Sensor y pruebas
 ![Conexión LM75A](https://github.com/user-attachments/assets/881b1ee8-1954-4908-a165-ceaeaa151fcb)
 
 ---
@@ -81,24 +81,6 @@ Los valores RGB se mantienen dentro de un rango coherente, lo que indica:
 - Ejecución fluida del código sin errores en Thonny.  
 
 El porcentaje en la parte inferior señala el estado de ejecución activo del programa, asegurando que el ESP32 continúa procesando y enviando las lecturas sin interrupciones.
-
-
-
----
-
-## 🧾 Descripción General
-
-- **Microcontrolador:** ESP32  
-- **Sensor:** LM75A (I2C)  
-- **Lenguaje:** MicroPython  
-- **Propósito:** Monitorear temperatura y enviar datos por puerto serial para visualización en MATLAB.  
-
----
-
-### 🚀 Cómo usar este repositorio
-1. Clona el proyecto:
-   ```bash
-   git clone https://github.com/TU_USUARIO/TU_REPOSITORIO.git
 
 
 
