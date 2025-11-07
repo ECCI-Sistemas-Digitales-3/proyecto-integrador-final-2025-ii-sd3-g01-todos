@@ -197,12 +197,12 @@ Sensor TCS34725 → ESP32 (lectura I2C)
 → Node-RED → Visualización de color en tiempo real
 
 ---
-Lectura de Temperatura
+Lectura sensor color
 
 ## Conexiones del sensor
 ![Conexión LM75A](https://github.com/user-attachments/assets/881b1ee8-1954-4908-a165-ceaeaa151fcb)
 
-## Diagrama del circuito
+## Resultados en pantalla
 ![Diagrama del sistema](https://github.com/user-attachments/assets/ff6f7077-b274-4fcf-8e62-255b2a87ab65)
 
 ## Resultados en pantalla
