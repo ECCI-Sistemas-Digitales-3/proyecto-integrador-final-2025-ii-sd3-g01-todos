@@ -1,5 +1,7 @@
 # AVANCES PROYECTO INTEGRADOR
 
+# Nombre de la etapa: Bomba
+
 ## Integrantes
 
 - [Michael Handrety Fonseca Arana](https://github.com/MichaelJF50)
