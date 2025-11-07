@@ -88,6 +88,8 @@ El porcentaje en la parte inferior señala el estado de ejecución activo del pr
 
 ### 1. [Flujos](/G03/flujos/flows.json)  
 
+![Image](https://github.com/user-attachments/assets/d588804c-b1ca-42e3-9cb4-e6f7abfe8364)
+
 ### 2. [Programación Micropython](/G03/micropython/test.py)  
 
 ### Funcionamiento del sensor TCS34725  
