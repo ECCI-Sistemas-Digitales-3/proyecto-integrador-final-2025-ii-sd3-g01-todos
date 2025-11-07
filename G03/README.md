@@ -202,7 +202,7 @@ LECTURA SENSOR COLOR
 
 ---
 
-## Conexión del Sensor
+## 9. Conexión del Sensor y pruebas
 ![Conexión LM75A](https://github.com/user-attachments/assets/881b1ee8-1954-4908-a165-ceaeaa151fcb)
 
 ---
