@@ -197,16 +197,50 @@ Sensor TCS34725 → ESP32 (lectura I2C)
 → Node-RED → Visualización de color en tiempo real
 
 ---
-Lectura sensor color
+LECTURA SENSOR COLOR
 
-## Conexiones del sensor
+
+---
+
+## Conexión del Sensor
 ![Conexión LM75A](https://github.com/user-attachments/assets/881b1ee8-1954-4908-a165-ceaeaa151fcb)
 
-## Resultados en pantalla
-![Diagrama del sistema](https://github.com/user-attachments/assets/ff6f7077-b274-4fcf-8e62-255b2a87ab65)
+---
 
-## Resultados en pantalla
-![Resultados en pantalla](https://github.com/user-attachments/assets/25b38edc-eac0-4150-b84c-cf4a1eba454c)
+##  Resultados de Lectura
+![Diagrama de cableado](https://github.com/user-attachments/assets/ff6f7077-b274-4fcf-8e62-255b2a87ab65)
+
+---
+
+##  Resultados de Lecturaa
+![Montaje del sistema](https://github.com/user-attachments/assets/25b38edc-eac0-4150-b84c-cf4a1eba454c)
+
+---
+
+## Resultados de Lectura
+![Resultados](https://github.com/user-attachments/assets/bac8eb74-b800-4fe1-bf69-726aade8fbf1)
+
+---
+
+##  Resultados de Lectura
+![Análisis](https://github.com/user-attachments/assets/a5b66317-8099-4298-aefc-4e12849512d0)
+
+---
+
+## 🧾 Descripción General
+
+- **Microcontrolador:** ESP32  
+- **Sensor:** LM75A (I2C)  
+- **Lenguaje:** MicroPython  
+- **Propósito:** Monitorear temperatura y enviar datos por puerto serial para visualización en MATLAB.  
+
+---
+
+### 🚀 Cómo usar este repositorio
+1. Clona el proyecto:
+   ```bash
+   git clone https://github.com/TU_USUARIO/TU_REPOSITORIO.git
+
 
 
 ## Avances  
