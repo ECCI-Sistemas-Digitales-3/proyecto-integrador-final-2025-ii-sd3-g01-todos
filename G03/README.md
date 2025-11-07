@@ -29,6 +29,85 @@ Este avance busca lograr una lectura rápida y precisa de los colores, garantiza
 
 Antes de usarlo, fue necesario entender cómo trabaja este sensor y cómo se comunica con el ESP32.  
 
+
+---
+LECTURA SENSOR COLOR
+
+
+---
+
+## 9. Conexión del Sensor y pruebas
+![Conexión LM75A](https://github.com/user-attachments/assets/881b1ee8-1954-4908-a165-ceaeaa151fcb)
+
+---
+
+##  Resultados de Lectura
+![Diagrama de cableado](https://github.com/user-attachments/assets/ff6f7077-b274-4fcf-8e62-255b2a87ab65)
+
+En esta imagen se aprecia el entorno **Thonny** durante la ejecución del script principal.  
+El código realiza las siguientes tareas:
+
+- Inicializa la interfaz I2C del ESP32 y verifica la conexión con el sensor TCS34725.  
+- Configura la ganancia y el tiempo de integración del sensor para obtener lecturas precisas.  
+- Inicia el bucle principal de adquisición de datos.  
+
+El porcentaje mostrado en la parte inferior de Thonny indica el avance de la transferencia del script hacia el ESP32.  
+Este indicador confirma que el microcontrolador está recibiendo correctamente el programa y comenzando la lectura de colores.
+
+
+---
+
+##  Resultados de Lecturaa
+![Montaje del sistema](https://github.com/user-attachments/assets/25b38edc-eac0-4150-b84c-cf4a1eba454c)
+
+En esta segunda imagen se visualizan los valores de color capturados por el sensor TCS34725.  
+En la consola de Thonny aparecen los datos en formato JSON o texto, mostrando las intensidades de los canales R (rojo), G (verde) y B (azul).
+
+- Cada lectura corresponde al color detectado en ese instante por el sensor.  
+- El porcentaje de ejecución indica que el código sigue corriendo correctamente en el ESP32.  
+- Los valores cambian según la luz o el color del objeto que se coloca frente al sensor.  
+
+
+---
+
+## Resultados de Lectura
+![Resultados](https://github.com/user-attachments/assets/bac8eb74-b800-4fe1-bf69-726aade8fbf1)
+
+La última imagen muestra la lectura de colores de forma estable y continua, evidenciando que el sistema ha alcanzado su funcionamiento óptimo.  
+Los valores RGB se mantienen dentro de un rango coherente, lo que indica:
+
+- Buena calibración del sensor TCS34725.  
+- Comunicación I2C estable con el ESP32.  
+- Ejecución fluida del código sin errores en Thonny.  
+
+El porcentaje en la parte inferior señala el estado de ejecución activo del programa, asegurando que el ESP32 continúa procesando y enviando las lecturas sin interrupciones.
+
+
+
+---
+
+## 🧾 Descripción General
+
+- **Microcontrolador:** ESP32  
+- **Sensor:** LM75A (I2C)  
+- **Lenguaje:** MicroPython  
+- **Propósito:** Monitorear temperatura y enviar datos por puerto serial para visualización en MATLAB.  
+
+---
+
+### 🚀 Cómo usar este repositorio
+1. Clona el proyecto:
+   ```bash
+   git clone https://github.com/TU_USUARIO/TU_REPOSITORIO.git
+
+
+
+## Avances  
+
+### 1. [Flujos](/G03/flujos/flows.json)  
+
+### 2. [Programación Micropython](/G03/micropython/test.py)  
+
 ### Funcionamiento del sensor TCS34725  
 
 El TCS34725 detecta el color de la luz que refleja un objeto. Mide la intensidad del rojo, verde y azul (RGB) y también calcula un valor adicional llamado Clear, que representa la cantidad total de luz.  
@@ -195,82 +274,4 @@ El envío se realiza cada medio segundo.
 Sensor TCS34725 → ESP32 (lectura I2C)
 → WiFi → MQTT (broker en Raspberry Pi)
 → Node-RED → Visualización de color en tiempo real
-
----
-LECTURA SENSOR COLOR
-
-
----
-
-## 9. Conexión del Sensor y pruebas
-![Conexión LM75A](https://github.com/user-attachments/assets/881b1ee8-1954-4908-a165-ceaeaa151fcb)
-
----
-
-##  Resultados de Lectura
-![Diagrama de cableado](https://github.com/user-attachments/assets/ff6f7077-b274-4fcf-8e62-255b2a87ab65)
-
-En esta imagen se aprecia el entorno **Thonny** durante la ejecución del script principal.  
-El código realiza las siguientes tareas:
-
-- Inicializa la interfaz I2C del ESP32 y verifica la conexión con el sensor TCS34725.  
-- Configura la ganancia y el tiempo de integración del sensor para obtener lecturas precisas.  
-- Inicia el bucle principal de adquisición de datos.  
-
-El porcentaje mostrado en la parte inferior de Thonny indica el avance de la transferencia del script hacia el ESP32.  
-Este indicador confirma que el microcontrolador está recibiendo correctamente el programa y comenzando la lectura de colores.
-
-
----
-
-##  Resultados de Lecturaa
-![Montaje del sistema](https://github.com/user-attachments/assets/25b38edc-eac0-4150-b84c-cf4a1eba454c)
-
-En esta segunda imagen se visualizan los valores de color capturados por el sensor TCS34725.  
-En la consola de Thonny aparecen los datos en formato JSON o texto, mostrando las intensidades de los canales R (rojo), G (verde) y B (azul).
-
-- Cada lectura corresponde al color detectado en ese instante por el sensor.  
-- El porcentaje de ejecución indica que el código sigue corriendo correctamente en el ESP32.  
-- Los valores cambian según la luz o el color del objeto que se coloca frente al sensor.  
-
-
----
-
-## Resultados de Lectura
-![Resultados](https://github.com/user-attachments/assets/bac8eb74-b800-4fe1-bf69-726aade8fbf1)
-
-La última imagen muestra la lectura de colores de forma estable y continua, evidenciando que el sistema ha alcanzado su funcionamiento óptimo.  
-Los valores RGB se mantienen dentro de un rango coherente, lo que indica:
-
-- Buena calibración del sensor TCS34725.  
-- Comunicación I2C estable con el ESP32.  
-- Ejecución fluida del código sin errores en Thonny.  
-
-El porcentaje en la parte inferior señala el estado de ejecución activo del programa, asegurando que el ESP32 continúa procesando y enviando las lecturas sin interrupciones.
-
-
-
----
-
-## 🧾 Descripción General
-
-- **Microcontrolador:** ESP32  
-- **Sensor:** LM75A (I2C)  
-- **Lenguaje:** MicroPython  
-- **Propósito:** Monitorear temperatura y enviar datos por puerto serial para visualización en MATLAB.  
-
----
-
-### 🚀 Cómo usar este repositorio
-1. Clona el proyecto:
-   ```bash
-   git clone https://github.com/TU_USUARIO/TU_REPOSITORIO.git
-
-
-
-## Avances  
-
-### 1. [Flujos](/G03/flujos/flows.json)  
-
-### 2. [Programación Micropython](/G03/micropython/test.py)  
 </div>
