@@ -252,10 +252,4 @@ El flujo principal del programa hace lo siguiente:
 El envío se realiza cada medio segundo.
 
 ---
-
-## 8. Flujo completo del sistema
-
-Sensor TCS34725 → ESP32 (lectura I2C)
-→ WiFi → MQTT (broker en Raspberry Pi)
-→ Node-RED → Visualización de color en tiempo real
 </div>
