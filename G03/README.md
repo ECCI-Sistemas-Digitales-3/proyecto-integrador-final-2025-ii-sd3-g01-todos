@@ -210,20 +210,45 @@ LECTURA SENSOR COLOR
 ##  Resultados de Lectura
 ![Diagrama de cableado](https://github.com/user-attachments/assets/ff6f7077-b274-4fcf-8e62-255b2a87ab65)
 
+En esta imagen se aprecia el entorno **Thonny** durante la ejecución del script principal.  
+El código realiza las siguientes tareas:
+
+- Inicializa la interfaz I2C del ESP32 y verifica la conexión con el sensor TCS34725.  
+- Configura la ganancia y el tiempo de integración del sensor para obtener lecturas precisas.  
+- Inicia el bucle principal de adquisición de datos.  
+
+El porcentaje mostrado en la parte inferior de Thonny indica el avance de la transferencia del script hacia el ESP32.  
+Este indicador confirma que el microcontrolador está recibiendo correctamente el programa y comenzando la lectura de colores.
+
+
 ---
 
 ##  Resultados de Lecturaa
 ![Montaje del sistema](https://github.com/user-attachments/assets/25b38edc-eac0-4150-b84c-cf4a1eba454c)
+
+En esta segunda imagen se visualizan los valores de color capturados por el sensor TCS34725.  
+En la consola de Thonny aparecen los datos en formato JSON o texto, mostrando las intensidades de los canales R (rojo), G (verde) y B (azul).
+
+- Cada lectura corresponde al color detectado en ese instante por el sensor.  
+- El porcentaje de ejecución indica que el código sigue corriendo correctamente en el ESP32.  
+- Los valores cambian según la luz o el color del objeto que se coloca frente al sensor.  
+
 
 ---
 
 ## Resultados de Lectura
 ![Resultados](https://github.com/user-attachments/assets/bac8eb74-b800-4fe1-bf69-726aade8fbf1)
 
----
+La última imagen muestra la lectura de colores de forma estable y continua, evidenciando que el sistema ha alcanzado su funcionamiento óptimo.  
+Los valores RGB se mantienen dentro de un rango coherente, lo que indica:
 
-##  Resultados de Lectura
-![Análisis](https://github.com/user-attachments/assets/a5b66317-8099-4298-aefc-4e12849512d0)
+- Buena calibración del sensor TCS34725.  
+- Comunicación I2C estable con el ESP32.  
+- Ejecución fluida del código sin errores en Thonny.  
+
+El porcentaje en la parte inferior señala el estado de ejecución activo del programa, asegurando que el ESP32 continúa procesando y enviando las lecturas sin interrupciones.
+
+
 
 ---
 
