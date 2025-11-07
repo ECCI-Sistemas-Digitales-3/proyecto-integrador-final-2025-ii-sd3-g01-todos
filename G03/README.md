@@ -112,7 +112,7 @@ El sensor se conectó al ESP32 mediante el protocolo I2C con la siguiente distri
 
 ---
 
-### ⚙️ Proceso de calibración del sensor  
+### Proceso de calibración del sensor  
 
 Para calibrar el sensor se realizaron tres pasos sencillos:  
 
@@ -122,7 +122,7 @@ Para calibrar el sensor se realizaron tres pasos sencillos:
 
 ---
 
-### 🔧 Características técnicas  
+### Características técnicas  
 
 - Voltaje de entrada: 3.0 V a 5.0 V  
 - Corriente de entrada: hasta 20 mA  
@@ -132,7 +132,7 @@ Para calibrar el sensor se realizaron tres pasos sencillos:
 
 ---
 
-### 📷 Aplicaciones  
+### Aplicaciones  
 
 - Detección y reconocimiento de color  
 - Control automático de iluminación RGB  
