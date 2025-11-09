@@ -135,9 +135,10 @@ Durante la semana se realizó la integración de las cinco galgas extensiométri
 ![alt text](medida.png)
 
 
-Igualmente, se realizaron los esquemas de conexión y visualización mediante Node-RED y su Dashboard. En este caso, se dejaron configurados los bloques de medida y el histograma obtenido durante las pruebas, permitiendo una representación gráfica del comportamiento de las señales provenientes de las galgas.
+Igualmente, se realizaron los esquemas de conexión y visualización mediante Node-RED. En este caso, se dejaron configurados los bloques de medida y el histograma obtenido durante las pruebas, permitiendo una representación gráfica del comportamiento de las señales provenientes de las galgas.
 
 
+![alt text](node )
 
 
 
