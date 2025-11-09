@@ -1,7 +1,7 @@
 # Nombre de la etapa:
 
 Control de Bombas con MQTT (ESP32)
-
+.
 ## Integrantes
 Steven Herrera 
 Carlos Medina
