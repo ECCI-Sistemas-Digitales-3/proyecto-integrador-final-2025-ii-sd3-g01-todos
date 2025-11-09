@@ -138,10 +138,13 @@ Durante la semana se realizó la integración de las cinco galgas extensiométri
 Igualmente, se realizaron los esquemas de conexión y visualización mediante Node-RED. En este caso, se dejaron configurados los bloques de medida y el histograma obtenido durante las pruebas, permitiendo una representación gráfica del comportamiento de las señales provenientes de las galgas.
 
 
-![alt text](node )
+![alt text](node_red.png)
 
+igualmente, se realizaron las visualizaciones en el Dashboard, permitiendo monitorear en tiempo real las lecturas de las cinco galgas extensiométricas.
 
+![alt text](dashboard.png)
 
+![alt text](dashboard2.png)
 ### 1. [Flujos](/G10/flujos/flows.json)
 
 
