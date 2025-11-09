@@ -3,17 +3,17 @@
 
 ## Integrantes
 
-[Karen Lizeth Sosa](https://github.com/karenlsosam-hub)
+[Karen Lizeth Sosa](https://github.com/karenlsosam-hub)  -  GRUPO 10
 
-[Michael Mendez](https://github.com/michaelsmendezm-collab)
+[Michael Mendez](https://github.com/michaelsmendezm-collab)  -  GRUPO 10
 
-[Juan Acosta](https://github.com/juanfacostap-wq)
+[Juan Acosta](https://github.com/juanfacostap-wq)  -  GRUPO 10
 
-[Julian Rodriguez](https://github.com/juliandrodriguezp-ops)
+[Julian Rodriguez](https://github.com/juliandrodriguezp-ops)  -  GRUPO 8
 
-[Edwin Correa](https://github.com/ECORREA-96)
+[Edwin Correa](https://github.com/ECORREA-96)  -  GRUPO 8
 
-Ricardo Sabogal
+Ricardo Sabogal   -  GRUPO 8
 
 ## Objetivo
 
