@@ -9,6 +9,12 @@
 
 [Juan Acosta](https://github.com/juanfacostap-wq)
 
+[Julian Rodriguez](https://github.com/juliandrodriguezp-ops)
+
+[Edwin Correa](https://github.com/ECORREA-96)
+
+Ricardo Sabogal
+
 ## Objetivo
 
 Implementar un sistema de lectura de peso mediante galgas extensiométricas conectadas a sus respectivos módulos HX711, los cuales entregan los valores digitales a una ESP32. De esta manera, se integra un sistema que combina la información obtenida por la cámara —encargada de sensar el color inicial— con los valores digitales de peso, con el fin de codificar dichos valores en el modelo de color CMYK y obtener así el color deseado en el recipiente final de pintura.
