@@ -142,12 +142,12 @@ Montaje de la estructura
 
 Se realizó el montaje de la estructura y la fabricación de los recipientes, los cuales estarán destinados a alojar las respectivas pinturas para el proceso de mezclado.
 
-![alt text](Estrucrura.png)
+![alt text](Estructura.png)
 
 
 Durante la semana se realizó la integración de las cinco galgas extensiométricas con el módulo ESP32, dejando cada una debidamente calibrada para que puedan ser dispuestas en las pruebas finales.
 
-![alt text](medida.png)
+![alt text](medida.jpge)
 
 
 Igualmente, se realizaron los esquemas de conexión y visualización mediante Node-RED. En este caso, se dejaron configurados los bloques de medida y el histograma obtenido durante las pruebas, permitiendo una representación gráfica del comportamiento de las señales provenientes de las galgas.
