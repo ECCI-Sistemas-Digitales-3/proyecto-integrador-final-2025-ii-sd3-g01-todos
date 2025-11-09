@@ -132,11 +132,17 @@ Se elabora el diagrama de flujo del sistema utilizando pseudocódigo, en el cual
 
 Durante la semana se realizó la integración de las cinco galgas extensiométricas con el módulo ESP32, dejando cada una debidamente calibrada para que puedan ser dispuestas en las pruebas finales.
 
-![alt text](Flujo_mezclador-Galga.drawio.png)
+![alt text](medida.png)
+
+
+Igualmente, se realizaron los esquemas de conexión y visualización mediante Node-RED y su Dashboard. En este caso, se dejaron configurados los bloques de medida y el histograma obtenido durante las pruebas, permitiendo una representación gráfica del comportamiento de las señales provenientes de las galgas.
+
+
+
+
 
 ### 1. [Flujos](/G10/flujos/flows.json)
 
-![Uploading image.png…]()
 
 
 ### 2. [Programación micropython](/G10/micropython/test.py)
