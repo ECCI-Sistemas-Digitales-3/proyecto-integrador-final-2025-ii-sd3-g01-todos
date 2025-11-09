@@ -136,6 +136,15 @@ Se elabora el diagrama de flujo del sistema utilizando pseudocódigo, en el cual
 
 ## AVANCE 07-11-2025
 
+
+Montaje de la estructura 
+
+
+Se realizó el montaje de la estructura y la fabricación de los recipientes, los cuales estarán destinados a alojar las respectivas pinturas para el proceso de mezclado.
+
+![alt text](Estrucrura.png)
+
+
 Durante la semana se realizó la integración de las cinco galgas extensiométricas con el módulo ESP32, dejando cada una debidamente calibrada para que puedan ser dispuestas en las pruebas finales.
 
 ![alt text](medida.png)
