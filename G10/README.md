@@ -127,8 +127,16 @@ A continuación, se presenta el diseño preliminar propuesto para las bases de l
 Se elabora el diagrama de flujo del sistema utilizando pseudocódigo, en el cual se indica la lógica prevista para la integración completa del sistema. Este diagrama representa la secuencia de operaciones que se ejecutarán durante el proceso de adquisición de datos de las galgas extensiométricas (por medio de los módulos HX711), la lectura de color mediante la cámara y la posterior codificación de los valores en el modelo CMYK, con el fin de obtener el color final en el recipiente de pintura.
 ![alt text](Flujo_mezclador-Galga.drawio.png)
 
+
+## AVANCE 07-11-2025
+
+Durante la semana se realizó la integración de las cinco galgas extensiométricas con el módulo ESP32, dejando cada una debidamente calibrada para que puedan ser dispuestas en las pruebas finales.
+
+![alt text](Flujo_mezclador-Galga.drawio.png)
+
 ### 1. [Flujos](/G10/flujos/flows.json)
 
+![Uploading image.png…]()
 
 
 ### 2. [Programación micropython](/G10/micropython/test.py)
