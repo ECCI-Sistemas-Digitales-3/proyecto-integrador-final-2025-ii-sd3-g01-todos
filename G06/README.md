@@ -131,12 +131,7 @@ Enviar `"OFF"` para apagarla.
 # ============================================================
 #  Proyecto: Control de Bombas CMYKW mediante MQTT y Galgas
 #  Plataforma: ESP32 con MicroPython
-#  Descripción: Este programa permite controlar cinco bombas peristálticas
-#     correspondientes a los colores CMYKW (Cyan, Magenta, Yellow,
-#     Black y White) mediante el protocolo MQTT. Cada bomba cuenta
-#     con una galga que actúa como interruptor de seguridad,
-#     habilitando o bloqueando su funcionamiento según condiciones
-#     físicas.
+#  Descripción: Este programa permite controlar cinco bombas peristálticas correspondientes a los colores CMYKW (Cyan, Magenta, Yellow, Black y White) mediante el protocolo MQTT. Cada bomba cuenta con una galga que actúa como interruptor de seguridad, habilitando o bloqueando su funcionamiento según condiciones físicas.
 # ============================================================
 
 # -------------------- IMPORTACIÓN DE LIBRERÍAS --------------------
