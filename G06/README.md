@@ -126,6 +126,11 @@ Enviar `"OFF"` para apagarla.
 
 ### 1. [Flujos](/G06/flujos/flows.json)
 
+ [Abrir en Canva](https://www.canva.com/design/DAG4QK7LDeE/3pnAjeRpyq-hxvf97iX1vA/edit?utm_content=DAG4QK7LDeE&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton)
+
+![Vista previa del diseño](diseño_canva.png)
+
+
 ### 2. [Programación micropython](/G06/micropython/test.py)
 
 # ============================================================
