@@ -1,5 +1,7 @@
 # AVANCES PROYECTO INTEGRADOR
 
+# Nombre de la etapa: Bomba
+
 ## Integrantes
 
 - [Michael Handrety Fonseca Arana](https://github.com/MichaelJF50)
@@ -42,6 +44,70 @@ Diseñar e implementar un sistema de control para las bombas peristálticas enca
 - El controlador evalúa las señales recibidas y ajusta el tiempo de activación de la bomba.  
 - En caso de error o lectura fuera del rango esperado, se detiene el proceso automáticamente.
 
+## 🧭 Diagrama de Flujo del Sistema
+
+A continuación se presenta el diagrama de flujo que describe el proceso completo de dosificación automática de tintas mediante bombas peristálticas.  
+El objetivo de este diagrama es representar de forma visual la **secuencia lógica de control**, desde la lectura de temperatura y peso, hasta la mezcla final de los colores base.
+
+<p align="center">
+  <img src="./Flujo_mezclador-Bombas.drawio.png" alt="Diagrama de flujo del sistema" width="800"/>
+</p>
+
+### 🧩 Descripción del funcionamiento
+
+1. **Inicio del proceso:**  
+   El sistema inicia asignando el valor del color actual en 1, lo que corresponde al primer color base (por ejemplo, Cian).
+
+2. **Lectura de temperatura de tinta:**  
+   Se mide la temperatura del tanque de tinta correspondiente. Esta variable garantiza que la tinta tenga la viscosidad adecuada antes de ser bombeada.
+
+3. **Verificación del rango de temperatura:**  
+   - Si la temperatura **no está dentro del rango**, el sistema espera hasta que la tinta alcance la temperatura adecuada.  
+   - Si la temperatura es correcta, continúa el proceso.
+
+4. **Activación de la bomba:**  
+   Una vez que la tinta está lista, se activa la **bomba peristáltica** asociada al color actual. El líquido comienza a fluir hacia el tanque principal.
+
+5. **Lectura del peso del tanque principal:**  
+   La galga de carga mide constantemente el peso del tanque principal para verificar el volumen transferido de tinta.
+
+6. **Control por peso objetivo:**  
+   - Si el peso **no ha alcanzado** el valor objetivo, el sistema mantiene activa la bomba.  
+   - Si el peso **alcanza el valor esperado**, la bomba se detiene automáticamente.
+
+7. **Cambio de color:**  
+   El sistema incrementa el contador (`color actual = color actual + 1`) para continuar con el siguiente color base.
+
+8. **Verificación del número total de colores:**  
+   - Si aún quedan colores por dosificar (`color actual < 5`), el proceso se repite desde el paso 2.  
+   - Si se han completado los cinco colores (C, M, Y, K, W), el proceso termina.
+
+9. **Fin del proceso:**  
+   El sistema detiene todas las bombas y finaliza el ciclo de mezcla.  
+   En este punto, el tanque principal contiene la proporción deseada de los cinco colores base, lista para el uso o empaquetado.
+
+---
+
+### ⚙️ Funcionalidad clave representada
+- **Control de temperatura:** asegura una mezcla estable y homogénea.  
+- **Medición de peso en tiempo real:** permite detener el flujo con precisión.  
+- **Secuencia automática:** cada bomba se activa solo cuando la anterior finaliza.  
+- **Verificación cíclica:** el proceso continúa hasta completar todas las tintas configuradas.  
+
+---
+
+## 📊 Resumen del ciclo de control
+
+| Etapa | Descripción | Acción del sistema |
+|--------|--------------|--------------------|
+| Inicialización | Se define el color inicial (C) | Color actual = 1 |
+| Lectura de temperatura | Sensor lee el tanque de tinta | Verifica rango de temperatura |
+| Bombeo | Bomba activa según color | Transfiere tinta al tanque principal |
+| Control por peso | Galga monitorea peso objetivo | Detiene bomba al alcanzar el valor |
+| Cambio de color | Incremento de variable de color | Repite proceso para siguiente tinta |
+| Finalización | Último color completado | Proceso de mezcla finalizado |
+
+
 ## 🔴 Comunicación MQTT
 - El ESP32 se comunica con un servidor MQTT que recibe y envía los datos en tiempo real.  
 - Los tópicos principales utilizados son:  
@@ -65,11 +131,111 @@ Diseñar e implementar un sistema de control para las bombas peristálticas enca
 | `modo_manual`   | Indica si el control es manual o automático       |
 | `bomba_estado`  | Estado actual de la bomba (ON / OFF)              |
 
+## 💻 Explicación del código
+El código está dividido en bloques principales:
 
+1. Configuración de red WiFi y MQTT
+2. Definición de pines y variables
+3. Funciones de conexión WiFi y MQTT
+4. Funciones de control de la bomba
+5. Bucle principal de ejecución
+
+### 📶 Conexión WiFi
+
+```python
+SSID = "TIGO-E325"
+PASSWORD = "7989956371"
+```
+Estas líneas almacenan las credenciales de la red WiFi a la que se conectará el ESP32.
+La función conectar_wifi() activa el modo estación (network.STA_IF), inicia la conexión y espera hasta que el dispositivo obtenga una dirección IP válida:
+
+```
+def conectar_wifi():
+    wlan = network.WLAN(network.STA_IF)
+    wlan.active(True)
+    wlan.connect(SSID, PASSWORD)
+    while not wlan.isconnected():
+        time.sleep(0.5)
+```
+Una vez conectado, imprime la IP asignada. Esto permite la comunicación posterior con el broker MQTT.
+
+### Configuración del broker MQTT
+```
+BROKER = "192.168.1.9"
+CLIENT_ID = "esp32_bomba"
+TOPIC_BOMBA_CONTROL = b'bomba/control'
+TOPIC_BOMBA_ESTADO = b'bomba/estado'
+```
+El broker MQTT (en este caso la Raspberry Pi) actúa como el servidor de mensajería.
+El ESP32 se conecta a él y se suscribe al tema bomba/control, donde recibe los comandos desde Node-RED.
+También publica su estado (encendido o apagado) en el tema bomba/estado.
+
+La conexión y suscripción se realizan mediante la función:
+
+```
+def conectar_mqtt():
+    client = MQTTClient(CLIENT_ID, BROKER)
+    client.set_callback(callback_mqtt)
+    client.connect()
+    client.subscribe(TOPIC_BOMBA_CONTROL)
+```
+## Callback MQTT
+
+La función callback_mqtt() recibe los mensajes enviados al ESP32.
+Dependiendo del comando (ON, OFF o AUTO), se activa o desactiva la bomba, o se cambia el modo de control:
+```
+def callback_mqtt(topic, msg):
+    comando = msg.decode().strip().upper()
+
+    if topic == TOPIC_BOMBA_CONTROL:
+        if comando == "ON":
+            encender_bomba()
+        elif comando == "OFF":
+            apagar_bomba()
+        elif comando == "AUTO":
+            modo_manual = False
+```
+Esto permite controlar el dispositivo directamente desde el dashboard en Node-RED.
+
+## Control de la bomba
+
+Las funciones encender_bomba() y apagar_bomba() controlan la salida GPIO25 (donde está conectada la bomba) y un LED indicador.
+Además, publican el estado actual al broker para mantener sincronizado el panel de control.
+
+```
+def encender_bomba():
+    bomba.value(1)
+    led.value(1)
+    client.publish(TOPIC_BOMBA_ESTADO, b"ON")
+
+def apagar_bomba():
+    bomba.value(0)
+    led.value(0)
+    client.publish(TOPIC_BOMBA_ESTADO, b"OFF")
+```
+
+## Lógica del modo automático
+
+En el bucle principal main(), el ESP32 revisa continuamente el estado de los sensores (sensor1, sensor2).
+Si ambos sensores están activos, se enciende la bomba; si alguno cambia, se apaga.
+
+```
+if not modo_manual:
+    if sensor1.value() == 1 and sensor2.value() == 1:
+        if not bomba_estado:
+            encender_bomba()
+    else:
+        if bomba_estado:
+            apagar_bomba()
+```
+Esto permite automatizar el proceso según las condiciones físicas del sistema (por ejemplo, el nivel o peso del tanque).
 
 ## 📹 Video del funcionamiento
 
 [![Ver video en YouTube](https://youtube.com/shorts/XyB3JLqUIzM)
+
+[![Ver video en YouTube](https://youtube.com/shorts/PtICswtYfNs)
+
 
 ## 📸 Evidencias del Montaje
 
