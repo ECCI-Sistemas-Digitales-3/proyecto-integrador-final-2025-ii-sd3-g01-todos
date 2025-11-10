@@ -123,6 +123,9 @@ Mensaje: ON
 Si la galga CYAN está activa, la bomba se encenderá.  
 Enviar `"OFF"` para apagarla.
 
+
+### 1. [flujos](/G06/flujos/flows.json)
+
 ### 2. [Programación micropython](/G06/micropython/test.py)
 
 # ============================================================
