@@ -3,11 +3,17 @@
 
 ## Integrantes
 
-[Karen Lizeth Sosa](https://github.com/karenlsosam-hub)
+[Karen Lizeth Sosa](https://github.com/karenlsosam-hub)  -  GRUPO 10
 
-[Michael Mendez](https://github.com/michaelsmendezm-collab)
+[Michael Mendez](https://github.com/michaelsmendezm-collab)  -  GRUPO 10
 
-[Juan Acosta](https://github.com/juanfacostap-wq)
+[Juan Acosta](https://github.com/juanfacostap-wq)  -  GRUPO 10
+
+[Julian Rodriguez](https://github.com/juliandrodriguezp-ops)  -  GRUPO 8
+
+[Edwin Correa](https://github.com/ECORREA-96)  -  GRUPO 8
+
+Ricardo Sabogal   -  GRUPO 8
 
 ## Objetivo
 
@@ -127,6 +133,34 @@ A continuación, se presenta el diseño preliminar propuesto para las bases de l
 Se elabora el diagrama de flujo del sistema utilizando pseudocódigo, en el cual se indica la lógica prevista para la integración completa del sistema. Este diagrama representa la secuencia de operaciones que se ejecutarán durante el proceso de adquisición de datos de las galgas extensiométricas (por medio de los módulos HX711), la lectura de color mediante la cámara y la posterior codificación de los valores en el modelo CMYK, con el fin de obtener el color final en el recipiente de pintura.
 ![alt text](Flujo_mezclador-Galga.drawio.png)
 
+
+## AVANCE 07-11-2025
+
+
+Montaje de la estructura 
+
+
+Se realizó el montaje de la estructura y la fabricación de los recipientes, los cuales estarán destinados a alojar las respectivas pinturas para el proceso de mezclado.
+
+
+![alt text](Esctructura.png)
+
+
+Durante la semana se realizó la integración de las cinco galgas extensiométricas con el módulo ESP32, dejando cada una debidamente calibrada para que puedan ser dispuestas en las pruebas finales.
+
+![alt text](medida.png)
+
+
+Igualmente, se realizaron los esquemas de conexión y visualización mediante Node-RED. En este caso, se dejaron configurados los bloques de medida y el histograma obtenido durante las pruebas, permitiendo una representación gráfica del comportamiento de las señales provenientes de las galgas.
+
+
+![alt text](node_red.png)
+
+igualmente, se realizaron las visualizaciones en el Dashboard, permitiendo monitorear en tiempo real las lecturas de las cinco galgas extensiométricas.
+
+![alt text](dashboard.png)
+
+![alt text](dashboard2.png)
 ### 1. [Flujos](/G10/flujos/flows.json)
 
 
