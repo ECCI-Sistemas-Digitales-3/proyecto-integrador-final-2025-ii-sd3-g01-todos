@@ -134,6 +134,7 @@ def controlar_led_automatico(temperatura):
     if not modo_automatico:
         return  # No hacer nada si estamos en modo manual
     
+<<<<<<< HEAD
     if temperatura > TEMPERATURA_APAGAR:
         # Apagar LED si temperatura supera 25°C
         led.off()
@@ -152,6 +153,35 @@ def controlar_led_automatico(temperatura):
         led_encendido = False
         print(f"Temperatura {temperatura}°C <= {TEMPERATURA_ENCENDER}°C - LED APAGADO")
         client.publish(MQTT_TOPIC_LED_STATUS, b"OFF_AUTO")
+=======
+    # DEBUG: Mostrar información de diagnóstico
+    print(f"DEBUG - Temp: {temperatura}°C, Encender: >{TEMPERATURA_ENCENDER}°C, Apagar: <{TEMPERATURA_APAGAR}°C, Estado actual: {'ON' if dispositivo_encendido else 'OFF'}")
+    
+    # LÓGICA CORREGIDA PARA CONTROL DE TEMPERATURA
+    if temperatura > TEMPERATURA_ENCENDER:
+        # ENCENDER dispositivo si temperatura > 45°C
+        if rele.value() == 0:  # Si el dispositivo está apagado
+            rele.on()
+            dispositivo_encendido = True
+            print(f"ALTA TEMPERATURA {temperatura}°C > {TEMPERATURA_ENCENDER}°C - ENCENDIENDO DISPOSITIVO")
+            client.publish(MQTT_TOPIC_LED_STATUS, b"ON_AUTO")
+        else:
+            print(f"Temperatura ALTA {temperatura}°C > {TEMPERATURA_ENCENDER}°C - DISPOSITIVO ya está ENCENDIDO")
+            
+    elif temperatura < TEMPERATURA_APAGAR:
+        # APAGAR dispositivo si temperatura < 20°C
+        if rele.value() == 1:  # Si el dispositivo está encendido
+            rele.off()
+            dispositivo_encendido = False
+            print(f"❄❄❄ BAJA TEMPERATURA {temperatura}°C < {TEMPERATURA_APAGAR}°C - APAGANDO DISPOSITIVO")
+            client.publish(MQTT_TOPIC_LED_STATUS, b"OFF_AUTO")
+        else:
+            print(f"❄ Temperatura BAJA {temperatura}°C < {TEMPERATURA_APAGAR}°C - DISPOSITIVO ya está APAGADO")
+    
+    else:
+        # Temperatura entre 20°C y 45°C - mantener estado actual
+        print(f"Temperatura NORMAL {temperatura}°C - Manteniendo estado: {'ON' if dispositivo_encendido else 'OFF'}")
+>>>>>>> 61f4a8b (Doc_inicial_servidor)
 
 # =======================
 # PROGRAMA PRINCIPAL
