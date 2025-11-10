@@ -21,20 +21,20 @@ Además, el sistema cuenta con una galga de carga que mide el peso del recipient
 
 Diseñar e implementar un sistema de control para las bombas peristálticas encargadas de transferir las pinturas base (C, M, Y, K, W), utilizando un ESP32 conectado a un servidor MQTT, para lograr una dosificación automática, precisa y monitoreada en tiempo real.
 
-# ⚙️ Funcionamiento General
+# Funcionamiento General
 
-## 🟢 Inicio del proceso
+## Inicio del proceso
 - El usuario selecciona el color que desea dosificar.  
 - Se envía un mensaje MQTT con el tema `bomba/inicio` y el valor `ON`.  
 - El ESP32 enciende la bomba (salida en el pin configurado para el actuador).  
 - El líquido fluye por el sistema hasta alcanzar el sensor correspondiente al color seleccionado.  
 
-## 🔵 Lectura de sensores
+## Lectura de sensores
 - Los sensores detectan la presencia del color mediante cambios en el valor de salida (S, M, Y, K, W).  
 - Cada sensor envía su señal al ESP32, donde se procesa para determinar el momento exacto en el que debe detenerse la bomba.  
 - Los valores se leen constantemente para garantizar precisión en la dosificación.
 
-## 🟡 Control del sistema
+## Control del sistema
 - El sistema trabaja con los parámetros S, M, Y, K y W, que representan los diferentes canales de color:  
   - **S:** Sensor de inicio o sincronización.  
   - **M:** Magenta.  
@@ -44,7 +44,7 @@ Diseñar e implementar un sistema de control para las bombas peristálticas enca
 - El controlador evalúa las señales recibidas y ajusta el tiempo de activación de la bomba.  
 - En caso de error o lectura fuera del rango esperado, se detiene el proceso automáticamente.
 
-## 🧭 Diagrama de Flujo del Sistema
+## Diagrama de Flujo del Sistema
 
 A continuación se presenta el diagrama de flujo que describe el proceso completo de dosificación automática de tintas mediante bombas peristálticas.  
 El objetivo de este diagrama es representar de forma visual la **secuencia lógica de control**, desde la lectura de temperatura y peso, hasta la mezcla final de los colores base.
@@ -53,7 +53,7 @@ El objetivo de este diagrama es representar de forma visual la **secuencia lógi
   <img src="./Flujo_mezclador-Bombas.drawio.png" alt="Diagrama de flujo del sistema" width="800"/>
 </p>
 
-### 🧩 Descripción del funcionamiento
+### Descripción del funcionamiento
 
 1. **Inicio del proceso:**  
    El sistema inicia asignando el valor del color actual en 1, lo que corresponde al primer color base (por ejemplo, Cian).
@@ -88,7 +88,7 @@ El objetivo de este diagrama es representar de forma visual la **secuencia lógi
 
 ---
 
-### ⚙️ Funcionalidad clave representada
+### Funcionalidad clave representada
 - **Control de temperatura:** asegura una mezcla estable y homogénea.  
 - **Medición de peso en tiempo real:** permite detener el flujo con precisión.  
 - **Secuencia automática:** cada bomba se activa solo cuando la anterior finaliza.  
@@ -96,7 +96,7 @@ El objetivo de este diagrama es representar de forma visual la **secuencia lógi
 
 ---
 
-## 📊 Resumen del ciclo de control
+## Resumen del ciclo de control
 
 | Etapa | Descripción | Acción del sistema |
 |--------|--------------|--------------------|
@@ -108,7 +108,7 @@ El objetivo de este diagrama es representar de forma visual la **secuencia lógi
 | Finalización | Último color completado | Proceso de mezcla finalizado |
 
 
-## 🔴 Comunicación MQTT
+## Comunicación MQTT
 - El ESP32 se comunica con un servidor MQTT que recibe y envía los datos en tiempo real.  
 - Los tópicos principales utilizados son:  
   - `bomba/inicio`: activa o detiene la bomba.  
@@ -116,12 +116,12 @@ El objetivo de este diagrama es representar de forma visual la **secuencia lógi
   - `estado/sistema`: reporta el estado general (activo, detenido, error).  
 - Esta comunicación permite visualizar el estado del proceso desde cualquier dispositivo conectado a la red.
 
-## ⚪ Visualización y monitoreo
+## Visualización y monitoreo
 - Los datos se pueden observar desde un panel MQTT o una interfaz desarrollada en Node-RED.  
 - El sistema muestra el estado de los sensores y la bomba en tiempo real.  
 - Esto permite verificar si la mezcla de colores y la cantidad dosificada son correctas.
 
-## 🔩 Variables Principales
+## Variables Principales
 
 | Variable        | Descripción                                       |
 |-----------------|---------------------------------------------------|
@@ -131,7 +131,7 @@ El objetivo de este diagrama es representar de forma visual la **secuencia lógi
 | `modo_manual`   | Indica si el control es manual o automático       |
 | `bomba_estado`  | Estado actual de la bomba (ON / OFF)              |
 
-## 💻 Explicación del código
+## Explicación del código
 El código está dividido en bloques principales:
 
 1. Configuración de red WiFi y MQTT
@@ -140,7 +140,7 @@ El código está dividido en bloques principales:
 4. Funciones de control de la bomba
 5. Bucle principal de ejecución
 
-### 📶 Conexión WiFi
+### Conexión WiFi
 
 ```python
 SSID = "TIGO-E325"
@@ -230,12 +230,11 @@ if not modo_manual:
 ```
 Esto permite automatizar el proceso según las condiciones físicas del sistema (por ejemplo, el nivel o peso del tanque).
 
-## 📹 Video del funcionamiento
+##  Video del funcionamiento
 
-[![Ver video en YouTube](https://youtube.com/shorts/XyB3JLqUIzM)
+[Ver video en YouTube](https://youtube.com/shorts/XyB3JLqUIzM)
 
-[![Ver video en YouTube](https://youtube.com/shorts/PtICswtYfNs)
-
+[Ver segundo video](https://youtube.com/shorts/PtICswtYfNs)
 
 ## 📸 Evidencias del Montaje
 
