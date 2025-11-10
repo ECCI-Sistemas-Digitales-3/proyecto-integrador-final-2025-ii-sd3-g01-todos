@@ -26,7 +26,7 @@ Cada bomba está asociada a un **topic MQTT individual**, y su funcionamiento de
   Facilitar la **integración con plataformas IoT** (Node-RED, Raspberry Pi, SCADA educativos, etc.).  
   Servir como **base didáctica** para prácticas de control y comunicaciones con MicroPython y ESP32.  
 
----
+-
 
 ## Arquitectura del Sistema
 
