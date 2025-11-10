@@ -103,12 +103,12 @@ Esto evita fallos eléctricos o activaciones indebidas, garantizando **un contro
 
 ## Estructura del Proyecto
 
-Control_Bombas_CMYKW_MQTT/
-│
-├── main.py # Código principal de control de bombas
-├── wify.py # Módulo de conexión Wi-Fi
-├── README.md # Documentación del proyecto
-└── requirements.txt # Dependencias (opcional)
+Control_Bombas_CMYKW_MQTT
+
+─ main.py # Código principal de control de bombas
+─ wify.py # Módulo de conexión Wi-Fi
+─ README.md # Documentación del proyecto
+─ requirements.txt # Dependencias (opcional)
 
 ## 🧪 Ejemplo de Uso
 
