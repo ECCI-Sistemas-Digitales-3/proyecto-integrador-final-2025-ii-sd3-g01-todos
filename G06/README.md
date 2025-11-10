@@ -1,13 +1,54 @@
 # Nombre de la etapa:
-
 Control de Bombas con MQTT (ESP32)
-.
 ## Integrantes
 Steven Herrera 
 Carlos Medina
 Daniel Camacho
 
 ## Documentación
+
+
+# Control de Bombas CMYKW mediante MQTT y Galgas
+
+## Resumen General
+
+Este proyecto implementa un **sistema de control remoto para cinco bombas peristálticas** correspondientes a los colores del modelo **CMYKW (Cyan, Magenta, Yellow, Black y White)**.  
+El control se realiza mediante el **protocolo MQTT**, utilizando un **ESP32 programado en MicroPython**, el cual recibe comandos remotos, **verifica el estado físico mediante galgas** y activa las bombas de forma segura.
+
+Cada bomba está asociada a un **topic MQTT individual**, y su funcionamiento depende tanto del **comando remoto ("ON"/"OFF")** como del **estado lógico de la galga correspondiente**, que actúa como un permiso físico de habilitación.
+
+
+
+## Objetivos del Sistema
+
+  Permitir el **control remoto e independiente** de las cinco bombas CMYKW mediante MQTT.  
+  Implementar una **seguridad lógica y física** con galgas que habilitan o bloquean cada bomba.  
+  Facilitar la **integración con plataformas IoT** (Node-RED, Raspberry Pi, SCADA educativos, etc.).  
+  Servir como **base didáctica** para prácticas de control y comunicaciones con MicroPython y ESP32.  
+
+---
+
+## Arquitectura del Sistema
+
+### ESP32 con MicroPython
+- Conectado por Wi-Fi mediante el módulo personalizado `wify.py`.  
+- Suscrito a **cinco topics MQTT**, uno por cada bomba.  
+- Controla directamente las **salidas digitales** que alimentan las bombas.  
+- Lee las **entradas digitales** de las galgas (una por cada color).  
+
+### Broker MQTT (Ngrok)
+- Servidor remoto que **intermedia la comunicación** entre el cliente y el ESP32.  
+
+###  Cliente Remoto (Node-RED / PC)
+- Envía comandos `"ON"` o `"OFF"` a los topics específicos de cada color.  
+
+---
+
+## Funcionamiento Lógico
+
+1. Al iniciar, el ESP32 se **conecta a la red Wi-Fi**.  
+2. Luego se **conecta al broker MQTT** y se **suscribe a los cinco topics**:
+
 
 # ===========================================================
 #     CONTROL DE BOMBAS MEDIANTE MQTT CON ESP32
@@ -128,10 +169,6 @@ except KeyboardInterrupt:
     cliente.disconnect()
 
 
-### 1. [Flujos](/G06/flujos/flows.json)
-
-### 2. [Programación micropython](/G06/micropython/test.py)
-
 import network
 import time
 from machine import Pin
@@ -246,3 +283,6 @@ except KeyboardInterrupt:
     print(" Desconectando...")
     cliente.disconnect()
 
+### 1. [Flujos](/G06/flujos/flows.json)
+
+### 2. [Programación micropython](/G06/micropython/test.py)
