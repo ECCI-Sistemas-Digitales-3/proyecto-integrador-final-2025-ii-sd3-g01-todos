@@ -110,7 +110,7 @@ Control_Bombas_CMYKW_MQTT
 ─ README.md # Documentación del proyecto
 ─ requirements.txt # Dependencias (opcional)
 
-## 🧪 Ejemplo de Uso
+## Ejemplo de Uso
 
 1. Iniciar el ESP32 con los archivos cargados (`main.py`, `wify.py`).  
 2. Conectarse al Wi-Fi automáticamente.  
@@ -127,3 +127,147 @@ Enviar `"OFF"` para apagarla.
 ### 1. [Flujos](/G06/flujos/flows.json)
 
 ### 2. [Programación micropython](/G06/micropython/test.py)
+
+# ============================================================
+#  Proyecto: Control de Bombas CMYKW mediante MQTT y Galgas
+#  Plataforma: ESP32 con MicroPython
+#  Descripción:
+#     Este programa permite controlar cinco bombas peristálticas
+#     correspondientes a los colores CMYKW (Cyan, Magenta, Yellow,
+#     Black y White) mediante el protocolo MQTT. Cada bomba cuenta
+#     con una galga que actúa como interruptor de seguridad,
+#     habilitando o bloqueando su funcionamiento según condiciones
+#     físicas.
+# ============================================================
+
+# -------------------- IMPORTACIÓN DE LIBRERÍAS --------------------
+
+import network            # Módulo para conexión Wi-Fi
+import time               # Permite pausas o temporización
+from machine import Pin   # Control de pines digitales del ESP32
+from umqtt.robust import MQTTClient  # Cliente MQTT robusto
+import ujson              # Para manejo de datos en formato JSON
+import wify               # Módulo personalizado para conexión Wi-Fi
+
+# -------------------- CONFIGURACIÓN DEL BROKER MQTT --------------------
+
+BROKER = "6.tcp.ngrok.io"   # Dirección del broker MQTT (ngrok en este caso)
+PORT = 18263                # Puerto TCP asignado al túnel MQTT
+
+# -------------------- DEFINICIÓN DE TOPICS MQTT --------------------
+# Cada bomba tiene su propio canal MQTT para recibir órdenes ON/OFF
+
+TOPICS = {
+    "CYAN": b"bombas/CYAN",
+    "MAGENTA": b"bombas/MAGENTA",
+    "YELLOW": b"bombas/YELLOW",
+    "BLACK": b"bombas/BLACK",
+    "WHITE": b"bombas/WHITE"
+}
+
+# -------------------- CONFIGURACIÓN DE PINES --------------------
+# Cada bomba está conectada a un pin de salida del ESP32
+# Cada galga (sensor o interruptor) está en un pin de entrada
+
+bombas = {
+    "CYAN": Pin(12, Pin.OUT),
+    "MAGENTA": Pin(13, Pin.OUT),
+    "YELLOW": Pin(14, Pin.OUT),
+    "BLACK": Pin(27, Pin.OUT),
+    "WHITE": Pin(26, Pin.OUT)
+}
+
+galgas = {
+    "CYAN": Pin(32, Pin.IN),
+    "MAGENTA": Pin(33, Pin.IN),
+    "YELLOW": Pin(25, Pin.IN),
+    "BLACK": Pin(15, Pin.IN),
+    "WHITE": Pin(4, Pin.IN)
+}
+
+# -------------------- CONEXIÓN A LA RED WI-FI --------------------
+# Se usa el módulo personalizado wify.py que contiene una función
+# de conexión automática. Esta función se encarga de conectar el
+# ESP32 a la red Wi-Fi configurada en ese archivo.
+
+print("Conectando a Wi-Fi...")
+wify.connect()             # Llama a la función de conexión del módulo externo
+print("Wi-Fi conectada correctamente\n")
+
+# -------------------- FUNCIÓN CALLBACK DE MENSAJES MQTT --------------------
+# Esta función se ejecuta automáticamente cada vez que llega un mensaje MQTT.
+# Recibe como parámetros el topic (canal) y el mensaje (ON/OFF).
+# Su función es determinar qué bomba debe encenderse o apagarse según:
+#  1. El topic del mensaje.
+#  2. El estado lógico de la galga asociada.
+
+def mensaje(topic, msg):
+    try:
+        # Decodifica los valores recibidos de bytes a texto
+        topic_str = topic.decode()
+        msg_str = msg.decode()
+        print(f"Mensaje recibido -> Topic: {topic_str} | Mensaje: {msg_str}")
+
+        # Recorre todos los colores definidos en el diccionario de TOPICS
+        for color, topico in TOPICS.items():
+            # Si el topic recibido corresponde a uno de los definidos
+            if topic == topico:
+                estado_galga = galgas[color].value()  # Lee el estado de la galga (1 o 0)
+                
+                # Condición lógica de seguridad:
+                # Solo enciende la bomba si el comando es "ON" y la galga está activa (1)
+                if msg_str == "ON" and estado_galga == 1:
+                    bombas[color].on()   # Activa la bomba
+                    print(f"Bomba {color} ENCENDIDA (galga activa)")
+                else:
+                    bombas[color].off()  # Apaga la bomba
+                    print(f"Bomba {color} APAGADA (comando OFF o galga inactiva)")
+                    
+    except Exception as e:
+        # Si ocurre un error (por ejemplo, topic no válido), se muestra en consola
+        print(f"Error procesando mensaje MQTT: {e}")
+
+# -------------------- FUNCIÓN PARA CONECTAR AL BROKER MQTT --------------------
+# Esta función establece la conexión con el broker MQTT y realiza la suscripción
+# a los topics definidos en el diccionario TOPICS.
+
+def conectar_mqtt():
+    try:
+        print("Conectando al broker MQTT...")
+        # Se crea un objeto cliente MQTT con un ID de cliente único
+        cliente = MQTTClient("ESP32_CMKW", BROKER, PORT)
+        cliente.set_callback(mensaje)  # Asigna la función callback a los mensajes entrantes
+        cliente.connect()              # Intenta establecer conexión con el broker
+        print("Conexión MQTT establecida correctamente.\n")
+
+        # Se suscribe a todos los topics definidos
+        for color, topic in TOPICS.items():
+            cliente.subscribe(topic)
+            print(f"Suscrito al topic: {topic.decode()}")
+        
+        return cliente  # Devuelve el objeto cliente para usarlo en el bucle principal
+
+    except Exception as e:
+        print(f"Error conectando al broker MQTT: {e}")
+        return None  # En caso de fallo, retorna None
+
+# -------------------- PROGRAMA PRINCIPAL --------------------
+
+cliente = conectar_mqtt()  # Llama a la función de conexión
+
+if cliente:
+    print("Esperando mensajes MQTT...\n")
+    while True:
+        try:
+            # Verifica si hay nuevos mensajes MQTT disponibles
+            cliente.check_msg()
+            # Pequeña pausa para evitar saturar el CPU
+            time.sleep(0.1)
+
+        except Exception as e:
+            # Si se pierde la conexión, intenta reconectarse automáticamente
+            print(f"Error en la conexión MQTT: {e}")
+            time.sleep(3)
+            cliente = conectar_mqtt()
+else:
+    print("No fue posible establecer conexión MQTT. Reinicie el dispositivo.")
