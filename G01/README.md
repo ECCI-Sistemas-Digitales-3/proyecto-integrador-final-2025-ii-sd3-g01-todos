@@ -236,7 +236,7 @@ Esto permite automatizar el proceso según las condiciones físicas del sistema 
 
 [Ver segundo video](https://youtube.com/shorts/PtICswtYfNs)
 
-## 📸 Evidencias del Montaje
+## Evidencias 
 
 <p align="center">
   <img src="./Thonny.jpeg" alt="Logo" width="800"/>
@@ -248,4 +248,8 @@ Esto permite automatizar el proceso según las condiciones físicas del sistema 
 
 <p align="center">
   <img src="./Control bomba.jpeg" alt="Logo" width="800"/>
+</p>
+
+<p align="center">
+  <img src="./Prueba.jpeg" alt="Logo" width="800"/>
 </p>
