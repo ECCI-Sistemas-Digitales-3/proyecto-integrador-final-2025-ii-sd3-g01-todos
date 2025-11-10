@@ -21,12 +21,12 @@ Cada bomba está asociada a un **topic MQTT individual**, y su funcionamiento de
 
 ## Objetivos del Sistema
 
-  Permitir el **control remoto e independiente** de las cinco bombas CMYKW mediante MQTT.  
-  Implementar una **seguridad lógica y física** con galgas que habilitan o bloquean cada bomba.  
-  Facilitar la **integración con plataformas IoT** (Node-RED, Raspberry Pi, SCADA educativos, etc.).  
-  Servir como **base didáctica** para prácticas de control y comunicaciones con MicroPython y ESP32.  
+  -Permitir el **control remoto e independiente** de las cinco bombas CMYKW mediante MQTT.  
+  -Implementar una **seguridad lógica y física** con galgas que habilitan o bloquean cada bomba.  
+  -Facilitar la **integración con plataformas IoT** (Node-RED, Raspberry Pi, SCADA educativos, etc.).  
+  -Servir como **base didáctica** para prácticas de control y comunicaciones con MicroPython y ESP32.  
 
--
+
 
 ## Arquitectura del Sistema
 
@@ -42,7 +42,7 @@ Cada bomba está asociada a un **topic MQTT individual**, y su funcionamiento de
 ###  Cliente Remoto (Node-RED / PC)
 - Envía comandos `"ON"` o `"OFF"` a los topics específicos de cada color.  
 
----
+
 
 ## Funcionamiento Lógico
 
