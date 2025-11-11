@@ -32,9 +32,9 @@ El objetivo principal es establecer un entorno robusto, accesible desde redes ex
 
  	```sudo systemctl status mosquitto```
  	El servicio debe mostrarse como active (running).
-3.	Instalar Node-RED: 
+3.	Instalar Node-RED: 	![Instalacion Node_RED](https://github.com/DianaNatali/ECCI-Sistemas-Digitales-3-2025-II/blob/main/labs/04_lab04/README.md)
 
- 	```<(curl -sL https://raw.githubusercontent.com/node-red/linux-installers/master/deb/update-nodejs-and-nodered)```
+ 	```bash <(curl -sL https://raw.githubusercontent.com/node-red/linux-installers/master/deb/update-nodejs-and-nodered)```
 
  	Luego:
 
@@ -45,6 +45,7 @@ El objetivo principal es establecer un entorno robusto, accesible desde redes ex
  	```http://localhost:1880```
 
  	Para que Node-RED arranque automáticamente con el sistema:
+
  	```sudo systemctl enable nodered.service```
 
 4.	Instalar Python y dependencias:
@@ -85,6 +86,49 @@ El broker Mosquitto es el núcleo de la comunicación MQTT.
 * Sin respuesta MQTT: revisar firewall o router local.
 
 ### 3.3 Instalación y configuración de Ngrok
-Ngrok se utiliza para exponer servicios locales (Node-RED y MQTT) a Internet de forma segura.
-1.	Descargar e instalar Ngrok:
+Ngrok se utiliza para exponer servicios locales (Node-RED y MQTT) a Internet de forma segura. 
+
+* Para este proyecto fue necesario crear dos cuentas distintas ya que para la vercion gratuita solo se puede crear un tunel a la vez.
+
+1.	Crear cuenta y obtener token:
+	* ir a ![Ngrok](https://ngrok.com)
+	* Registrarse gratis y copiar el AuthToken (en el panel principal)
+
+ 2.	Agregar tokens de autenticación (cuentas separadas):
+	* Para esto se creaaron dos carpetas para correr y almacenar los tokens de forma separa y asi evitar conplictos
+
+		```mkdir ~/ngrok_nodered```
+
+		```mkdir ~/ngrok_mqtt```
+
+	* Token Node-RED (puerto 1880): Se ingresa a la carpeta ```~/ngrok_nodered``` o donde este guardodo el token para ser utilizado en el puerto 1880 y luego ejecutar:
+
+ 	```ngrok config add-authtoken Aca va el token que se copio```
+
+	* Token MQTT (puerto 1883):Se ingresa a la carpeta ```~/ngrok_mqtt```o donde este guardodo el token para ser utilizado en el puerto 1883 y luego ejecutar:
+
+ 	```ngrok config add-authtoken <Aca va el token que se copio>```
+
+3.	Lanzar túneles:
+* Para Node-RED:
+
+ 	```cd ~/ngrok_nodered```
+	
+	```ngrok http 1880```
+
+ 	→ Copiar la URL HTTPS pública y compartirla con los demas integrantes.
+* Para MQTT (tras verificar la cuenta):
+ 	
+	```cd ~/ngrok_mqtt```
+
+	```ngrok tcp 1883```
+
+ 	Esto generará una dirección tipo tcp://0.tcp.ngrok.io:xxxxx.
+ 	
+
+
+ 	
+
+
+
  	
