@@ -61,6 +61,7 @@ El objetivo principal es establecer un entorno robusto, accesible desde redes ex
 ### 3.2 Configuración del broker MQTT
 
 El broker Mosquitto es el núcleo de la comunicación MQTT.
+![Instalacion de mosquito](https://github.com/DianaNatali/ECCI-Sistemas-Digitales-3-2025-II/blob/main/labs/05_lab05/README.md)
 
 1.	Probar la comunicación local:
 
