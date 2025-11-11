@@ -21,7 +21,12 @@ TEMPERATURA_ENCENDER = 20.0 # Encender LED cuando supere 20°C TEMPERATURA_APAGA
 def conectar_wifi(): wlan = network.WLAN(network.STA_IF) wlan.active(True) wlan.connect(WIFI_SSID, WIFI_PASS) print("Conectando a WiFi...", end="") while not wlan.isconnected(): print(".", end="") time.sleep(1) print("\n✅ WiFi conectado:", wlan.ifconfig())
 
 ## Conectar MQTT
-def conectar_mqtt(): client = MQTTClient("esp32", MQTT_BROKER) client.connect() print("✅ Conectado a broker MQTT:", MQTT_BROKER) return client
+MQTT_BROKER = "10.171.40.138"  # Broker público para pruebas
+# MQTT_BROKER = "192.168.1.100"   # O usa tu broker local
+MQTT_PORT = 1883
+MQTT_TOPIC_SUB = "esp32/leds/control"
+MQTT_TOPIC_PUB = "esp32/leds/status"
+CLIENT_ID = "esp32_led_controller_" + str(time.ticks_ms())
 
 ## Simulación lectura temperatura
 (En práctica puedes leer desde un sensor real como LM75, DHT, etc.)
@@ -52,15 +57,53 @@ else:
     client = conectar_mqtt()
 
 # Publicar estado inicial
-client.publish(MQTT_TOPIC_LED_STATUS, b"AUTO" if modo_automatico else ("ON" if led_encendido else "OFF"))
-
-print("\nSistema iniciado. Comandos disponibles via MQTT:")
-print("  - 'on' / '1' / 'encender': Encender LED manual")
-print("  - 'off' / '0' / 'apagar': Apagar LED manual")
-print("  - 'auto' / 'automatico': Volver a modo automático")
-print("  - 'toggle' / 'alternar': Alternar estado LED")
-print("  - 'status' / 'estado': Consultar estado actual")
-
+def mqtt_callback(topic, msg):
+    try:
+        topic = topic.decode('utf-8')
+        msg = msg.decode('utf-8')
+        print(f"Mensaje recibido: {topic} -> {msg}")
+        
+        if topic == MQTT_TOPIC_SUB:
+            data = json.loads(msg)
+            led_id = data.get("led")
+            action = data.get("action")
+            interval = data.get("interval")
+            
+            if led_id in leds:
+                if action == "on":
+                    leds[led_id].on()
+                    led_timers[led_id]["state"] = True
+                    led_timers[led_id]["blink_enabled"] = False
+                    print(f"LED {led_id} ENCENDIDO")
+                    
+                elif action == "off":
+                    leds[led_id].off()
+                    led_timers[led_id]["state"] = False
+                    led_timers[led_id]["blink_enabled"] = False
+                    print(f"LED {led_id} APAGADO")
+                    
+                elif action == "toggle":
+                    current_state = leds[led_id].value()
+                    leds[led_id].value(not current_state)
+                    led_timers[led_id]["state"] = not current_state
+                    led_timers[led_id]["blink_enabled"] = False
+                    print(f"LED {led_id} ALTERNADO")
+                    
+                elif action == "blink":
+                    if interval:
+                        led_timers[led_id]["interval"] = interval
+                    led_timers[led_id]["blink_enabled"] = True
+                    print(f"LED {led_id} parpadeando cada {led_timers[led_id]['interval']}ms")
+                
+                elif action == "stop_blink":
+                    led_timers[led_id]["blink_enabled"] = False
+                    print(f"LED {led_id} parpadeo detenido")
+                
+                # Publicar estado actualizado
+                publish_status()
+                
+    except Exception as e:
+        print(f"Error procesando mensaje: {e}")
 while True:
     try:
         # Verificar mensajes MQTT (non-blocking)
@@ -93,6 +136,19 @@ while True:
             client.connect()
         except:
             pass
+##  Evidencias de montaje final de resistencias 
+![WhatsApp Image 2025-11-10 at 9 34 14 PM (3)](https://github.com/user-attachments/assets/cb6f9c5f-3729-4e82-b8b0-f65a2762e5e6)
+
+![WhatsApp Image 2025-11-10 at 9 34 14 PM](https://github.com/user-attachments/assets/c0af4b7f-a312-4745-95d1-6b771a16ac88)
+
+![WhatsApp Image 2025-11-10 at 9 34 14 PM (1)](https://github.com/user-attachments/assets/f1d1fcd8-23f5-4390-bf6b-52a08768e5b8)
+
+##  visualizacion en node red 
+![WhatsApp Image 2025-11-10 at 9 34 13 PM](https://github.com/user-attachments/assets/1f2a1b64-a84b-4f1a-bfab-782fddbbbdf9)
+
+![Uploading WhatsApp Image 2025-11-10 at 9.34.13 PM (1).jpeg…]()
+
+
 ### 1. [Flujos](/G05/flujos/flows.json)
 
 ### 2. [Programación micropython](/G05/micropython/test.py)
