@@ -22,7 +22,7 @@ El objetivo principal es establecer un entorno robusto, accesible desde redes ex
 1.	Actualizar el sistema operativo:
 
  	```sudo apt update && sudo apt upgrade -y```
-2.	Instalar Mosquitto y sus clientes:
+2.	Instalar Mosquitto y sus clientes: ![Instalacion de mosquito](https://github.com/DianaNatali/ECCI-Sistemas-Digitales-3-2025-II/blob/main/labs/05_lab05/README.md)
 
  	    sudo apt install mosquitto mosquitto-clients -y
         sudo systemctl enable mosquitto
@@ -61,7 +61,6 @@ El objetivo principal es establecer un entorno robusto, accesible desde redes ex
 ### 3.2 Configuración del broker MQTT
 
 El broker Mosquitto es el núcleo de la comunicación MQTT.
-![Instalacion de mosquito](https://github.com/DianaNatali/ECCI-Sistemas-Digitales-3-2025-II/blob/main/labs/05_lab05/README.md)
 
 1.	Probar la comunicación local:
 
