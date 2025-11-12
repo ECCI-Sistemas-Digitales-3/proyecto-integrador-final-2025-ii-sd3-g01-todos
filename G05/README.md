@@ -82,60 +82,7 @@ def mqtt_callback(topic, msg):
                     led_timers[led_id]["blink_enabled"] = False
                     print(f"LED {led_id} APAGADO")
                     
-                elif action == "toggle":
-                    current_state = leds[led_id].value()
-                    leds[led_id].value(not current_state)
-                    led_timers[led_id]["state"] = not current_state
-                    led_timers[led_id]["blink_enabled"] = False
-                    print(f"LED {led_id} ALTERNADO")
-                    
-                elif action == "blink":
-                    if interval:
-                        led_timers[led_id]["interval"] = interval
-                    led_timers[led_id]["blink_enabled"] = True
-                    print(f"LED {led_id} parpadeando cada {led_timers[led_id]['interval']}ms")
-                
-                elif action == "stop_blink":
-                    led_timers[led_id]["blink_enabled"] = False
-                    print(f"LED {led_id} parpadeo detenido")
-                
-                # Publicar estado actualizado
-                publish_status()
-                
-    except Exception as e:
-        print(f"Error procesando mensaje: {e}")
-while True:
-    try:
-        # Verificar mensajes MQTT (non-blocking)
-        client.check_msg()
-        
-        # Leer y publicar temperatura si hay sensor
-        if lm75_addr is not None:
-            temperatura = leer_lm75(lm75_addr)
-            if temperatura is not None:
-                print(f"Temperatura: {temperatura}°C - Modo: {'AUTO' if modo_automatico else 'MANUAL'} - LED: {'ON' if led_encendido else 'OFF'}")
-                
-                # Control automático del LED (solo si está en modo automático)
-                controlar_led_automatico(temperatura)
-                
-                # Publicar temperatura
-                client.publish(MQTT_TOPIC_TEMP, str(temperatura))
-            else:
-                print("Error al leer temperatura")
-        else:
-            # Sin sensor, solo reportar estado
-            print(f"Modo: {'AUTO' if modo_automatico else 'MANUAL'} - LED: {'ON' if led_encendido else 'OFF'}")
-        
-        time.sleep(2)  # Esperar 2 segundos entre lecturas
-        
-    except Exception as e:
-        print(f"Error en loop principal: {e}")
-        time.sleep(5)
-        # Intentar reconectar si hay error
-        try:
-            client.connect()
-        except:
-            pass
+              
 ##  Evidencias de montaje final de resistencias 
 ![WhatsApp Image 2025-11-10 at 9 34 14 PM (3)](https://github.com/user-attachments/assets/cb6f9c5f-3729-4e82-b8b0-f65a2762e5e6)
 
@@ -146,7 +93,7 @@ while True:
 ##  visualizacion en node red 
 ![WhatsApp Image 2025-11-10 at 9 34 13 PM](https://github.com/user-attachments/assets/1f2a1b64-a84b-4f1a-bfab-782fddbbbdf9)
 
-![Uploading WhatsApp Image 2025-11-10 at 9.34.13 PM (1).jpeg…]()
+![WhatsApp Image 2025-11-10 at 9 34 13 PM (1)](https://github.com/user-attachments/assets/0ad2d6ac-25af-4b74-9516-74d182a68031)
 
 
 ### 1. [Flujos](/G05/flujos/flows.json)
