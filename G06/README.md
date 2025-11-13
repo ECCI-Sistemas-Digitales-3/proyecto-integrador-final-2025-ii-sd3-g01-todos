@@ -270,6 +270,11 @@ if cliente:
             print(f"Error en la conexión MQTT: {e}")
             time.sleep(3)
             cliente = conectar_mqtt()
+
+           print("No fue posible establecer conexión MQTT. Reinicie el dispositivo.")
+
+
+           
 else:![Imagen de WhatsApp 2025-11-12 a las 21 20 54_911c1da5](https://github.com/user-attachments/assets/1d85a63e-9ea6-49bc-93d5-34f362265db9)
 
 Esta imagen muestra un panel de control titulado "DSB Bombas" que contiene botones para gestionar cinco bombas identificadas por colores (CYAN, MAGENTA, YELLOW, BLACK, WHITE), donde cada bomba tiene dos comandos independientes: "ON" para activación y "OFF" para desactivación, lo que sugiere la implementación de un sistema de control remoto basado en MQTT donde estos botones enviarían mensajes a los tópicos correspondientes para que un ESP32 o microcontrolador similar ejecute las acciones físicas sobre los actuadores conectados a sus pines GPIO.
@@ -277,7 +282,9 @@ Esta imagen muestra un panel de control titulado "DSB Bombas" que contiene boton
 _________________________________________________________________________________________________________________________________________________________
 
 
-    print("No fue posible establecer conexión MQTT. Reinicie el dispositivo.")
+   
 
     
 ![Imagen de WhatsApp 2025-11-12 a las 21 23 26_a00b6747](https://github.com/user-attachments/assets/8a6209b0-3653-4ff0-9e06-0204b86a53f7)
+
+Esta imagen muestra la interfaz de control y la salida del sistema MQTT en funcionamiento, donde se observa el panel completo con botones ON/OFF para cinco bombas de colores (CYAN, MAGENTA, YELLOW, BLACK, WHITE) y simultáneamente la consola que indica el proceso de conexión a los tópicos MQTT específicos para cada bomba ("bombas/CYAN", "bombas/MAGENTA", etc.), demostrando que el sistema está estableciendo las suscripciones individuales para cada canal de control mientras mantiene disponible la interfaz gráfica para que el usuario envíe comandos de activación y desactivación a cada dispositivo de forma independiente.
