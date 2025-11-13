@@ -59,6 +59,10 @@ Fin del proceso.
 
 ![Montaje inicial](Montaje%20inicial.jpg)
 
+## 5. Video de funcionamiento
+
+[Ver video en YouTube]([https://youtube.com/shorts/XyB3JLqUIzM](https://youtu.be/HBjTdIqZB7Q))
+
 
 
 
