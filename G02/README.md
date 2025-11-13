@@ -52,7 +52,7 @@ Fin del proceso.
 ## 2. Avances Node-red
 
 <p float="left">
-  <img src="Node%20red%20final.jpg" width="300" />
+  <img src="Node%20red%20final.jpg" width="350" />
   <img src="Node%20red%20visual.jpg" width="400" />
 </p>
 
