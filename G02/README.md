@@ -45,19 +45,20 @@ Retraso de seguridad (5 segundos).
 Activación del Motor 1 en sentido inverso: el aspa asciende a su posición inicial.  
 Fin del proceso.  
 
-![Periféricos del sistema](Flujo_motoagitador.jpg)
+<img src="Flujo_motoagitador.jpg" width="300">
 
 ### 2. [Programación micropython](/G02/micropython/test.py)
 
 ### 3. Diseño digital montaje final
 
-![Diseño final](Diseño%20final.jpg)
-![Diseño final 1](Diseño%20final1.jpg)
-![Diseño final 2](Diseño%20final2.jpg)
+<img src="Diseño%20final.jpg" width="300">
+<img src="Diseño%20final1.jpg" width="300">
+<img src="Diseño%20final2.jpg" width="300">
+
 
 ## 4. Diseño moto agitador fisico
 
-![Montaje inicial](Montaje%20inicial.jpg)
+<img src="Montaje%20inicial.jpg" width="300">
 
 ## 5. Video de funcionamiento
 
