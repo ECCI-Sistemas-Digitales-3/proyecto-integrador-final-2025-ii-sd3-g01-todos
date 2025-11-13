@@ -49,16 +49,16 @@ Fin del proceso.
 
 ![Periféricos del sistema](Flujo_motoagitador.jpg)
 
-## 2. [Programación micropython](/G02/micropython/test.py)
+### 2. [Programación micropython](/G02/micropython/test.py)
 
-## 3. Avances Node-red
+### 3. Avances Node-red
 
 <p float="left">
   <img src="Node%20red%20final.jpg" width="300">
   <img src="Node%20red%20visual.jpg" width="300">
 </p>
 
-## 4. Diseño digital montaje final
+### 4. Diseño digital montaje final
 
 <p float="left">
   <img src="Diseño%20final.jpg" width="250" />
