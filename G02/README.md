@@ -13,7 +13,7 @@ El primer motor se encarga de bajar y subir la hélice mezcladora, mientras que 
 La coordinación de ambos motores se realiza de forma secuencial según el flujo de operación establecido, garantizando un proceso automatizado, preciso y eficiente.
 Los motores son controlados a través de los pines GPIO2 y GPIO4 de la ESP32, con el apoyo de módulos puente H que permiten invertir el sentido de giro, y convertidores DC-DC Step-Down (Buck Converter) ajustables que regulan el voltaje de alimentación de cada motor.
 
-![Periféricos del sistema](ESP1.jpg)
+<img src="ESP1.jpg" width="300">
 
 ## Herramientas utilizadas
 
@@ -45,7 +45,7 @@ Retraso de seguridad (5 segundos).
 Activación del Motor 1 en sentido inverso: el aspa asciende a su posición inicial.  
 Fin del proceso.  
 
-<img src="Flujo_motoagitador.jpg" width="300">
+![Periféricos del sistema](Flujo_motoagitador.jpg)
 
 ### 2. [Programación micropython](/G02/micropython/test.py)
 
