@@ -56,6 +56,8 @@ Fin del proceso.
   <img src="Node%20red%20visual.jpg" width="400" />
 </p>
 
+<img src="terminal%20Thonny.jpg" width="300">
+
 ### 3. Diseño digital montaje final
 
 <p float="left">
