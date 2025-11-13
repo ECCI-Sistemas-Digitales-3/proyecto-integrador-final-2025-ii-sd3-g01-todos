@@ -53,10 +53,11 @@ Fin del proceso.
 
 ### 3. Diseño digital montaje final
 
-<img src="Diseño%20final.jpg" width="300">
-<img src="Diseño%20final1.jpg" width="300">
-<img src="Diseño%20final2.jpg" width="300">
-
+<p float="left">
+  <img src="Diseño%20final.jpg" width="250" />
+  <img src="Diseño%20final1.jpg" width="250" />
+  <img src="Diseño%20final2.jpg" width="250" />
+</p>
 
 ## 4. Diseño moto agitador fisico
 
