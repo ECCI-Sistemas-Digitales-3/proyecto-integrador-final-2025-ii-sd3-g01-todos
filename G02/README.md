@@ -58,6 +58,7 @@ Fin del proceso.
 
 <img src="terminal%20Thonny.jpg" width="300">
 
+
 ### 3. Diseño digital montaje final
 
 <p float="left">
