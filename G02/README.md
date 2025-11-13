@@ -61,7 +61,8 @@ Fin del proceso.
 
 ## 5. Video de funcionamiento
 
-[Ver video en YouTube]([https://youtube.com/shorts/XyB3JLqUIzM](https://youtu.be/HBjTdIqZB7Q))
+[![Miniatura del vídeo](https://img.youtube.com/vi/HBjTdIqZB7Q/0.jpg)](https://youtu.be/HBjTdIqZB7Q)
+
 
 
 
