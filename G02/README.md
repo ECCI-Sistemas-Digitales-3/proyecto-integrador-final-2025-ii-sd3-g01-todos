@@ -14,7 +14,7 @@ La coordinación de ambos motores se realiza de forma secuencial según el flujo
 Los motores son controlados a través de los pines GPIO2 y GPIO4 de la ESP32, con el apoyo de módulos puente H que permiten invertir el sentido de giro, y convertidores DC-DC Step-Down (Buck Converter) ajustables que regulan el voltaje de alimentación de cada motor.
 
 <p align="center">
-  <img src="ESP1.jpg" width="500">
+  <img src="ESP1.jpg" width="800">
 </p>
 
 ## Herramientas utilizadas
