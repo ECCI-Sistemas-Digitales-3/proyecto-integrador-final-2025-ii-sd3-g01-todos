@@ -53,7 +53,7 @@ Fin del proceso.
 
 <p float="left">
   <img src="Node%20red%20final.jpg" width="320" />
-  <img src="Node%20red%20visual.jpg" width="400" />
+  <img src="Noderedvisual.jpg" width="400" />
 </p>
 
 <img src="terminal%20Thonny.jpg" width="300">
