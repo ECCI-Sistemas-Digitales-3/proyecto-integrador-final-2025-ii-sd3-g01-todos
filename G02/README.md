@@ -13,7 +13,9 @@ El primer motor se encarga de bajar y subir la hélice mezcladora, mientras que 
 La coordinación de ambos motores se realiza de forma secuencial según el flujo de operación establecido, garantizando un proceso automatizado, preciso y eficiente.
 Los motores son controlados a través de los pines GPIO2 y GPIO4 de la ESP32, con el apoyo de módulos puente H que permiten invertir el sentido de giro, y convertidores DC-DC Step-Down (Buck Converter) ajustables que regulan el voltaje de alimentación de cada motor.
 
-<img src="ESP1.jpg" width="300">
+<p align="center">
+  <img src="ESP1.jpg" width="500">
+</p>
 
 ## Herramientas utilizadas
 
