@@ -49,9 +49,16 @@ Fin del proceso.
 
 ![Periféricos del sistema](Flujo_motoagitador.jpg)
 
-### 2. [Programación micropython](/G02/micropython/test.py)
+## 2. [Programación micropython](/G02/micropython/test.py)
 
-### 3. Diseño digital montaje final
+## 3. Avances Node-red
+
+<p float="left">
+  <img src="Node%20red%20final.jpg" width="300">
+  <img src="Node%20red%20visual.jpg" width="300">
+</p>
+
+## 4. Diseño digital montaje final
 
 <p float="left">
   <img src="Diseño%20final.jpg" width="250" />
@@ -59,11 +66,11 @@ Fin del proceso.
   <img src="Diseño%20final2.jpg" width="250" />
 </p>
 
-## 4. Diseño moto agitador fisico
+## 5. Diseño moto agitador fisico
 
 <img src="Montaje%20inicial.jpg" width="300">
 
-## 5. Video de funcionamiento
+## 6. Video de funcionamiento
 
 [![Miniatura del vídeo](https://img.youtube.com/vi/HBjTdIqZB7Q/0.jpg)](https://youtu.be/HBjTdIqZB7Q)
 
