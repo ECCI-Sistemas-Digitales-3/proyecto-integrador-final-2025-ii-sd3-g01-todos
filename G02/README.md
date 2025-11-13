@@ -49,7 +49,7 @@ Fin del proceso.
 
 ![Periféricos del sistema](Flujo_motoagitador.jpg)
 
-### 2. [Posicion y agitacion](/G02/micropython/Posicion_y_agitacion.py)
+### 2. [Posición y agitación](G02/Posicion_y_agitacion.py)
 
 ## 3. Avances Node-red
 
