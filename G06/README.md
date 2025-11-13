@@ -270,5 +270,14 @@ if cliente:
             print(f"Error en la conexión MQTT: {e}")
             time.sleep(3)
             cliente = conectar_mqtt()
-else:
+else:![Imagen de WhatsApp 2025-11-12 a las 21 20 54_911c1da5](https://github.com/user-attachments/assets/1d85a63e-9ea6-49bc-93d5-34f362265db9)
+
+Esta imagen muestra un panel de control titulado "DSB Bombas" que contiene botones para gestionar cinco bombas identificadas por colores (CYAN, MAGENTA, YELLOW, BLACK, WHITE), donde cada bomba tiene dos comandos independientes: "ON" para activación y "OFF" para desactivación, lo que sugiere la implementación de un sistema de control remoto basado en MQTT donde estos botones enviarían mensajes a los tópicos correspondientes para que un ESP32 o microcontrolador similar ejecute las acciones físicas sobre los actuadores conectados a sus pines GPIO.
+
+_________________________________________________________________________________________________________________________________________________________
+
+
     print("No fue posible establecer conexión MQTT. Reinicie el dispositivo.")
+
+    
+![Imagen de WhatsApp 2025-11-12 a las 21 23 26_a00b6747](https://github.com/user-attachments/assets/8a6209b0-3653-4ff0-9e06-0204b86a53f7)
