@@ -51,7 +51,7 @@ Fin del proceso.
 
 ### 2. [Programación micropython](/G02/micropython/test.py)
 
-### 3. Avances Node-red
+## 3. Avances Node-red
 
 <p float="left">
   <img src="Node%20red%20final.jpg" width="300">
