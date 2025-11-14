@@ -43,11 +43,11 @@ if not conectar_wifi():
 
 # === Configuración de LEDs ===
 leds = {
-    "led1": Pin(2, Pin.OUT),   # GPIO2
-    "led2": Pin(4, Pin.OUT),   # GPIO4
-    "led3": Pin(5, Pin.OUT),   # GPIO5
-    "led4": Pin(18, Pin.OUT),  # GPIO18
-    "led5": Pin(19, Pin.OUT)   # GPIO19
+    "led1": Pin(15, Pin.OUT),   # GPIO2
+    "led2": Pin(2, Pin.OUT),   # GPIO4
+    "led3": Pin(4, Pin.OUT),   # GPIO5
+    "led4": Pin(32, Pin.OUT),  # GPIO18
+    "led5": Pin(35, Pin.OUT)   # GPIO19
 }
 
 # Estado inicial de los LEDs (todos apagados)
