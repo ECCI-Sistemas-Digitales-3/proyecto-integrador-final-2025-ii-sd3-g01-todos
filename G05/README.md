@@ -90,7 +90,7 @@ def mqtt_callback(topic, msg):
 
 ![WhatsApp Image 2025-11-10 at 9 34 14 PM (1)](https://github.com/user-attachments/assets/f1d1fcd8-23f5-4390-bf6b-52a08768e5b8)
 
-##  visualizacion en node red 
+##  visualizacion en node red  resistencias
 ![WhatsApp Image 2025-11-10 at 9 34 13 PM](https://github.com/user-attachments/assets/1f2a1b64-a84b-4f1a-bfab-782fddbbbdf9)
 
 ![WhatsApp Image 2025-11-10 at 9 34 13 PM (1)](https://github.com/user-attachments/assets/0ad2d6ac-25af-4b74-9516-74d182a68031)
