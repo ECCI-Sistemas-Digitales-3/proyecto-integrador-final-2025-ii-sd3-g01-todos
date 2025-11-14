@@ -1,4 +1,4 @@
-# Nombre de la etapa: Resistencias para calentar las pinturas 
+# Nombre de la etapa: Resistencias para controlar temperatura de la pintura
 
 ## Integrantes
 Michael Yesid Velasquez V.- Cod: 94882 Yeison Gabriel Niño J. - Cod: 61096 Carlos Eduardo Puentes L. - Cod: 89466
