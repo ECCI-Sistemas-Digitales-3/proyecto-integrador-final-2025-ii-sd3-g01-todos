@@ -95,6 +95,14 @@ def mqtt_callback(topic, msg):
 
 ![WhatsApp Image 2025-11-10 at 9 34 13 PM (1)](https://github.com/user-attachments/assets/0ad2d6ac-25af-4b74-9516-74d182a68031)
 
+## visualizacion de node red on/off resistencias
+En este flujo podemos evidenciar el encendido y apagado de cada resistencia por independiente desde node red.
+
+![WhatsApp Image 2025-11-12 at 10 21 04 PM](https://github.com/user-attachments/assets/c4ce088b-5276-4317-a2d0-7da578798aaa)
+![WhatsApp Image 2025-11-12 at 10 20 44 PM](https://github.com/user-attachments/assets/82193182-bfaa-4ab0-8d21-4adcf6e19358)
+![WhatsApp Image 2025-11-12 at 10 20 28 PM](https://github.com/user-attachments/assets/925b9b61-8021-4c1c-b2c7-5eafb3533a9d)
+![WhatsApp Image 2025-11-12 at 10 20 05 PM](https://github.com/user-attachments/assets/71d14297-176f-4494-96df-386e04ff88f5)
+
 
 ### 1. [Flujos](/G05/flujos/flows.json)
 
