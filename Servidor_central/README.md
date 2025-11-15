@@ -204,8 +204,6 @@ Nota: La versión gratuita solo permite un túnel activo. Para este proyecto se 
 
  	Esto generará una dirección tipo tcp://0.tcp.ngrok.io:xxxxx.
  	
-4. Exposición del Servicio MQTT mediante Ngrok
-
 Para permitir que el servidor MQTT sea accesible de forma segura desde ubicaciones externas, se utilizó Ngrok, una herramienta que crea túneles cifrados hacia servicios locales.
 En la prueba realizada, Ngrok generó un túnel TCP que redirige las conexiones públicas hacia el puerto local 1883, donde se ejecuta el broker MQTT.
 
