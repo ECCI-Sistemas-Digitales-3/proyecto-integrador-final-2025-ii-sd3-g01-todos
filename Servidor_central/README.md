@@ -1,28 +1,64 @@
-## Servidor Central - Sistema de Captura y Comunicación MQTT con Raspberry Pi
+# Servidor Central - Sistema de Captura y Comunicación MQTT con Raspberry Pi
+
+1. [**Resumen**](#resumen)  
+2. [**Introducción**](#introduccion)  
+3. [**Metodología del Servidor Central**](#metodologia-del-servidor-central)  
+   - [3.1 Instalación del entorno base](#31-instalacion-del-entorno-base)  
+   - [3.2 Configuración del Broker MQTT (Mosquitto)](#32-configuracion-del-broker-mqtt-mosquitto)  
+   - [3.3 Instalación y configuración de Node-RED](#33-instalacion-y-configuracion-de-node-red)  
+   - [3.4 Instalación y configuración de Ngrok](#34-instalacion-y-configuracion-de-ngrok)  
+4. [**Integración completa del sistema**](#integracion-completa-del-sistema)  
+5. [**Pruebas y Validación del Sistema**](#pruebas-y-validacion-del-sistema)  
+6. [**Conclusión**](#conclusion) 
 
 
-### 1. RESUMEN
+## 1. RESUMEN
 
-Este documento detalla la implementación del servidor central del proyecto de captura de imágenes y comunicación IoT basado en Raspberry Pi, Node-RED y MQTT. El servidor actúa como nodo principal encargado de la gestión de datos, publicación de imágenes, y coordinación con dispositivos clientes (ESP32, otros nodos MQTT, etc.).
-Se describe detalladamente la instalación de servicios, configuración de Ngrok para accesos externos, resolución de errores, y pruebas de funcionamiento.
+Este documento explica cómo se implementó el servidor central del sistema de monitoreo basado en Raspberry Pi, MQTT, Node-RED y Ngrok.
 
-### 2. INTRODUCCIÓN
-El servidor central se diseñó para concentrar la comunicación entre los diferentes dispositivos del sistema de monitoreo. Opera bajo una arquitectura cliente-servidor, donde la Raspberry Pi ejecuta los servicios MQTT y Node-RED, además de servir como pasarela a Internet mediante Ngrok.
+El servidor es el "cerebro" del proyecto: recibe datos, publica imágenes y coordina la comunicación con otros dispositivos como ESP32 u otros nodos IoT. Aquí encontrarás todos los pasos necesarios para configurarlo: instalación de servicios, activación del broker MQTT, habilitación de accesos externos con Ngrok, solución de errores comunes y pruebas básicas para validar el funcionamiento.	
 
-El objetivo principal es establecer un entorno robusto, accesible desde redes externas, y compatible con dispositivos que envíen o reciban información mediante tópicos MQTT.
+## 2. INTRODUCCIÓN
+El servidor central es la pieza fundamental del sistema de monitoreo desarrollado. Su función principal es actuar como punto de encuentro para todos los dispositivos que participan en el proyecto: cámaras, sensores, microcontroladores ESP32, dashboards de supervisión y cualquier otro nodo IoT que necesite enviar o recibir información.
+
+Este enfoque se logra gracias a una arquitectura basada en Raspberry Pi, Node-RED, MQTT y Ngrok, tecnologías que permiten construir una plataforma sólida, modular y accesible.
+
+![Arquitectura de servidor](/2.JPG)
+
+### ¿Por qué se necesita un servidor central?
+
+En sistemas de monitoreo y control distribuidos, cada dispositivo genera datos de manera independiente. Sin un servidor central, estos datos quedarían aislados, serían difíciles de coordinar y no habría una forma eficiente de integrarlos. El servidor central cumple funciones clave como:
+
+* Recolectar datos provenientes de distintos dispositivos.
+
+* Procesar información, como imágenes u otros eventos capturados.
+
+* Distribuir mensajes MQTT, garantizando que cada nodo reciba la información correcta.
+
+* Conectar la red local con Internet, permitiendo supervisión remota en tiempo real.
+
+* Ejecutar automatizaciones mediante Node-RED.
 ### Componentes utilizados
 •	Hardware: Raspberry Pi 3 B+ (o superior), microSD ≥ 16GB, cámara CSI.
 
-•	Software: Raspberry Pi OS (Bookworm), Node-RED, Mosquitto, Python3, Ngrok.
+## ¿Cómo opera dentro del sistema?
 
-•	Protocolos: MQTT para mensajería ligera, HTTP/HTTPS para acceso remoto a Node-RED.
+La Raspberry Pi se ejecuta como un mini-servidor completamente autónomo. Administra:
+* El broker Mosquitto MQTT, que gestiona tópicos, conexiones, publicaciones y suscripciones.
+
+* El servidor Node-RED, encargado de flujos lógicos, interfaces visuales y automatizaciones.
+
+* La pasarela remota Ngrok, que permite acceder desde cualquier lugar sin necesidad de modificar el router o abrir puertos.
+
+Dado que la Raspberry Pi consume poca energía, puede mantenerse encendida de manera continua, convirtiéndose en un servidor estable, seguro y confiable para un sistema IoT. Esta configuración está pensada para que incluso personas sin experiencia puedan entender las funciones del servidor y replicarlo paso a paso.
+
 
 ### 3. METODOLOGÍA
 ### 3.1 Preparación del entorno
 1.	Actualizar el sistema operativo:
 
  	```sudo apt update && sudo apt upgrade -y```
-2.	Instalar Mosquitto y sus clientes: ![Instalacion de mosquito](https://github.com/DianaNatali/ECCI-Sistemas-Digitales-3-2025-II/blob/main/labs/05_lab05/README.md)
+2.	Instalar Mosquitto y sus clientes: [Instalacion de mosquito](https://github.com/DianaNatali/ECCI-Sistemas-Digitales-3-2025-II/blob/main/labs/05_lab05/README.md)
 
  	    sudo apt install mosquitto mosquitto-clients -y
         sudo systemctl enable mosquitto
@@ -32,7 +68,7 @@ El objetivo principal es establecer un entorno robusto, accesible desde redes ex
 
  	```sudo systemctl status mosquitto```
  	El servicio debe mostrarse como active (running).
-3.	Instalar Node-RED: 	![Instalacion Node_RED](https://github.com/DianaNatali/ECCI-Sistemas-Digitales-3-2025-II/blob/main/labs/04_lab04/README.md)
+3.	Instalar Node-RED: 	[Instalacion Node_RED](https://github.com/DianaNatali/ECCI-Sistemas-Digitales-3-2025-II/blob/main/labs/04_lab04/README.md)
 
  	```bash <(curl -sL https://raw.githubusercontent.com/node-red/linux-installers/master/deb/update-nodejs-and-nodered)```
 
@@ -61,37 +97,80 @@ El objetivo principal es establecer un entorno robusto, accesible desde redes ex
 
 ### 3.2 Configuración del broker MQTT
 
-El broker Mosquitto es el núcleo de la comunicación MQTT.
+El broker Mosquitto es el núcleo de la infraestructura MQTT: gestiona conexiones, tópicos, publicaciones y suscripciones. Aquí tienes una guía paso a paso —más clara, segura y orientada a resolución de problemas— para dejar el broker operativo en la Raspberry Pi y exponerlo (si es necesario) a clientes externos.
 
-1.	Probar la comunicación local:
+Con el broker MQTT funcionando localmente y protegido mediante autenticación, el siguiente paso es habilitar acceso remoto seguro utilizando Ngrok, lo cual se explica en la siguiente sección.
 
- 	```mosquitto_sub -t prueba & mosquitto_pub -t prueba -m "Hola MQTT"```
+#### 1) Prueba rápida local (verifica que Mosquitto funciona)
 
- 	Si el mensaje aparece en la terminal del mosquitto_sub, la comunicación está operativa.
+Terminal A (suscriptor):
 
-2.	Permitir conexiones externas:
+	mosquitto_sub -t prueba
 
-    Editar el archivo de configuración: ```sudo nano /etc/mosquitto/mosquitto.conf```
+Terminal B (publicador):
 
-    Agregar al final:
+	mosquitto_pub -t prueba -m "Hola MQTT"
 
-    listener 1883
-    allow_anonymous true
+Si en la Terminal A aparece Hola MQTT, el broker funciona localmente.
 
-    Reiniciar el servicio: ```sudo systemctl restart mosquitto```
+#### 2) Configuración básica y control de acceso (¡no uses allow_anonymous true en producción!)
 
-3.	Errores frecuentes:
+Por defecto permitir acceso anónimo es cómodo pero inseguro. Te muestro dos opciones según tu objetivo:
 
-* Conexión rechazada: verificar que el puerto 1883 esté libre (sudo netstat -tulnp | grep 1883).
-* Sin respuesta MQTT: revisar firewall o router local.
+### A) Para pruebas rápidas en red local (solo temporal)
+
+Editar archivo:
+
+	sudo nano /etc/mosquitto/mosquitto.conf
+
+Agregar al final:
+
+	listener 1883
+	allow_anonymous true
+
+Guardar y reiniciar:
+
+	sudo systemctl restart mosquitto
+	sudo systemctl status mosquitto --no-pager
+
+Aviso: esto permite que cualquiera en tu red local se conecte sin autenticación. Úsalo solo en entornos controlados.
+
+
+### B) Recomendado: acceso con usuario/contraseña (seguro)
+
+1) Crear archivo de contraseñas y añadir un usuario:
+	sudo mosquitto_passwd -c /etc/mosquitto/passwd tu_usuario
+	nota: te pedirá la contraseña
+2) Configurar Mosquitto para usar el archivo y denegar anónimo:
+
+	sudo nano /etc/mosquitto/mosquitto.conf
+
+Agregar:
+
+	listener 1883
+	allow_anonymous false
+	password_file /etc/mosquitto/passwd
+
+3) Reiniciar y verificar:
+
+	sudo systemctl restart mosquitto
+	sudo systemctl status mosquitto
+
+4) Probar la conexión autenticada (desde cliente):
+
+		mosquitto_pub -h localhost -t prueba -m "test" -u tu_usuario -P 'tu_contraseña'
+		mosquitto_sub -h localhost -t prueba -u tu_usuario -P 'tu_contraseña'
+
 
 ### 3.3 Instalación y configuración de Ngrok
-Ngrok se utiliza para exponer servicios locales (Node-RED y MQTT) a Internet de forma segura. 
+Ngrok permite acceder al servidor desde Internet sin necesidad de modificar el router, abrir puertos o gestionar IP pública dinámica. Esto hace que el sistema sea fácil de implementar incluso en redes restringidas, como universidades, oficinas o redes domésticas sin acceso al módem.
+
+Nota: La versión gratuita solo permite un túnel activo. Para este proyecto se crearon dos cuentas (una para Node-RED y otra para MQTT).
 
 * Para este proyecto fue necesario crear dos cuentas distintas ya que para la vercion gratuita solo se puede crear un tunel a la vez.
 
 1.	Crear cuenta y obtener token:
-	* ir a ![Ngrok](https://ngrok.com)
+	* ir a [Ngrok](https://ngrok.com)
 	* Registrarse gratis y copiar el AuthToken (en el panel principal)
 
  2.	Agregar tokens de autenticación (cuentas separadas):
@@ -125,7 +204,24 @@ Ngrok se utiliza para exponer servicios locales (Node-RED y MQTT) a Internet de 
 
  	Esto generará una dirección tipo tcp://0.tcp.ngrok.io:xxxxx.
  	
+4. Exposición del Servicio MQTT mediante Ngrok
 
+Para permitir que el servidor MQTT sea accesible de forma segura desde ubicaciones externas, se utilizó Ngrok, una herramienta que crea túneles cifrados hacia servicios locales.
+En la prueba realizada, Ngrok generó un túnel TCP que redirige las conexiones públicas hacia el puerto local 1883, donde se ejecuta el broker MQTT.
+
+
+![Arquitectura de servidor](/1..JPG)
+
+* El túnel activo en la región Estados Unidos (US)
+* La latencia promedio del enlace
+* El endpoint público generado:
+tcp://8.tcp.ngrok.io:12777 → localhost:1883
+* El panel de control local disponible en http://127.0.0.1:4041
+* El registro de conexiones realizadas en tiempo real
+
+### Conclusion
+
+El servidor central construido sobre Raspberry Pi integra de forma eficiente las tecnologías Node-RED, Mosquitto MQTT y Ngrok, permitiendo un entorno IoT robusto, modular y accesible. Su arquitectura garantiza comunicación en tiempo real, fácil escalabilidad y acceso remoto seguro. La metodología presentada permite que cualquier usuario pueda replicar la instalación, extenderla con nuevos sensores y depurar problemas comunes sin dificultades, consolidando así un sistema confiable para monitoreo distribuido.
 
  	
 
