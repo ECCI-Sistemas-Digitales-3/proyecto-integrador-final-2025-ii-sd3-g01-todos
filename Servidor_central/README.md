@@ -23,8 +23,6 @@ El servidor central es la pieza fundamental del sistema de monitoreo desarrollad
 
 Este enfoque se logra gracias a una arquitectura basada en Raspberry Pi, Node-RED, MQTT y Ngrok, tecnologías que permiten construir una plataforma sólida, modular y accesible.
 
-![Arquitectura de servidor](/2.JPG)
-
 ### ¿Por qué se necesita un servidor central?
 
 En sistemas de monitoreo y control distribuidos, cada dispositivo genera datos de manera independiente. Sin un servidor central, estos datos quedarían aislados, serían difíciles de coordinar y no habría una forma eficiente de integrarlos. El servidor central cumple funciones clave como:
@@ -90,10 +88,11 @@ Dado que la Raspberry Pi consume poca energía, puede mantenerse encendida de ma
 
     ```pip install paho-mqtt --break-system-packages```
 
-5.	Verificar la cámara (opcional):
+Una vez instaladas las dependencias necesarias para el procesamiento de imágenes y la comunicación MQTT en Python, se valida también la correcta integración del sistema visual mediante Node-RED. En la siguiente figura se presenta el dashboard completo del proyecto, donde se centraliza la visualización de los diferentes sensores y módulos conectados.
 
- 	libcamera-hello
- 	Si no responde, usar Raspberry Pi OS Bookworm o superior, donde la cámara ya está habilitada por defecto.
+Este panel operativo permite monitorear, en tiempo real, los valores reportados por los sensores de temperatura, las galgas de fuerza, el módulo de detección de color y el estado de las válvulas. Además, incluye el componente de cámara, desde el cual se pueden capturar imágenes y realizar análisis directamente desde la interfaz. Esta integración facilita la supervisión global del sistema y confirma que todos los módulos de software y hardware se encuentran correctamente vinculados.
+
+![Arquitectura de servidor](/2.JPG)
 
 ### 3.2 Configuración del broker MQTT
 
