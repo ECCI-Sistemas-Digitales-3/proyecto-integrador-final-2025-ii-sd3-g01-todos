@@ -77,11 +77,12 @@ Este proyecto consiste en la integración de una interfaz de adquisición y proc
 La implementación consiste en una secuencia de nodos específicamente configurados para:
 
 
-- Capturar y visualizar la imagen proveniente de la cámara en la interfaz de Node-RED.
-- Permitir la selección interactiva de un color específico por parte del usuario directamente sobre la imagen capturada.
-- Procesar el color seleccionado a través de una función personalizada que extrae sus componentes y los convierte a los modelos de color RGB y CMYK.
-- Envio los datos de color resultantes (RGB y CMYK) a través del protocolo de comunicación MQTT a una ESP32.
-- Guarda los datos de color resultantes (RGB y CMYK) a través de un archivo .txt.
+-   Gestionar la captura de una imagen desde la interfaz de Node-RED.
+-   Visualizar la imagen proveniente de la cámara en un Dashboard interactivo.
+-   Permitir la selección interactiva de un píxel específico por parte del usuario directamente sobre la imagen capturada.
+-   Procesar el color seleccionado a través de una función personalizada que extrae sus componentes en los modelos de color RGB y hexadecimal.
+-   Enviar los datos de color resultantes a través del protocolo de comunicación MQTT, con el fin de ser recibidos por un dispositivo externo como un ESP32.
+
 
 
 ## Configuración inicial Captura imagen  de la Raspberry Pi
@@ -101,145 +102,101 @@ rpicam-still --encoding png --output ~/Pictures/Camera_PI/test.png --immediate -
 
 - ```--viewfinder```  Cada uno acepta un único número que define las dimensiones, en píxeles, de la imagen mostrada en la ventana de vista previa. No afecta a las dimensiones de la ventana de vista previa, ya que las imágenes se redimensionan para ajustarse. No afecta a las imágenes fijas ni a los vídeos capturados.
 
-# Habilitación del Servidor de Contenido Estático
+### Flujo I: Adquisición de Imagen
 
-Para la correcta visualización de las imágenes capturadas por el sistema a través de un navegador web, es imperativo configurar Node-RED para que actúe como un servidor de archivos estáticos.
+Este proceso es responsable de la captura y publicación de la imagen.
 
-El primer paso consiste en acceder al archivo de configuración principal de Node-RED, ```settings.js.``` Para ello, se ejecutará el siguiente comando en la terminal, utilizando el editor nano con privilegios de superusuario para garantizar los permisos de escritura:
+1.  **Inicio de Captura (Botón del Dashboard "Tomar foto"):** El proceso es iniciado por el usuario a través del botón **"Tomar foto"**, un componente de la interfaz de usuario del **Dashboard de Node-RED**. Técnicamente, este botón corresponde a un nodo de tipo `inject` en el flujo de trabajo, el cual está configurado para mostrarse en el Dashboard y enviar un mensaje (payload) al ser presionado. Su función es actuar como el disparador manual de todo el ciclo de captura.
+2.  **Publicación del Disparador:** El mensaje generado por el botón es dirigido a un nodo de salida MQTT (`camara/captura`), que lo publica de inmediato en el tópico correspondiente. Este mensaje sirve como una señal de comando para el script que controla la cámara.
+3.  **Ejecución de Script:** Un script en Python (`camera_trigger.py`), operando como un servicio en segundo plano en la Raspberry Pi, está suscrito a dicho tópico. Al recibir el mensaje de activación, el script procede a ejecutar la captura.
+4.  **Procesamiento y Publicación de la Imagen:** El script invoca la utilidad `libcamera-jpeg` para obtener una imagen. A continuación, esta imagen es codificada en formato Base64 y publicada en el tópico MQTT `camara/pi`.
 
+### Flujo II: Procesamiento de Color
 
-```Bash
-sudo nano ~/.node-red/settings.js
-```
+Este flujo se activa tras la recepción de una nueva imagen y gestiona la interacción del usuario.
 
-Dentro del archivo de configuración, es necesario localizar la directiva ```httpStatic.``` Esta propiedad, que por defecto se encuentra comentada, define el directorio que Node-RED servirá públicamente. Se debe descomentar (eliminando los caracteres // al inicio de la línea) y asignarle la ruta absoluta al directorio que contiene las imágenes de la cámara.
-El parámetro a configurar es el siguiente, el cual mapea el contenido del directorio a la ```URL``` raíz del servidor de Node-RED:
-
-```JavaScript
-
-    httpStatic: '/home/pi/Pictures/Camera_PI/',
-```
-Al establecer esta configuración, cualquier archivo dentro de /home/pi/Pictures/Camera_PI/ (por ejemplo, test.png) se vuelve accesible a través de la URL ```http://[IP_DE_LA_RASPBERRY_PI]:1880/test.png```
-
-Como se puede visualizar en la siguiente imagen:
-
-![](2.Image/Web_Server.png)
-
-A continuación, se muestra una imagen de la sección correspondiente del archivo settings.js debidamente modificada:
+1.  **Recepción de Imagen:** Un nodo de entrada MQTT (`camara/pi`) recibe la imagen codificada y la transmite al siguiente nodo del flujo.
+2.  **Renderizado en Interfaz:** La imagen es renderizada en un elemento `<canvas>` HTML5 dentro de un nodo `template`, permitiendo su visualización en el Dashboard de Node-RED.
+3.  **Selección Interactiva:** El código JavaScript embebido en el nodo `template` detecta el evento de clic del usuario sobre el canvas y extrae los datos de color del píxel seleccionado.
+4.  **Retorno de Datos:** Esta información es encapsulada en un objeto `payload` y enviada de vuelta al flujo principal de Node-RED.
+5.  **Distribución de la Información:** Un nodo `function` (`Procesar_color`) recibe el objeto, lo procesa y bifurca la información hacia dos salidas para su visualización y envío al dispositivo final.
 
 
-![](2.Image/Setting_Node_Red.png)
 
-Una vez que la directiva ```httpStatic``` ha sido modificada, es fundamental guardar los cambios en el archivo settings.js de manera correcta. El editor nano proporciona un flujo de salida específico para este propósito.
-Al presionar la combinación de teclas ```Ctrl + X,``` se inicia el proceso para salir del editor. nano detectará que el buffer del archivo ha sido modificado y solicitará una confirmación para guardar los cambios, como se ilustra en la siguiente línea de la terminal:
+# Implementación y Puesta en Marcha
 
-En este punto, se debe presionar la tecla Y (correspondiente a "Yes") para confirmar la intención de guardar. Posteriormente, el editor solicitará que se confirme el nombre del archivo a escribir. Dado que estamos editando un archivo existente, simplemente se debe presionar la tecla ```Enter``` para sobrescribir el archivo ```settings.js``` con la nueva configuración.
+Para el correcto funcionamiento del sistema, es necesario seguir los siguientes pasos en la Raspberry Pi.
 
-El procedimiento completo es el siguiente:
+1.  **Ubicación de Archivos:** Se ha creado un directorio específico para alojar los archivos del proyecto en la ruta: `/Documents/Digitales_03/Camera`.
+
+2.  **Instalación de Dependencias:** Para que el script de Python (`camera_trigger.py`) pueda comunicarse a través del protocolo MQTT, requiere una librería externa específica. Esta librería es `paho-mqtt`. Antes de ejecutar el script, es indispensable instalar esta dependencia abriendo una terminal en la Raspberry Pi y ejecutando el siguiente comando:
+
+    ```bash
+    pip3 install paho-mqtt
+    ```
+
+3.  **Ejecución del Script:** Una vez instalada la dependencia, el script `camera_trigger.py` debe ser ejecutado en segundo plano. Para ello, navegue hasta el directorio del proyecto y ejecute:
+
+    ```bash
+    python3 camera_trigger.py
+    ```
+    Este comando iniciará el cliente MQTT, que quedará a la escucha de las instrucciones enviadas desde el Dashboard de Node-RED.
 
 
-1. Iniciar salida: ```Ctrl + X```
-2. Confirmar guardado: ```Y```
-3. Confirmar nombre de archivo: ```Enter```
+![](2.Image/Terminal.png)
 
 
 
 # Diagrama Flujo Node_Red 
 
 A continuacion se muestra el digrama de flujo implementado en node red como se visualiza en la siguiente imagen 
-![](2.Image/Flujo_Node_Red.png)
+![](2.Image/Camara_Final_Node_Red.png)
 
 
-# 4.1 Desglose de Componentes del Flujo
-El flujo se segmenta en tres fases operativas principales: iniciación, ejecución y post-procesamiento.
+### Explicación de los Componentes de Código
 
+A continuación, se detalla la lógica de programación detrás de los nodos y scripts más importantes del sistema.
 
-**Fase 1: Iniciación de Captura**
+#### [1. Script de Control de Cámara (`camera_trigger.py`)](3.Micropython/camera_trigger.py)
 
-El proceso se inicia mediante dos nodos de tipo inject: 
+Este es un script de Python que se ejecuta continuamente en la Raspberry Pi y actúa como el puente entre Node-RED y la cámara física.
 
+*   **Función Principal:** Su única tarea es escuchar mensajes en un tópico MQTT específico (`camara/captura`). Cuando recibe un mensaje válido (como la palabra "capturar"), activa la cámara.
+*   **Proceso de Captura:**
+    1.  **Tomar la Foto:** Utiliza la biblioteca `subprocess` para ejecutar un comando de terminal: `libcamera-jpeg`. Este comando instruye al sistema operativo de la Raspberry Pi para que use la cámara, tome una foto de 640x480 píxeles y la guarde temporalmente en un archivo llamado `/tmp/foto_node_red.jpg`.
+    2.  **Codificar y Publicar:** Inmediatamente después, ejecuta un segundo comando de terminal más complejo. Este comando toma el archivo de imagen recién creado, lo convierte a formato de texto Base64, le añade el prefijo `data:image/jpeg;base64,` (necesario para que los navegadores web entiendan que es una imagen), y publica toda esa cadena de texto en un tópico MQTT  (`camara/pi`).
+*   **Mecanismo de Escucha:** El script utiliza la biblioteca `paho-mqtt` para conectarse al broker MQTT. Permanece en un bucle infinito (`loop_forever`), esperando pasivamente la señal de disparo desde Node-RED para iniciar el proceso de captura.
 
-- ```timestamp:``` Este nodo, al ser activado, inyecta una marca de tiempo (timestamp) en el flujo. Su función principal es servir como un disparador automático o programado.
+#### [2. Nodo `template`](1.Flujos_Node_Red/2.Node_Template.java)
 
-- ```Takephoto:``` Este nodo actúa como un disparador manual. Al ser presionado desde la interfaz de Node-RED por el usuario, envía una señal para iniciar el proceso de captura de manera inmediata.
+Este nodo contiene una combinación de código HTML y JavaScript que crea el elemento visual en el Dashboard de Node-RED.
 
-**Fase 2: Ejecución del Comando de Captura**
+*   **Componente HTML:** Define la estructura visual que ve el usuario. Consiste principalmente en un elemento `<canvas>`, que es como un lienzo digital en blanco sobre el cual se puede dibujar. También incluye un título y un párrafo de texto para mostrar información.
+*   **Componente JavaScript:** Añade la interactividad al lienzo.
+    1.  **Recepción de la Imagen:** El script está constantemente "observando" si llega un nuevo mensaje a este nodo. Cuando recibe la cadena de texto Base64 (enviada por el script de Python), la interpreta como una fuente de imagen y la dibuja sobre el elemento `<canvas>`, haciendo que la foto capturada aparezca en la pantalla.
+    2.  **Detección de Clic:** El script también está a la escucha de un evento "clic" sobre el lienzo. Cuando el usuario hace clic en cualquier punto de la imagen, el código se activa.
+    3.  **Extracción de Color:** En el momento del clic, el script obtiene las coordenadas exactas (x, y) del puntero. Utiliza una función nativa del canvas, `getImageData`, para leer la información del píxel individual en esas coordenadas. Esta función devuelve los valores de color de ese punto en el modelo RGB (Rojo, Verde, Azul).
+    4.  **Envío de Datos:** Finalmente, el script empaqueta los datos del color (valores RGB y su equivalente en formato hexadecimal) junto con las coordenadas en un nuevo objeto de mensaje y lo envía de vuelta al flujo de Node-RED para que el siguiente nodo lo procese.
 
-Ambos nodos de inyección están conectados a un nodo exec. Este componente es fundamental, ya que es el encargado de ejecutar comandos directamente en la terminal del sistema operativo de la Raspberry Pi.
-El comando configurado en este nodo es el siguiente:
+#### [3. Nodo `function` (Procesar_color)](1.Flujos_Node_Red/1.Funtion_Procesar_Color.java)
 
-```bash
-rpicam-still --encoding png --output ~/Pictures/Camera_PI/test.png --immediate --viewfinder-width 640 --viewfinder-height 480
-```
+Este es un nodo de JavaScript simple que actúa como un distribuidor de información inteligente. Recibe el mensaje con los datos del color del nodo `template` y lo prepara para diferentes destinos.
 
-**Fase 3: Post-procesamiento y Salida de Datos**
-
-##   [Nodo function 1:](1.Flujos_Node_Red/1.Funtion_01.java)
-
-Este nodo prepara el mensaje para el refresco de la imagen en el dashboard. 
-
-
-
-La función principal de este código es realizar un "cache busting". Al añadir un parámetro de consulta (?t=) con el timestamp actual, se asegura que el navegador web del cliente solicite siempre la versión más reciente del archivo /test.png, evitando que se muestre una imagen previamente almacenada en la caché.
-
-## [Nodo template: ](1.Flujos_Node_Red/3.Node_Template.java)
-
-Este es el componente más complejo de la interfaz. Crea un widget interactivo en el Dashboard que permite al usuario ver la imagen y seleccionar un píxel.
-
-- Estructura (HTML/CSS): Define un elemento ```<canvas>``` para renderizar la imagen y un ```<div>``` para mostrar la información del color seleccionado (una muestra de color y los valores RGB/coordenadas). El CSS asegura que el cursor se transforme en una cruz (crosshair) para mejorar la precisión de la selección.
-
-**Lógica (JavaScript):**
-
-1. **Carga de Imagen:** El script carga la imagen test.png en el canvas. Utiliza la misma técnica de "cache busting" que el nodo function 1 para garantizar que la imagen esté actualizada.
-
-2. **Manejo de Eventos:** El script añade un event listener para el evento click sobre el canvas.
-
-3. **Extracción de Color:** Al hacer clic, se calculan las coordenadas exactas del píxel seleccionado y se utiliza el método ctx.getImageData(x, y, 1, 1).data para extraer el valor RGBA del píxel.
-
-4. **Actualización de la UI:** La interfaz del widget se actualiza en tiempo real, mostrando el color en la muestra (swatch) y los valores numéricos.
-Envío de Datos: Este es el paso crucial. El script empaqueta los valores R, G y B en un objeto JSON y lo asigna como payload de un nuevo mensaje. Este mensaje se envía a la salida del nodo template usando scope.send(newMsg), permitiendo que el flujo continúe con los datos de color seleccionados.
-
-# Nodo colour picker: 
-
-
-Este nodo de dashboard actúa como intermediario. Recibe el objeto JSON {r, g, b} enviado por el nodo template y lo convierte a un formato de color estándar, en este caso, una cadena de texto hexadecimal (ej. "#RRGGBB"). Este formato estandarizado es el que se pasa al siguiente nodo de procesamiento.
-
-Configuración  colour picker :
-![](2.Image/Dashboard_Color_Picker.png)
-
-# [Nodo function 2:](1.Flujos_Node_Red/2.Nodo_Funtion_2.java)
-
-Este nodo recibe el color en formato hexadecimal y realiza la conversión final y el formateo de los datos.
-
-- **Paso 1 y 2:** Valida la entrada y convierte la cadena hexadecimal a sus componentes R, G, B numéricos (0-255).
-
-- **Paso 3:** Implementa el algoritmo de conversión de RGB a CMYK. Normaliza los valores RGB a un rango de 0-1, calcula el componente K (negro) y, a partir de este, los componentes C, M e Y. Los resultados se escalan a un porcentaje (0-100).
-
-- **Paso 4:** Formatea múltiples salidas en el objeto msg. msg.payload se prepara para visualización directa en el dashboard. Se crean objetos msg.rgb y msg.cmyk para un posible uso futuro. Finalmente, se genera msg.filePayload, una cadena en formato CSV-like con timestamp y todos los valores de color, lista para ser almacenada.
-
-# Nodo text: 
-
-Un nodo simple del dashboard que muestra el contenido de msg.payload (la cadena RGB | CMYK) al usuario.
-
-
-# Nodo file (/home/pi/Pictures/Camera_PI/pp.txt): 
-
-Este nodo file out está configurado para añadir (append) el contenido de la propiedad msg.filePayload al final del archivo pp.txt. De esta manera, cada selección de color queda registrada de forma persistente junto con su timestamp y sus valores RGB/CMYK, creando un log de datos completo.
-
-Evidencia Fotográfica :
-
-![](2.Image/pp.png)
+*   **Función Principal:** Su objetivo es tomar el objeto de datos de color y crear dos mensajes separados y formateados a partir de él.
+*   **Lógica de Procesamiento:**
+    1.  **Extrae la Información:** Lee el objeto de mensaje entrante para obtener el color en formato hexadecimal (ej. `"#FF5733"`) y el objeto completo con todos los datos (RGB, HEX, coordenadas).
+    2.  **Crea el Primer Mensaje:** Genera un primer mensaje cuyo `payload` es únicamente la cadena de texto del color hexadecimal. Este formato simple es el que necesita el nodo `colour picker` del Dashboard para mostrar el color.
+    3.  **Crea el Segundo Mensaje:** Genera un segundo mensaje que contiene el objeto completo con toda la información detallada del color y las coordenadas. Este mensaje es más rico en datos y se destina tanto al nodo de depuración (`debug`) como al nodo MQTT que enviará la información al ESP32.
+*   **Salida Múltiple:** El nodo finaliza devolviendo un array con los dos mensajes que creó: `[mensaje_para_picker, mensaje_para_esp32]`. Node-RED envía automáticamente el primer mensaje por la primera salida del nodo y el segundo por la segunda salida, permitiendo así bifurcar el flujo de datos de manera eficiente.
 
 # Visualización del Panel en Node-RED
 
-![](2.Image/Screenshot.png)
+![](2.Image/Node_Red_Camara_Jesus.png)
 
 
 # Aspectos importantes a tomar en consideración
+Para la captura con la cámara, es imprescindible contar con una buena iluminación , ya que esto garantiza una detección correcta de los colores.  
 
-- 📸 Para la captura con la cámara, es imprescindible contar con una buena iluminación 💡, ya que esto garantiza una detección correcta de los colores.  
-
-- 🔧 Actualmente se está trabajando en el envío mediante **MQTT** hacia la **Raspberry Pi**.  Cualquier recomendación o apreciación sobre la implementación es muy bien recibida por parte de la docente **Diana**. 🙌  
 
 
 
@@ -249,12 +206,6 @@ En esta etapa se logró integrar de forma funcional la cámara Raspberry Pi con 
 
 Además, se desarrolló un flujo interactivo que permite seleccionar un píxel sobre la imagen, extraer su color (RGB), convertirlo a CMYK y registrar los resultados en un archivo de log. Se dejaron preparadas las salidas necesarias para el envío vía MQTT hacia una ESP32, así como los nodos que formatean y presentan la información en el dashboard.
 
-Aspectos alcanzados:
-
-- Captura y visualización de imágenes desde la Raspberry Pi.
-- Widget interactivo para selección de color y extracción de valores RGB.
-- Conversión a CMYK y almacenamiento en archivo (log).
-- Preparación del flujo para envío de datos por MQTT.
 
 # Referencia 
 [[1]  Camera_Software_Raspberrypi](https://www.raspberrypi.com/documentation/computers/camera_software.html)
