@@ -1,6 +1,6 @@
 ## Código MicroPython 
 
-```python
+
 # main.py – Control secuencial de 5 bombas de diafragma vía MQTT
 # ESP32 + MicroPython
 

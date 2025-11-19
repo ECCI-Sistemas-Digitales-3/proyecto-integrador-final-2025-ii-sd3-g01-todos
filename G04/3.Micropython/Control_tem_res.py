@@ -14,7 +14,7 @@ if not Wifi.conectar():
 print("WiFi conectado")
 
 #  CONFIGURACIÓN MQTT
-MQTT_BROKER = "192.168.250.216"
+MQTT_BROKER = "192.168.2.216"
 MQTT_PORT   = 1883
 MQTT_ID     = "esp1_temperaturas"
 
@@ -30,16 +30,26 @@ client = MQTTClient(MQTT_ID, MQTT_BROKER, port=MQTT_PORT)
 client.connect()
 print("MQTT conectado\n")
 
-PINES_SENSORES = [15, 2, 4, 5, 32]  # 5 sensores DS18B20
-PINES_RESISTENCIAS = [33, 25, 26, 27, 14]  # 5 resistencias
+#  PINES Y HARDWARE
+PINES_SENSORES = [15, 2, 4, 5, 32]    
+PINES_RESISTENCIAS = [33, 25, 26, 27, 14]
 
-#  CONFIGURACIÓN SENSORES 
+#  CONFIGURACIÓN SENSORES
 sensores = []
+estado_sensores = []   # registros: {roms, fallos, estado}
+
 for pin in PINES_SENSORES:
     ow = onewire.OneWire(machine.Pin(pin))
     ds = ds18x20.DS18X20(ow)
     roms = ds.scan()
-    sensores.append((ds, roms))
+
+    sensores.append(ds)
+    estado_sensores.append({
+        "roms": roms,
+        "fallos": 0,
+        "estado": "OK" if roms else "SIN_ROM"
+    })
+
     print(f"Sensor en pin {pin}: {roms}")
 
 #  CONFIGURACIÓN RESISTENCIAS
@@ -49,16 +59,17 @@ for pin in PINES_RESISTENCIAS:
     r.value(0)
     resistencias.append(r)
 
-#  PARÁMETROS CONTROL
-TEMP_MIN = 22.0   # Bajo este valor encender resistencia
-TEMP_MAX = 27.0   # Sobre este valor apagar resistencia
+#  PARÁMETROS DE CONTROL
+TEMP_MIN = 22.0
+TEMP_MAX = 27.0
 
-TIEMPO_MAX_RESISTENCIA = 60  # 1 minuto máximo
-INTERVALO_LECTURA = 5  # Tiempo entre lecturas
+TIEMPO_MAX_RESISTENCIA = 60
+INTERVALO_LECTURA = 5
 
 #  VARIABLES DE CONTROL
 resistencia_activa = None
 tiempo_inicio_resistencia = None
+
 
 def apagar_todas():
     global resistencia_activa, tiempo_inicio_resistencia
@@ -68,47 +79,61 @@ def apagar_todas():
     tiempo_inicio_resistencia = None
     print("Todas las resistencias APAGADAS\n")
 
-# ==========================
-#  NOTA: Pines I2C libres
-#  SDA = 21
-#  SCL = 22
-#  (NO usados por ahora)
-# ==========================
-
 #  BUCLE PRINCIPAL
 print("\nESP1 listo: Temperaturas + Control de resistencias\n")
+
 while True:
 
     temperaturas = []
+    #  1. LECTURA SEGURA DE SENSORES — con try/except
+    for i, ds in enumerate(sensores):
 
-    # 1. LEER TEMPERATURAS 
-    for i, (sensor, roms) in enumerate(sensores):
+        registro = estado_sensores[i]
+        roms = registro["roms"]
 
-        sensor.convert_temp()
-        time.sleep_ms(750)
+        # Si no hay ROM → no intentamos leer
+        if not roms:
+            registro["fallos"] += 1
+            registro["estado"] = "SIN_ROM"
+            temperaturas.append(None)
+            print(f"Sensor {i+1}: SIN_ROM")
+            continue
 
-        if roms:
-            temp = sensor.read_temp(roms[0])
-        else:
-            temp = None
+        try:
+            ds.convert_temp()
+            time.sleep_ms(750)
 
-        temperaturas.append(temp)
-        print(f"Sensor {i+1}: {temp} °C")
+            temp = ds.read_temp(roms[0])
 
-        # Publicar temperatura
-        if temp is not None:
+            # Lectura correcta
+            registro["fallos"] = 0
+            registro["estado"] = "OK"
+            temperaturas.append(temp)
+
+            print(f"Sensor {i+1}: {temp} °C")
+
             client.publish(TOPICS_TEMP[i], str(temp))
 
-    # 2. CONTROL DE RESISTENCIAS 
+        except Exception as e:
+            registro["fallos"] += 1
+            temperaturas.append(None)
+
+            if registro["fallos"] >= 5:
+                registro["estado"] = "DAÑADO"
+            else:
+                registro["estado"] = "ERROR"
+
+            print(f"Sensor {i+1}: ERROR ({registro['estado']}) (fallos {registro['fallos']})")
+
+
+    #  2. LÓGICA DE CONTROL DE RESISTENCIAS (sin cambios)
     for i, temp in enumerate(temperaturas):
 
         if temp is None:
             continue
 
-        # ENCENDER resistencia (solo a la ves)
         if temp < TEMP_MIN:
 
-            # Si ya hay otra encendida, ignorar
             if resistencia_activa is not None and resistencia_activa != i:
                 continue
 
@@ -118,7 +143,6 @@ while True:
                 resistencia_activa = i
                 tiempo_inicio_resistencia = time.time()
 
-        # APAGAR si pasó del máximo
         elif temp > TEMP_MAX:
 
             if resistencia_activa == i:
@@ -127,7 +151,7 @@ while True:
                 resistencia_activa = None
                 tiempo_inicio_resistencia = None
 
-    # 3. CONTROL DE TIEMPO MÁXIMO 
+    #  3. CONTROL DE TIEMPO MÁXIMO
     if resistencia_activa is not None:
         if time.time() - tiempo_inicio_resistencia > TIEMPO_MAX_RESISTENCIA:
             print("Tiempo máximo excedido → apagando resistencias")
