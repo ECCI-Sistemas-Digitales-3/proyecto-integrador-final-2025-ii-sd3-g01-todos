@@ -3,10 +3,10 @@ import machine
 import onewire
 import ds18x20
 from umqtt.robust import MQTTClient
-import wifi  
+import Wifi 
 
 #  CONFIGURACIÓN WIFI
-if not wifi.conectar():
+if not Wifi.conectar():
     print("Error: No hay conexión WiFi")
     while True:
         time.sleep(1)
@@ -14,8 +14,8 @@ if not wifi.conectar():
 print("WiFi conectado")
 
 #  CONFIGURACIÓN MQTT
-MQTT_BROKER = "8.tcp.ngrok.io"
-MQTT_PORT   = 12777
+MQTT_BROKER = "192.168.250.216"
+MQTT_PORT   = 1883
 MQTT_ID     = "esp1_temperaturas"
 
 TOPICS_TEMP = [
@@ -30,8 +30,8 @@ client = MQTTClient(MQTT_ID, MQTT_BROKER, port=MQTT_PORT)
 client.connect()
 print("MQTT conectado\n")
 
-PINES_SENSORES = [33, 25, 26, 27, 14]  # 5 sensores DS18B20
-PINES_RESISTENCIAS = [15, 2, 4, 5, 32]  # 5 resistencias
+PINES_SENSORES = [15, 2, 4, 5, 32]  # 5 sensores DS18B20
+PINES_RESISTENCIAS = [33, 25, 26, 27, 14]  # 5 resistencias
 
 #  CONFIGURACIÓN SENSORES 
 sensores = []
