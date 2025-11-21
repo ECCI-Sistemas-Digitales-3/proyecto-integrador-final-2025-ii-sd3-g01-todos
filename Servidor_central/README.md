@@ -1,5 +1,8 @@
 # Servidor Central - Sistema de Captura y Comunicación MQTT con Raspberry Pi
 
+### Indice
+
+
 1. [**Resumen**](#resumen)  
 2. [**Introducción**](#introduccion)  
 3. [**Metodología del Servidor Central**](#metodologia-del-servidor-central)  
@@ -38,6 +41,8 @@ En sistemas de monitoreo y control distribuidos, cada dispositivo genera datos d
 * Ejecutar automatizaciones mediante Node-RED.
 ### Componentes utilizados
 •	Hardware: Raspberry Pi 3 B+ (o superior), microSD ≥ 16GB, cámara CSI.
+
+• Software: Raspberry Pi OS, Mosquitto, Node-RED, Python3, Ngrok.
 
 ## ¿Cómo opera dentro del sistema?
 
