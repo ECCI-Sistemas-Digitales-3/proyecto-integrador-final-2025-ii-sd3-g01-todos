@@ -97,7 +97,7 @@ Una vez instaladas las dependencias necesarias para el procesamiento de imágene
 
 Este panel operativo permite monitorear, en tiempo real, los valores reportados por los sensores de temperatura, las galgas de fuerza, el módulo de detección de color y el estado de las válvulas. Además, incluye el componente de cámara, desde el cual se pueden capturar imágenes y realizar análisis directamente desde la interfaz. Esta integración facilita la supervisión global del sistema y confirma que todos los módulos de software y hardware se encuentran correctamente vinculados.
 
-![Arquitectura de servidor](/2.JPG)
+![Arquitectura de servidor](/Servidor_central/img/Interfaz.JPG)
 
 ### 3.2 Configuración del broker MQTT
 
@@ -212,7 +212,7 @@ Para permitir que el servidor MQTT sea accesible de forma segura desde ubicacion
 En la prueba realizada, Ngrok generó un túnel TCP que redirige las conexiones públicas hacia el puerto local 1883, donde se ejecuta el broker MQTT.
 
 
-![Arquitectura de servidor](/1..JPG)
+![Arquitectura de servidor](/Servidor_central/img/1..JPG)
 
 * El túnel activo en la región Estados Unidos (US)
 * La latencia promedio del enlace
