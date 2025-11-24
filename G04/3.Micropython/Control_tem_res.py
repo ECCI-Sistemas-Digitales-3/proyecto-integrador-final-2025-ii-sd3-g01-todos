@@ -13,10 +13,18 @@ if not Wifi.conectar():
 
 print("WiFi conectado")
 
+def on_message(topic, msg):
+    print("\n MENSAJE RECIBIDO EN esp/out ")
+    print("Topic:", topic)
+    print("Mensaje:", msg)
+    print("*************************************\n")
+
 #  CONFIGURACIÓN MQTT
-MQTT_BROKER = "192.168.2.216"
+MQTT_BROKER = "192.168.207.216"
 MQTT_PORT   = 1883
 MQTT_ID     = "esp1_temperaturas"
+
+
 
 TOPICS_TEMP = [
     b"in/esp1/temperatura/azul",
@@ -26,8 +34,12 @@ TOPICS_TEMP = [
     b"in/esp1/temperatura/blanco"
 ]
 
+TOPIC_OUT = b"esp/out"
+
 client = MQTTClient(MQTT_ID, MQTT_BROKER, port=MQTT_PORT)
+client.set_callback(on_message)
 client.connect()
+client.subscribe(TOPIC_OUT)
 print("MQTT conectado\n")
 
 #  PINES Y HARDWARE
@@ -83,6 +95,11 @@ def apagar_todas():
 print("\nESP1 listo: Temperaturas + Control de resistencias\n")
 
 while True:
+
+    # LIMPIAR TERMINAL
+    print("\033[2J\033[H")
+    client.check_msg()
+
 
     temperaturas = []
     #  1. LECTURA SEGURA DE SENSORES — con try/except
