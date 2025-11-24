@@ -79,27 +79,17 @@ Publicación hacia dispositivos (ej. esp2/out, esp1/in).
 
     * Cámara_color
     (visualización de frame y diagnóstico de conexión)
-    ![Camara_color](2.Image/Camara_color_dash.JPG)
-
     * Sensor de Color
     Donde se reciben los valores RGB, se dividen y se agrupan.
-    ![Sensor color](2.Image/Sensor_colorJPG.JPG)
-
     * TemperaturaSensor
     Se muestran las temperaturas por color y su respectiva resistencia (ON/OFF).
-    ![TemRes_dash](2.Image/TemRes_dashJPG.JPG)
-
     * GALGA
     Lectura del peso y control asociado.
-    ![Galgas_dash](2.Image/Galga_dash.JPG)
-
     * Mezclador
     Control del proceso de mezcla.
-    ![Mezclaror_dash](2.Image/Mezclador_dash.JPG)
-
     * Bombas
     Encendido/apagado, tiempos y control del sistema de llenado.
-    ![Bombas_dash]()
+    ![Pestañas_dashboard](2.Image/Pestañas_dashboard.JPG)
 
 4.	Integración de nodos clave
     * mqtt in/out
@@ -144,8 +134,8 @@ mayúsculas/minúsculas cambian totalmente el comportamiento.
     •	ESP32-2 → Estado, controles remotos, depuración.
     •	Cámara → Frame actual, información de captura.
     •	Registros → Historial de mensajes recibidos y enviados.
-<!-- Aquí insertar imagen del DASHBOARD COMPLETO — nombre sugerido: dashboard_nodered.png --> 
-________________________________________
+
+
 5.2 Widgets Utilizados
 Widget	Uso
 ui_text	Mostrar mensajes de esp2/out
@@ -154,13 +144,12 @@ ui_image	Mostrar fotografías de cámara
 ui_button	Control manual
 ui_switch	Encendido/apagado de actuadores
 ui_chart	Gráficas históricas
-<!-- Imagen sugerida: widgets_utilizados.png --> 
-________________________________________
+ 
+
 5.3 Integración MQTT
 •	Subscripción principal para depuración:
 esp2/out  →  Node-RED  → esp1/in
 •	Esto permite verificar prestación de datos cruzados entre ESPs.
-<!-- Imagen sugerida del flujo MQTT: flujo_mqtt_dashboard.png --> 
 ________________________________________
 ## 6. Resultados
 * El dashboard quedó totalmente operativo.
@@ -169,6 +158,7 @@ ________________________________________
 * La cámara funciona de manera estable en el dashboard.
 * Integración MQTT estable y sin pérdida de datos.
 * El sistema puede supervisarse desde PC y desde móvil.
+![Dash_completo](2.Image/Dashboard_completo.JPG)
 
 ## 7. Conclusiones
 * Node-RED demostró ser una plataforma flexible y robusta para integrar múltiples ESP32 y sensores.
