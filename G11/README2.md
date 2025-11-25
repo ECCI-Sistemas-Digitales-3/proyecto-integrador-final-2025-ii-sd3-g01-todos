@@ -38,10 +38,12 @@ VALVE_TOPICS = [
     b"",  # bomba 5 -> W
 ]
 
+```
 Propósito: Establece las credenciales de red y la conexión al broker MQTT.
 
 2. Configuración de Bombas y PWM
 
+```python
 
 PWM_PINS = []   # Pines para 5 bombas
 PWM_FREQ = 1000                 # Frecuencia PWM en Hz
@@ -57,24 +59,32 @@ Limitación del duty cycle al 70% para protección
 
 Restricción del total CMYKW al 40% para evitar sobrecargas
 
+```
+
 3. Sistema de Agitador
+
+```python
 
 AGITATOR_PIN_NUM = 
 AGITATOR_TIME_S = 
 Propósito: Mezcla la pintura después de completar la secuencia de bombas durante 10 segundos.
 
+```
+
 4. Estados y Variables Globales
 
+```python
 # Estados del sistema
 tiempos_bombas_receta = [0.0] * 5  # Tiempos calculados para cada bomba
 flags = [0] * 5                    # Bandera de finalización por bomba
 receta_lista = False               # Indica si hay receta pendiente
 mezcla_en_progreso = False         # Indica si hay mezcla en curso
 temp_ok = [False] * 5              # Estados de temperatura por bomba
+```
 
 Funciones Principales de Control
 Inicialización de PWM
-
+```python
 def init_pwms():
     global pwms
     pwms = []
@@ -83,11 +93,11 @@ def init_pwms():
         p.duty(0)
         pwms.append(p)
     aplicar_pwm_global()
-
+```
 Propósito: Configura todos los pines PWM y establece el duty cycle inicial.
 
 Procesamiento de Recetas CMYKW
-
+```python
 def parse_cmykw(text):
     """
     Convierte texto 'C:10 M:0 Y:0 K:90 W:0' a diccionario
@@ -105,9 +115,9 @@ def parse_cmykw(text):
                 except:
                     pass
     return values
-
+```
 Conversión a Tiempos
-
+```python
 def cmykw_to_tiempos(values):
     # Aplica límite del 40% y escala si es necesario
     total = values['C'] + values['M'] + values['Y'] + values['K'] + values['W']
@@ -125,9 +135,11 @@ def cmykw_to_tiempos(values):
         t = tmax * (pct / 100.0)
         tiempos.append(t)
     return tiempos
+```
 
 Control de Ejecución de Bombas
 
+```python
 def ejecutar_bomba_tiempo(i, t_seg):
     """
     Ejecuta bomba i por t_seg segundos si:
@@ -157,6 +169,7 @@ def ejecutar_bomba_tiempo(i, t_seg):
         time.sleep_ms(50)
     apagar_bomba(i)
     flags[i] = 1
+```
 
 Características:
 
@@ -167,6 +180,8 @@ Control de tiempo preciso con time.ticks_ms()
 Monitoreo continuo de MQTT durante la ejecución
 
 Manejo de MQTT
+
+```python
 
 def mqtt_callback(topic, msg):
     global tiempos_bombas_receta, receta_lista, mezcla_en_progreso, temp_ok
@@ -190,9 +205,9 @@ def mqtt_callback(topic, msg):
             val = s.strip().upper()
             temp_ok[i] = (val in ("ON", "1", "TRUE"))
             return
-
+```
 Flujo Principal del Programa
-
+```python
 def main():
     global receta_lista, mezcla_en_progreso
 
@@ -224,9 +239,11 @@ def main():
             receta_lista = False
 
         time.sleep_ms(100)
-
+```
 Formato de Mensajes MQTT
+
 Recetas CMYKW
+
 Topic: ""
 
 Formato: C:10 M:20 Y:5 K:15 W:0
