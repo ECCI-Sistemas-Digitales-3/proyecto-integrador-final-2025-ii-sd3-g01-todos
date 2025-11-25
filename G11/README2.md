@@ -1,4 +1,4 @@
-##Control de Bombas de Diafragma con ESP32, MicroPython y MQTT
+## Control de Bombas de Diafragma con ESP32, MicroPython y MQTT
 ## Integrantes
 - [David Santiago Puentes Cárdenas — 99225](https://github.com/Monstertrox)  
 - [Juan David Arias Bojacá — 107394](https://github.com/juandariasb-ai)
