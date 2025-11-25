@@ -3,7 +3,6 @@
 
 
 # DOCUMENTACIÓN DEL AVANCE DEL PROYECTO INTEGRADOR
-Fecha Entrega  11/3/2025
 
 
 # Integrantes

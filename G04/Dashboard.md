@@ -89,7 +89,6 @@ Publicación hacia dispositivos (ej. esp2/out, esp1/in).
     Control del proceso de mezcla.
     * Bombas
     Encendido/apagado, tiempos y control del sistema de llenado.
-    ![Pestañas_dashboard](2.Image/Pestañas_dashboard.JPG)
 
 4.	Integración de nodos clave
     * mqtt in/out
