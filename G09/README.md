@@ -209,6 +209,113 @@ Así, Node-RED puede enviar cada dato al destino que corresponde.
  - **const / let:**	Formas de crear variables en JavaScript.
 
 
+ ## [Funcionamiento y funciones Especiales del Código SVR.py](/G09/micropython/SVR.py)
+
+
+El código SVR se encarga de leer la temperatura desde varios sensores DS18B20 y dependiendo del valor que obtenga, decide si debe activar una válvula (cuando la temperatura sube) o activar una resistencia (cuando la temperatura baja).
+
+1. Lee la temperatura
+
+El ESP32 toma la lectura directamente desde cada sensor DS18B20 conectado.
+Cada lectura queda guardada dentro de la variable temp.
+
+2. Compara la temperatura con los valores de control
+
+Se definieron dos umbrales:
+
+<table style="width: 70%; border-collapse: collapse; font-family: Arial, sans-serif; background-color: #000; color: #fff;">
+
+  <tr style="border-bottom: 1px solid #555;">
+    <th style="text-align: left; padding: 10px;">Temperatura</th>
+    <th style="text-align: left; padding: 10px;">Acción del Sistema</th>
+  </tr>
+
+  <tr style="border-bottom: 1px solid #333;">
+    <td style="padding: 8px; text-align: center;">≤ 25°C</td>
+    <td style="padding: 8px;">Se enciende la resistencia → aumenta la temperatura</td>
+  </tr>
+
+  <tr style="border-bottom: 1px solid #333;">
+    <td style="padding: 8px; text-align: center;">≥ 27°C</td>
+    <td style="padding: 8px;">Se activa la válvula → disminuye la temperatura</td>
+  </tr>
+
+  <tr>
+    <td style="padding: 8px; text-align: center;">25°C a 27°C</td>
+    <td style="padding: 8px;">Se mantiene el estado → evita cambios bruscos</td>
+  </tr>
+
+</table>
+
+Esto permite mantener la temperatura estable sin que el sistema esté encendiendo y apagando continuamente.
+
+3. Define los tópicos MQTT
+
+Se modifico los Topic Utilizados anteriormente por los siguientes:
+
+<table style="width: 75%; border-collapse: collapse; font-family: Arial, sans-serif; background-color: #000; color: #fff;">
+
+  <tr style="border-bottom: 1px solid #555;">
+    <th style="text-align: left; padding: 10px;">Tipo de Dato</th>
+    <th style="text-align: left; padding: 10px;">Ejemplo de Tópico</th>
+    <th style="text-align: left; padding: 10px;">Función</th>
+  </tr>
+
+  <tr style="border-bottom: 1px solid #333;">
+    <td style="padding: 8px;">Temperatura</td>
+    <td style="padding: 8px; font-family: monospace;">esp1/temperatura/sensor1</td>
+    <td style="padding: 8px;">Se envía el valor de la temperatura medida</td>
+  </tr>
+
+  <tr>
+    <td style="padding: 8px;">Control de Válvulas</td>
+    <td style="padding: 8px; font-family: monospace;">esp2/pintura/valvula1</td>
+    <td style="padding: 8px;">Se envía la orden <strong>ON</strong> o <strong>OFF</strong> para activar o desactivar la válvula</td>
+  </tr>
+
+</table>
+
+Las resistencias no usan MQTT, ya que se controlan directamente desde el ESP32 mediante pines digitales.
+
+4. Acciona los dispositivos
+
+Según la temperatura medida:
+
+<table style="width: 75%; border-collapse: collapse; font-family: Arial, sans-serif; background-color: #000; color: #fff;">
+
+  <tr style="border-bottom: 1px solid #555;">
+    <th style="text-align: left; padding: 10px;">Comando</th>
+    <th style="text-align: left; padding: 10px;">Dispositivo</th>
+    <th style="text-align: left; padding: 10px;">Acción</th>
+  </tr>
+
+  <tr style="border-bottom: 1px solid #333;">
+    <td style="padding: 8px; font-family: monospace;">client.publish(..., "ON")</td>
+    <td style="padding: 8px;">Válvula</td>
+    <td style="padding: 8px;">Se abre para bajar la temperatura</td>
+  </tr>
+
+  <tr style="border-bottom: 1px solid #333;">
+    <td style="padding: 8px; font-family: monospace;">client.publish(..., "OFF")</td>
+    <td style="padding: 8px;">Válvula</td>
+    <td style="padding: 8px;">Se cierra cuando ya no es necesario enfriar</td>
+  </tr>
+
+  <tr style="border-bottom: 1px solid #333;">
+    <td style="padding: 8px; font-family: monospace;">resistencia_pin.value(1)</td>
+    <td style="padding: 8px;">Resistencia</td>
+    <td style="padding: 8px;">Se enciende para aumentar la temperatura</td>
+  </tr>
+
+  <tr>
+    <td style="padding: 8px; font-family: monospace;">resistencia_pin.value(0)</td>
+    <td style="padding: 8px;">Resistencia</td>
+    <td style="padding: 8px;">Se apaga cuando se alcanza la temperatura deseada</td>
+  </tr>
+
+</table>
+
+
 ## Retos Encontrados
 
 1.	Sincronización de sensores:

@@ -13,7 +13,9 @@ El primer motor se encarga de bajar y subir la hélice mezcladora, mientras que 
 La coordinación de ambos motores se realiza de forma secuencial según el flujo de operación establecido, garantizando un proceso automatizado, preciso y eficiente.
 Los motores son controlados a través de los pines GPIO2 y GPIO4 de la ESP32, con el apoyo de módulos puente H que permiten invertir el sentido de giro, y convertidores DC-DC Step-Down (Buck Converter) ajustables que regulan el voltaje de alimentación de cada motor.
 
-![Periféricos del sistema](ESP1.jpg)
+<p align="center">
+  <img src="ESP1.jpg" width="800">
+</p>
 
 ## Herramientas utilizadas
 
@@ -47,17 +49,31 @@ Fin del proceso.
 
 ![Periféricos del sistema](Flujo_motoagitador.jpg)
 
-### 2. [Programación micropython](/G02/micropython/test.py)
+## 2. Avances Node-red
+
+<p float="left">
+  <img src="Node%20red%20final.jpg" width="320" />
+  <img src="Noderedvisual.jpg" width="400" />
+</p>
+
+<img src="terminal%20Thonny.jpg" width="300">
+
 
 ### 3. Diseño digital montaje final
 
-![Diseño final](Diseño%20final.jpg)
-![Diseño final 1](Diseño%20final1.jpg)
-![Diseño final 2](Diseño%20final2.jpg)
+<p float="left">
+  <img src="Diseño%20final.jpg" width="270" />
+  <img src="Diseño%20final1.jpg" width="260" />
+  <img src="Diseño%20final2.jpg" width="250" />
+</p>
 
 ## 4. Diseño moto agitador fisico
 
-![Montaje inicial](Montaje%20inicial.jpg)
+<img src="Montaje%20inicial.jpg" width="200">
+
+## 5. Video de funcionamiento
+
+[![Miniatura del vídeo](https://img.youtube.com/vi/O7TT6smyXDI/0.jpg)](https://youtu.be/O7TT6smyXDI)
 
 
 
