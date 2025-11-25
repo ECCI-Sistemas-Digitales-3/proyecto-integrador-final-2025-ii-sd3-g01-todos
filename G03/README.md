@@ -249,6 +249,7 @@ El flujo principal del programa hace lo siguiente:
      {"R": 120, "G": 85, "B": 60}
    - Envía ese mensaje al **topic MQTT** para que Node-RED lo reciba y visualice.
 
+## Node RED
 ![Image 1](https://github.com/user-attachments/assets/b1fc2930-c9a6-4c19-82fc-e1d7a6c3c80a)
 
 ![Image 2](https://github.com/user-attachments/assets/0f40eb46-ca02-4c8a-86d8-b9953604d745)
