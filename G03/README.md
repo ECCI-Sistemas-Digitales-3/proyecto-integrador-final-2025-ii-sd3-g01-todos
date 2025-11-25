@@ -250,9 +250,11 @@ El flujo principal del programa hace lo siguiente:
    - Envía ese mensaje al **topic MQTT** para que Node-RED lo reciba y visualice.
 
 ## Node RED
-![Image 1](https://github.com/user-attachments/assets/b1fc2930-c9a6-4c19-82fc-e1d7a6c3c80a)
 
 ### Nodo MQTT IN
+
+![Image 1](https://github.com/user-attachments/assets/b1fc2930-c9a6-4c19-82fc-e1d7a6c3c80a)
+
 
 En esta imagen aparece la configuración del nodo encargado de recibir datos desde MQTT.  
 Está suscrito al tópico **`in/micro/sensor/color`** usando el **broker local**.  
@@ -262,9 +264,12 @@ Este nodo debe recibir el mensaje enviado por el ESP32 con los valores **RGB**.
 Si no llegan datos, todo el flujo queda sin información para procesar.
 
 
-![Image 2](https://github.com/user-attachments/assets/0f40eb46-ca02-4c8a-86d8-b9953604d745)
 
 ### Nodo Template
+
+![Image 2](https://github.com/user-attachments/assets/0f40eb46-ca02-4c8a-86d8-b9953604d745)
+
+
 
 Esta imagen muestra el nodo que contiene el código **HTML y JavaScript** para visualizar el color detectado.  
 El HTML crea un **recuadro** y un **texto** donde se mostrará el código RGB.  
@@ -274,9 +279,11 @@ El recuadro cambia su fondo según los valores **R**, **G** y **B** recibidos.
 Este nodo es el encargado de **mostrar el resultado final del sensor** en la pantalla.
 
 
+### Dashboard con indicadores en cero
+
 ![Image 3](https://github.com/user-attachments/assets/e331b434-33a0-4f74-95c9-bb1e272b672f)
 
-### Dashboard con indicadores en cero
+
 
 Aquí se observa la interfaz gráfica del dashboard, donde deberían aparecer los valores de **rojo**, **verde** y **azul**.  
 Los tres indicadores están en **cero**, lo cual significa que **no se están recibiendo datos del sensor**.
@@ -287,9 +294,11 @@ La interfaz está bien diseñada, pero no tiene datos para actualizarse.
 Esto indica un **problema previo en la recepción MQTT**.
 
 
+### Nodo “Dividir RGB”
+
 ![Image 4](https://github.com/user-attachments/assets/fb9d5ec8-12e4-4795-bbb1-1a463788ec2c)
 
-### Nodo “Dividir RGB”
+
 
 Esta imagen muestra el nodo función que separa el mensaje RGB original.  
 El código toma los valores de **R**, **G** y **B** y genera **tres mensajes independientes**.
@@ -300,9 +309,11 @@ Estos mensajes luego se conectan a indicadores individuales para representar cad
 Este nodo permite **visualizar los tres canales por separado** en el dashboard.
 
 
+### Nodo “Agrupar RGB”
+
 ![Image 5](https://github.com/user-attachments/assets/9061c416-d160-4931-909e-ed608fc47b47)
 
-### Nodo “Agrupar RGB”
+
 
 Aquí se ve el nodo función encargado de tomar los valores **R**, **G** y **B** del mensaje recibido.  
 El código extrae cada componente del payload y los coloca dentro de un **nuevo objeto JSON**.
@@ -313,9 +324,11 @@ Su propósito es entregar los **tres valores juntos** al template que mostrará 
 Es una etapa de **reconstrucción de datos** para usarlos en el dashboard.
 
 
+### Flujo general
+
+
 ![Image 6](https://github.com/user-attachments/assets/2fd229b1-3abf-4d01-9bae-c8ea19bddfa8)
 
-### Flujo general
 
 Esta imagen muestra el diagrama completo del flujo en **Node-RED**, donde el nodo MQTT recibe los datos de color enviados desde el **ESP32**.  
 Esos datos pasan a dos nodos función: uno para **dividir** el valor RGB y otro para **agruparlo** nuevamente.
