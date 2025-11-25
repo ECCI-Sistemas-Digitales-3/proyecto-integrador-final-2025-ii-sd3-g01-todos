@@ -240,48 +240,38 @@ def main():
 
         time.sleep_ms(100)
 ```
-Formato de Mensajes MQTT
+## Formato de Mensajes MQTT
 
-Recetas CMYKW
+### Recetas CMYKW
+- **Topic**: `""`
+- **Formato**: `C:10 M:20 Y:5 K:15 W:0`
+- **Descripción**: Porcentajes de cada color (0-100%)
 
-Topic: ""
+### Estados de Temperatura
+- **Topics**: `""` a `""`
+- **Valores**: `ON`, `1`, `TRUE` (temperatura OK) u otros (temperatura no OK)
 
-Formato: C:10 M:20 Y:5 K:15 W:0
+## Secuencia de Operación
 
-Descripción: Porcentajes de cada color (0-100%)
+1. **Recepción de Receta**: El sistema recibe una receta CMYKW por MQTT
+2. **Validación de Temperatura**: Verifica que cada bomba tenga temperatura OK
+3. **Ejecución Secuencial**: Activa cada bomba en orden por su tiempo calculado
+4. **Agitación Final**: Mezcla la pintura por 10 segundos
+5. **Reset**: Prepara el sistema para la siguiente receta
 
-Estados de Temperatura
-Topics: "" a ""
+## Características de Seguridad
 
-Valores: ON, 1, TRUE (temperatura OK) u otros (temperatura no OK)
+- **Límite de Capacidad**: Máximo 40% total en recetas CMYKW
+- **Verificación de Temperatura**: Cada bomba requiere temperatura OK
+- **Control de PWM**: Duty cycle limitado al 70%
+- **Manejo de Errores**: Try-catch en puntos críticos
 
-Secuencia de Operación
-Recepción de Receta: El sistema recibe una receta CMYKW por MQTT
+## Integración con Node-RED
 
-Validación de Temperatura: Verifica que cada bomba tenga temperatura OK
-
-Ejecución Secuencial: Activa cada bomba en orden por su tiempo calculado
-
-Agitación Final: Mezcla la pintura por 10 segundos
-
-Reset: Prepara el sistema para la siguiente receta
-
-Características de Seguridad
-Límite de Capacidad: Máximo 40% total en recetas CMYKW
-
-Verificación de Temperatura: Cada bomba requiere temperatura OK
-
-Control de PWM: Duty cycle limitado al 70%
-
-Manejo de Errores: Try-catch en puntos críticos
-
-Integración con Node-RED
-Flujo Recomendado:
-Nodo de Entrada: Para enviar recetas CMYKW al topic ""
-
-Nodos de Temperatura: Publicar estados de válvulas en topics ""
-
-Dashboard: Monitoreo visual del estado del sistema
+### Flujo Recomendado:
+- **Nodo de Entrada**: Para enviar recetas CMYKW al topic `""`
+- **Nodos de Temperatura**: Publicar estados de válvulas en topics `""`
+- **Dashboard**: Monitoreo visual del estado del sistema
 
 Conclusión
 Este sistema proporciona un control preciso de mezclas de pintura con validaciones de seguridad y comunicación bidireccional mediante MQTT.
