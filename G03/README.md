@@ -250,6 +250,18 @@ El flujo principal del programa hace lo siguiente:
    - Envía ese mensaje al **topic MQTT** para que Node-RED lo reciba y visualice.
 
 El envío se realiza cada medio segundo.
+![Image 1](https://github.com/user-attachments/assets/b1fc2930-c9a6-4c19-82fc-e1d7a6c3c80a)
+
+![Image 2](https://github.com/user-attachments/assets/0f40eb46-ca02-4c8a-86d8-b9953604d745)
+
+![Image 3](https://github.com/user-attachments/assets/e331b434-33a0-4f74-95c9-bb1e272b672f)
+
+![Image 4](https://github.com/user-attachments/assets/fb9d5ec8-12e4-4795-bbb1-1a463788ec2c)
+
+![Image 5](https://github.com/user-attachments/assets/9061c416-d160-4931-909e-ed608fc47b47)
+
+![Image 6](https://github.com/user-attachments/assets/2fd229b1-3abf-4d01-9bae-c8ea19bddfa8)
+
 
 ---
 </div>
