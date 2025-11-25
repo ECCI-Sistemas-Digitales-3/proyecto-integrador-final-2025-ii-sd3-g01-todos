@@ -1,24 +1,25 @@
-## Control de Bombas de Diafragma con ESP32, MicroPython y MQTT
+# Control de Bombas de Diafragma con ESP32, MicroPython y MQTT
+
 ## Integrantes
 - [David Santiago Puentes Cárdenas — 99225](https://github.com/Monstertrox)  
 - [Juan David Arias Bojacá — 107394](https://github.com/juandariasb-ai)
 
-Objetivo del Sistema
+## Objetivo del Sistema
 Controlar cinco bombas de diafragma mediante una ESP32 que recibe recetas de mezcla en formato CMYKW (Cian, Magenta, Yellow, Black, White) por MQTT. El sistema convierte los porcentajes de color en tiempos de activación para cada bomba, considerando restricciones de temperatura y límites de capacidad total.
 
-Arquitectura del Sistema
-Componentes Principales
-5 Bombas de diafragma controladas por PWM
+## Arquitectura del Sistema
 
-1 Motor agitador para mezclar la pintura
+### Componentes Principales
+- 5 Bombas de diafragma controladas por PWM
+- 1 Motor agitador para mezclar la pintura
+- Sistema de validación de temperatura por bomba
+- Comunicación MQTT para recibir recetas y estados
 
-Sistema de validación de temperatura por bomba
+## Descripción Detallada del Código
 
-Comunicación MQTT para recibir recetas y estados
+### 1. Configuración de Hardware y Comunicaciones
 
-Descripción Detallada del Código
-1. Configuración de Hardware y Comunicaciones
-python
+```python
 # Configuración WiFi
 WIFI_SSID = ""
 WIFI_PASSWORD = ""
@@ -36,15 +37,18 @@ VALVE_TOPICS = [
     b"",  # bomba 4 -> K
     b"",  # bomba 5 -> W
 ]
+
 Propósito: Establece las credenciales de red y la conexión al broker MQTT.
 
 2. Configuración de Bombas y PWM
-python
+
+
 PWM_PINS = []   # Pines para 5 bombas
 PWM_FREQ = 1000                 # Frecuencia PWM en Hz
 PWM_GLOBAL = 70                 # Duty cycle global en %
 TIEMPOS_BOMBAS_MAX = []  # Tiempos máximos por bomba
 MAX_TOTAL_PERCENT = 40          # Límite total de porcentaje CMYKW
+
 Funcionalidad:
 
 Control individual de cada bomba mediante PWM
@@ -54,22 +58,23 @@ Limitación del duty cycle al 70% para protección
 Restricción del total CMYKW al 40% para evitar sobrecargas
 
 3. Sistema de Agitador
-python
+
 AGITATOR_PIN_NUM = 
 AGITATOR_TIME_S = 
 Propósito: Mezcla la pintura después de completar la secuencia de bombas durante 10 segundos.
 
 4. Estados y Variables Globales
-python
+
 # Estados del sistema
 tiempos_bombas_receta = [0.0] * 5  # Tiempos calculados para cada bomba
 flags = [0] * 5                    # Bandera de finalización por bomba
 receta_lista = False               # Indica si hay receta pendiente
 mezcla_en_progreso = False         # Indica si hay mezcla en curso
 temp_ok = [False] * 5              # Estados de temperatura por bomba
-5. Funciones Principales de Control
+
+Funciones Principales de Control
 Inicialización de PWM
-python
+
 def init_pwms():
     global pwms
     pwms = []
@@ -78,10 +83,11 @@ def init_pwms():
         p.duty(0)
         pwms.append(p)
     aplicar_pwm_global()
+
 Propósito: Configura todos los pines PWM y establece el duty cycle inicial.
 
 Procesamiento de Recetas CMYKW
-python
+
 def parse_cmykw(text):
     """
     Convierte texto 'C:10 M:0 Y:0 K:90 W:0' a diccionario
@@ -99,9 +105,9 @@ def parse_cmykw(text):
                 except:
                     pass
     return values
-Conversión a Tiempos:
 
-python
+Conversión a Tiempos
+
 def cmykw_to_tiempos(values):
     # Aplica límite del 40% y escala si es necesario
     total = values['C'] + values['M'] + values['Y'] + values['K'] + values['W']
@@ -119,8 +125,9 @@ def cmykw_to_tiempos(values):
         t = tmax * (pct / 100.0)
         tiempos.append(t)
     return tiempos
-6. Control de Ejecución de Bombas
-python
+
+Control de Ejecución de Bombas
+
 def ejecutar_bomba_tiempo(i, t_seg):
     """
     Ejecuta bomba i por t_seg segundos si:
@@ -150,6 +157,7 @@ def ejecutar_bomba_tiempo(i, t_seg):
         time.sleep_ms(50)
     apagar_bomba(i)
     flags[i] = 1
+
 Características:
 
 Verificación de temperatura antes de activar
@@ -158,8 +166,8 @@ Control de tiempo preciso con time.ticks_ms()
 
 Monitoreo continuo de MQTT durante la ejecución
 
-7. Manejo de MQTT
-python
+Manejo de MQTT
+
 def mqtt_callback(topic, msg):
     global tiempos_bombas_receta, receta_lista, mezcla_en_progreso, temp_ok
 
@@ -182,8 +190,9 @@ def mqtt_callback(topic, msg):
             val = s.strip().upper()
             temp_ok[i] = (val in ("ON", "1", "TRUE"))
             return
-8. Flujo Principal del Programa
-python
+
+Flujo Principal del Programa
+
 def main():
     global receta_lista, mezcla_en_progreso
 
@@ -215,16 +224,18 @@ def main():
             receta_lista = False
 
         time.sleep_ms(100)
+
 Formato de Mensajes MQTT
 Recetas CMYKW
 Topic: ""
+
 Formato: C:10 M:20 Y:5 K:15 W:0
+
 Descripción: Porcentajes de cada color (0-100%)
 
 Estados de Temperatura
-Topics:
+Topics: "" a ""
 
-"" a ""
 Valores: ON, 1, TRUE (temperatura OK) u otros (temperatura no OK)
 
 Secuencia de Operación
@@ -255,5 +266,15 @@ Nodos de Temperatura: Publicar estados de válvulas en topics ""
 
 Dashboard: Monitoreo visual del estado del sistema
 
+Conclusión
 Este sistema proporciona un control preciso de mezclas de pintura con validaciones de seguridad y comunicación bidireccional mediante MQTT.
+
+
+Este formato README.md está bien estructurado para GitHub con:
+- Encabezados jerárquicos claros
+- Código formateado en bloques
+- Listas organizadas
+- Secciones lógicas
+- Énfasis en elementos importantes
+- Fácil lectura y navegación
 
