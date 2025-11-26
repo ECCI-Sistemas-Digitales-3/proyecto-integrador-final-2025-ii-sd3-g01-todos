@@ -70,9 +70,9 @@ Este comportamiento se representa en el código mediante la validación indirect
 
 ### 2. Flujo del Motor Agitador
 
-```markdown
-![Flujo Agitador](./imagenes/flujo_agitador.png)
-```
+<p align="center">
+  <img src="./fotos_flujo/Flujo_motoagitador.jpg" alt="Diagrama de flujo del sistema" width="800"/>
+</p>
 
 **Funcionamiento:**
 
@@ -94,10 +94,10 @@ Que activa el pin del agitador durante **10 segundos**.
 
 ### 3. Flujo de Bombas de Pintura
 
-```markdown
-[Flujo Bombas](https://github.com/ECCI-Sistemas-Digitales-3/proyecto-integrador-final-2025-ii-sd3-g01-todos/blob/main/G11/fotos_flujo/Flujo_mezclador-Bombas.drawio.pdf)
+<p align="center">
+  <img src="./fotos_flujo/Flujo_mezclador-Bombas.png" alt="Diagrama de flujo del sistema" width="800"/>
+</p>
 
-```
 
 **Funcionamiento:**
 
