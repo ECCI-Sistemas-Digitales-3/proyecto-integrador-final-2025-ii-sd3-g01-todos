@@ -181,14 +181,50 @@ Durante el proceso se inició la instalación de las galgas sobre la estructura 
 
 Una vez finalizado el montaje de las bases y de las galgas, se procedió con la instalación de los módulos HX711, junto con su respectivo cableado, asegurando las conexiones según las especificaciones técnicas del diseño
 
-![alt text](cableado.png)
-
-
 
 ![alt text](cableado1.png)
 
+## Entrega a integradores 21/11/2025
 
 
+Posterior a la realización del cableado y las conexiones, se efectuó nuevamente la validación del código, donde se evidenció la necesidad de reemplazar los pines 34 y 35 de la ESP32, debido a que dichos pines estaban generando fallas en la lectura de los datos.
+En consecuencia, se optó por realizar el cambio de pines asignados, con el fin de garantizar la correcta adquisición de señales y proceder con las pruebas finales del sistema.
+
+![alt text](cableado.png)
+
+
+de esta manera se realiza la verificaciones de las lecturas y se realiza el ajuste de valores para la calibracion del sistema, El arreglo de las  GALGAS se hace en una lista de diccionarios en Python, donde cada diccionario representa la configuración individual de una galga (célula de carga) conectada a un módulo HX711.
+
+Cada elemento contiene la información necesaria para:
+
+Identificar los pines de conexión al ESP32
+
+Definir el topic MQTT donde se publicará el peso
+
+Establecer el valor de calibración (scale) para cada sensor
+
+![alt text](code.png)
+
+ Esta clase HX711 implementa su lectura manualmente usando pines GPIO del ESP32.
+
+Configura los pines del microcontrolador:
+
+PD_SCK: pin OUT → genera pulsos de reloj
+DOUT: pin IN → recibe los bits del HX711
+Con PULL_UP se activa la resistencia interna.
+
+
+El HX711 selecciona ganancia enviando pulsos adicionales después de la lectura.
+
+Tambien genra valores iniciales como:
+
+OFFSET: valor en cero después de hacer tare.
+
+SCALE: factor de calibración.
+
+Coloca PD_SCK en estado bajo (importante al inicio).
+
+![alt text](code2.png)
 
 
 ### 1. [Flujos](/G10/flujos/flows.json)
