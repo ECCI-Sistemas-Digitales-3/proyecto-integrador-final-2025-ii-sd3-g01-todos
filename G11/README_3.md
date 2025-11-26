@@ -94,7 +94,8 @@ Que activa el pin del agitador durante **10 segundos**.
 ### 3. Flujo de Bombas de Pintura
 
 ```markdown
-![Flujo Bombas](./imagenes/flujo_bombas.png)
+[Flujo Bombas](https://github.com/ECCI-Sistemas-Digitales-3/proyecto-integrador-final-2025-ii-sd3-g01-todos/blob/main/G11/fotos_flujo/Flujo_mezclador-Bombas.drawio.pdf)
+
 ```
 
 **Funcionamiento:**
