@@ -29,7 +29,7 @@ El sistema permite realizar la medición de peso mediante celdas de carga, emple
 
 Se adjunta el documento en formato PDF, donde se presenta el diseño del sistema, el esquema de conexiones eléctricas y la configuración de los periféricos utilizados para la correcta integración del sensor de peso con el entorno de control.
 
-ver pfd (PLANO_GALGA_ACTUALIZADO)
+ver pfd (PLANO_CONEXIONES.pdf)
 
 
 Se implementaron los programas destinados a la adquisición y visualización de los datos generados por la galga extensiométrica, empleando el entorno de desarrollo Thonny,  el lenguaje MicroPython para la programación del microcontrolador.
@@ -62,33 +62,33 @@ GND=GND DE LA FUENTE
 
 GALGA 1
 
-DT_PIN = 13    # Pin de datos DT del HX711 pin GPIO 13 de la esp32
+DT_PIN = 12    # Pin de datos DT del HX711 pin GPIO 13 de la esp32
 
-SCK_PIN = 12   # Pin de reloj SCK del HX711 pin GPIO 12 de la esp32
+SCK_PIN = 13   # Pin de reloj SCK del HX711 pin GPIO 12 de la esp32
 
 GALGA 2
 
-DT_PIN = 16   # Pin de datos DT del HX711 pin GPIO 16 de la esp32
+DT_PIN = 14   # Pin de datos DT del HX711 pin GPIO 16 de la esp32
 
-SCK_PIN = 17   # Pin de reloj SCK del HX711 pin GPIO 17 de la esp32
+SCK_PIN = 27   # Pin de reloj SCK del HX711 pin GPIO 17 de la esp32
 
 GALGA 3
 
-DT_PIN = 5   # Pin de datos DT del HX711 pin GPIO 5 de la esp32
+DT_PIN = 25   # Pin de datos DT del HX711 pin GPIO 5 de la esp32
 
-SCK_PIN = 18   # Pin de reloj SCK del HX711 pin GPIO 18 de la esp32
+SCK_PIN = 28   # Pin de reloj SCK del HX711 pin GPIO 18 de la esp32
 
 GALGA 4
 
-DT_PIN = 19   # Pin de datos DT del HX711 pin GPIO 19 de la esp32
+DT_PIN = 32   # Pin de datos DT del HX711 pin GPIO 19 de la esp32
 
-SCK_PIN = 3   # Pin de reloj SCK del HX711 pin GPIO 3 de la esp32
+SCK_PIN = 33   # Pin de reloj SCK del HX711 pin GPIO 3 de la esp32
 
 GALGA 5
 
-DT_PIN = 1   # Pin de datos DT del HX711 pin GPIO 1 de la esp32
+DT_PIN = 4   # Pin de datos DT del HX711 pin GPIO 1 de la esp32
 
-SCK_PIN = 23   # Pin de reloj SCK del HX711 pin GPIO 23 de la esp32
+SCK_PIN = 16   # Pin de reloj SCK del HX711 pin GPIO 23 de la esp32
 
 
 
