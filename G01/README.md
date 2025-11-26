@@ -230,11 +230,68 @@ if not modo_manual:
 ```
 Esto permite automatizar el proceso según las condiciones físicas del sistema (por ejemplo, el nivel o peso del tanque).
 
+## Node-RED: Monitoreo y Control del Sistema
+
+En esta etapa se integró Node-RED para visualizar las temperaturas de las cinco bombas y controlar el modo de operación mediante MQTT. El Dashboard permite observar en tiempo real el estado térmico y activar funciones manuales o automáticas según el requerimiento.
+
+### Funcionamiento General
+
+### Control del Modo de Operación
+- El usuario modifica el estado mediante el interruptor **Cambiar Modo** en el Dashboard.
+- El valor enviado se publica en un tópico MQTT que el ESP32 recibe.
+- El ESP32 ajusta su comportamiento según el modo seleccionado (manual o automático).
+
+### Recepción de Temperaturas
+- Cada bomba publica su temperatura mediante un tópico MQTT independiente.
+- Node-RED recibe estas temperaturas mediante nodos **MQTT In**.
+- Los valores alimentan indicadores LED en el Dashboard.
+- Los LED cambian según el estado térmico definido.
+
+### Publicación del Estado Final de las Bombas
+- Cada LED está conectado a un nodo **MQTT Out**.
+- Se publica el estado procesado: “normal”, “advertencia” o “crítico”.
+- Otros sistemas pueden suscribirse a estos tópicos.
+
+## Arquitectura del Flujo Node-RED
+
+### Componentes Principales
+- Nodo UI **Cambiar Modo**  
+- Cinco nodos **MQTT In** (temperaturas)  
+- Cinco indicadores LED del Dashboard  
+- Cinco nodos **MQTT Out** (estados finales)
+
+### Flujo General de Datos
+- El ESP32 envía temperatura → Node-RED la recibe.  
+- Node-RED determina estado → LED indica estado.  
+- LED → MQTT Out publica estado final.  
+- Usuario cambia modo desde el Dashboard → valor enviado al ESP32.
+
+## Interfaz del Dashboard
+
+### Elementos del Dashboard
+- Interruptor UI para cambiar modo.
+- Cinco indicadores LED para los estados térmicos.
+- Flujo visual que muestra el estado de cada bomba.
+
+## Evidencia del Flujo y Dashboard
+
+### Flujo en Node-RED
+
+<p align="center">
+  <img src="./Intento_ Node_red_final.jpeg" alt="Logo" width="800"/>
+</p>
+
+<p align="center">
+  <img src="./Intento_final.jpeg" alt="Logo" width="800"/>
+</p>
+
+
 ##  Video del funcionamiento
 
 [Ver video en YouTube](https://youtube.com/shorts/XyB3JLqUIzM)
 
 [Ver segundo video](https://youtube.com/shorts/PtICswtYfNs)
+
 [Ver tercer video](https://youtube.com/shorts/ESgXuht2zm0)
 
 [Ver cuarto video](https://youtube.com/shorts/nzPR5bZkEt8)
@@ -270,10 +327,3 @@ Esto permite automatizar el proceso según las condiciones físicas del sistema 
 </p>
 
 
-<p align="center">
-  <img src="./Intento_ Node_red_final.jpeg" alt="Logo" width="800"/>
-</p>
-
-<p align="center">
-  <img src="./Intento_final.jpeg" alt="Logo" width="800"/>
-</p>
