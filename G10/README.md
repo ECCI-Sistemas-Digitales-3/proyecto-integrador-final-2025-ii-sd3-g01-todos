@@ -205,18 +205,14 @@ Establecer el valor de calibración (scale) para cada sensor
 
 ![alt text](code.png)
 
- Esta clase HX711 implementa su lectura manualmente usando pines GPIO del ESP32.
-
-Configura los pines del microcontrolador:
+ Esta clase HX711 implementa su lectura manualmente usando pines GPIO del ESP32. Esto configura los pines del microcontrolador:
 
 PD_SCK: pin OUT → genera pulsos de reloj
 DOUT: pin IN → recibe los bits del HX711
 Con PULL_UP se activa la resistencia interna.
 
 
-El HX711 selecciona ganancia enviando pulsos adicionales después de la lectura.
-
-Tambien genra valores iniciales como:
+El HX711 selecciona ganancia enviando pulsos adicionales después de la lectura. Como tambien genera valores iniciales como:
 
 OFFSET: valor en cero después de hacer tare.
 
@@ -226,6 +222,28 @@ Coloca PD_SCK en estado bajo (importante al inicio).
 
 ![alt text](code2.png)
 
+
+para la conexion en wifi usa funciones conectar_wifi() el cual Activa el WiFi del ESP32 e intenta conectarse usando SSID y PASSWORD.
+
+y para en la funcion mqtt_connect(), Crea un cliente MQTT con el nombre ESP32_5GALGAS.luego intenta conectarse al broker configurado.
+
+![alt text](code3.png)
+
+y finalizando sigue el main() el cual es la secuencia principal del programa:
+
+el cual  Inicializa WiFi y MQTT, Llama conectar_wifi() → conecta MQTT.
+
+Luego inicializa las galgas, Para cada configuración en GALGAS:
+-Crea el objeto HX711.
+-Realiza tare (poner en cero).
+-Aplica el factor de escala.
+-Guarda el sensor en la lista galgas.
+
+![alt text](code4.png)
+
+Con el equipo de integración se verificó que la información generada por las galgas llega correctamente a la interfaz gráfica en Node-RED. Como se observa, se realizó la implementación y visualización individual de cada galga, incluyendo su lectura inicial antes de ejecutar la tara y comenzar las mediciones. De esta manera, el sistema de galgas realiza las pruebas funcionales finales necesarias para su correcta integración con los demás sistemas del proyecto.
+
+![alt text](nodered.png)
 
 ### 1. [Flujos](/G10/flujos/flows.json)
 
