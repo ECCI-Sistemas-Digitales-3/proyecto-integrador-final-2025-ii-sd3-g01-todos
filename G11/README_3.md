@@ -51,8 +51,9 @@ Controlar cinco bombas de diafragma mediante una **ESP32_2** que recibe recetas 
 Este es el primer flujo que se ejecuta tras recibir el color desde la Raspberry.
 
 <p align="center">
-  <img src=".fotos_flujo/Flujo_mezclador-Galga.drawio.png" alt="Diagrama de flujo del sistema" width="800"/>
+  <img src="./fotos_flujo/Flujo_mezclador-Galga.drawio.png" alt="Diagrama de flujo del sistema" width="800"/>
 </p>
+
 
 **Funcionamiento:**
 
