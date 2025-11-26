@@ -64,7 +64,7 @@ Recepción de datos desde tópicos como:
     * Mostrar estados en widgets
 3.	Salida (MQTT-OUT)
 Publicación hacia dispositivos (ej. esp2/out, esp1/in).
-<!-- Aquí insertar DIAGRAMA ARQUITECTURA — nombre sugerido: arquitectura_nodered.png --> 
+<!-- Aquí insertar DIAGRAMA ARQUITECTURA --> 
 
 ## 4. Metodología
 4.1 Procedimiento
@@ -78,7 +78,7 @@ Publicación hacia dispositivos (ej. esp2/out, esp1/in).
    Cada módulo recibió una pestaña propia:
 
     * Cámara_color
-    (visualización de frame y diagnóstico de conexión)
+    (visualización de frame y diagnóstico de conexión) [Camara_color](https://github.com/ECCI-Sistemas-Digitales-3/proyecto-integrador-final-2025-ii-sd3-g01-todos/tree/main/G04)
     * Sensor de Color
     Donde se reciben los valores RGB, se dividen y se agrupan.
     * TemperaturaSensor
