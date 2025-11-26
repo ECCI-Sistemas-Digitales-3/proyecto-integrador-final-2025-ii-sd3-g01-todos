@@ -190,7 +190,7 @@ Definir el topic MQTT donde se publicará el peso
 
 Establecer el valor de calibración (scale) para cada sensor
 
-![alt text](code.png)
+![alt text](1pines.png)
 
  Esta clase HX711 implementa su lectura manualmente usando pines GPIO del ESP32. Esto configura los pines del microcontrolador:
 
