@@ -235,6 +235,9 @@ Esto permite automatizar el proceso según las condiciones físicas del sistema 
 [Ver video en YouTube](https://youtube.com/shorts/XyB3JLqUIzM)
 
 [Ver segundo video](https://youtube.com/shorts/PtICswtYfNs)
+[Ver tercer video](https://youtube.com/shorts/ESgXuht2zm0)
+
+[Ver cuarto video](https://youtube.com/shorts/nzPR5bZkEt8)
 
 ## Evidencias 
 
@@ -252,4 +255,25 @@ Esto permite automatizar el proceso según las condiciones físicas del sistema 
 
 <p align="center">
   <img src="./Prueba.jpeg" alt="Logo" width="800"/>
+</p>
+
+<p align="center">
+  <img src="./conexion.jpeg" alt="Logo" width="800"/>
+</p>
+
+<p align="center">
+  <img src="./imagen.jpeg" alt="Logo" width="800"/>
+</p>
+
+<p align="center">
+  <img src="./imagen.jpeg" alt="Logo" width="800"/>
+</p>
+
+
+<p align="center">
+  <img src="./Intento_ Node_red_final.jpeg" alt="Logo" width="800"/>
+</p>
+
+<p align="center">
+  <img src="./Intento_final.jpeg" alt="Logo" width="800"/>
 </p>
