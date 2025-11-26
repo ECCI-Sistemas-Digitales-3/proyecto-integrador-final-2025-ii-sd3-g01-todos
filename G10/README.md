@@ -161,6 +161,36 @@ igualmente, se realizaron las visualizaciones en el Dashboard, permitiendo monit
 ![alt text](dashboard.png)
 
 ![alt text](dashboard2.png)
+
+
+## AVANCE 14-11-2025
+
+Durante el proceso se inició la instalación de las galgas sobre la estructura de madera. Conforme al diseño establecido, se efectuó el montaje de las bases de las galgas junto con su tornillería correspondiente, garantizando la correcta fijación y alineación de los elementos.
+
+
+![alt text](Montaje1.png)
+
+
+
+![alt text](Montaje2.png)
+
+
+
+![alt text](Montaje3.png)
+
+
+Una vez finalizado el montaje de las bases y de las galgas, se procedió con la instalación de los módulos HX711, junto con su respectivo cableado, asegurando las conexiones según las especificaciones técnicas del diseño
+
+![alt text](cableado.png)
+
+
+
+![alt text](cableado1.png)
+
+
+
+
+
 ### 1. [Flujos](/G10/flujos/flows.json)
 
 
