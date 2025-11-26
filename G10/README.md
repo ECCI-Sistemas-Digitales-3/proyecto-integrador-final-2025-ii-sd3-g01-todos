@@ -51,43 +51,30 @@ A continuación, se diseñaron los esquemas de comunicación en Node-RED y se re
 
 
 
-# ===== CONFIGURACIÓN HX711 =====
-
-
-Pines de conexion HX711 y la esp32
+#  CONFIGURACIÓN HX711 
+# Pines de conexion HX711 y la esp32
 
 VCC= FUENTE +5V
-
 GND=GND DE LA FUENTE
 
-GALGA 1
-
+# GALGA 1
 DT_PIN = 12    # Pin de datos DT del HX711 pin GPIO 13 de la esp32
-
 SCK_PIN = 13   # Pin de reloj SCK del HX711 pin GPIO 12 de la esp32
 
-GALGA 2
-
+# GALGA 2
 DT_PIN = 14   # Pin de datos DT del HX711 pin GPIO 16 de la esp32
-
 SCK_PIN = 27   # Pin de reloj SCK del HX711 pin GPIO 17 de la esp32
 
-GALGA 3
-
+# GALGA 3
 DT_PIN = 25   # Pin de datos DT del HX711 pin GPIO 5 de la esp32
-
 SCK_PIN = 28   # Pin de reloj SCK del HX711 pin GPIO 18 de la esp32
 
-GALGA 4
-
+# GALGA 4
 DT_PIN = 32   # Pin de datos DT del HX711 pin GPIO 19 de la esp32
-
 SCK_PIN = 33   # Pin de reloj SCK del HX711 pin GPIO 3 de la esp32
 
-GALGA 5
-
+# GALGA 5
 DT_PIN = 4   # Pin de datos DT del HX711 pin GPIO 1 de la esp32
-
 SCK_PIN = 16   # Pin de reloj SCK del HX711 pin GPIO 23 de la esp32
 
 
@@ -112,7 +99,7 @@ SEÑAL-: A-
 
 ![alt text](image-3.png)
 
-## Avances
+# Avances
 
 En este apartado se presenta la evidencia fotográfica del montaje realizado por parte de nuestro equipo, correspondiente al sistema instalado.
 
@@ -134,7 +121,7 @@ Se elabora el diagrama de flujo del sistema utilizando pseudocódigo, en el cual
 ![alt text](Flujo_mezclador-Galga.drawio.png)
 
 
-## AVANCE 07-11-2025
+# AVANCE 07-11-2025
 
 
 Montaje de la estructura 
