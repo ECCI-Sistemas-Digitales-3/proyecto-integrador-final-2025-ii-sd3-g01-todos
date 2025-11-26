@@ -13,7 +13,7 @@
 
 [Edwin Correa](https://github.com/ECORREA-96)  -  GRUPO 8
 
-Ricardo Sabogal   -  GRUPO 8
+[Ricardo Sabogal]( https://github.com/ricardosr-82)  -  GRUPO 8
 
 ## Objetivo
 
