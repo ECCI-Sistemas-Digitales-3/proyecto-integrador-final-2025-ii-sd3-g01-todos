@@ -275,97 +275,98 @@ Además maneja:
 
 El sistema escucha comandos en el tópico:
 
-*bascula/comando/<ID>
+- (bascula/comando/<ID>)
 
 Cuando llega un mensaje con "TARA", Se identifica cuál galga corresponde a ese ID, se marca la solicitud de TARA mediante tara_solicitada_idx
 l sistema ejecutará la TARA en la siguiente iteración del loop principal
 
 Esto permite controlar cada báscula desde Node-RED u otro sistema externo.
 
-🔘 Botón físico de TARA
+* Botón físico de TARA:
 
 El pin configurado como entrada permite realizar TARA manual presionando un botón.
 
 Si se presiona:
 
-Se detecta la interrupción
+- Se detecta la interrupción
 
-Se marca que la galga activa debe ser tarada
+- Se marca que la galga activa debe ser tarada
 
-La TARA se ejecuta inmediatamente en el siguiente ciclo
+- La TARA se ejecuta inmediatamente en el siguiente ciclo
 
-📡 Conexión a WiFi y creación del cliente MQTT
 
-La función conectar_wifi() activa el WiFi del ESP32, conecta usando las credenciales almacenadas y espera hasta obtener una dirección IP.
+*Conexión a WiFi y creación del cliente MQTT:
 
-Luego se crea un cliente MQTT y se suscribe al tópico de comandos:
+La función conectar_wifi() activa el WiFi del ESP32, conecta usando las credenciales almacenadas y espera hasta obtener una dirección IP y luego se crea un cliente MQTT y se suscribe al tópico de comandos:
 
-bascula/comando/#
+-(bascula/comando/#)
 
 Esto permite recibir órdenes de TARA por MQTT.
 
-🧮 Filtro exponencial EMA para suavizar lecturas
 
-Cada lectura cruda del HX711 tiende a ser ruidosa.
-El programa utiliza un filtro EMA con un factor alpha configurable:
+* Filtro exponencial EMA para suavizar lecturas
 
-peso_suave = lectura_raw * α + lectura_anterior * (1 – α)
+Cada lectura cruda del HX711 tiende a ser ruidosa. El programa utiliza un filtro EMA con un factor alpha configurable:
+
+- peso_suave = lectura_raw * α + lectura_anterior * (1 – α)
 
 Esto reduce variaciones rápidas y produce una lectura más estable para visualizar y publicar en MQTT.
 
-▶️ Ciclo principal del programa (main loop)
+
+* Ciclo principal del programa (main loop)
 
 El corazón del sistema es un bucle que corre continuamente:
 
-1️⃣ Revisión de mensajes MQTT
+1. Revisión de mensajes MQTT
 
 Se verifica si llegó una solicitud de TARA remota.
 
-2️⃣ Ejecución de TARA
+
+2. Ejecución de TARA
 
 Si una galga tiene TARA pendiente:
 
-Se ejecuta hx.tara()
+- Se ejecuta hx.tara()
 
-Se recalcula la memoria del filtro EMA con 20 muestras nuevas
+- Se recalcula la memoria del filtro EMA con 20 muestras nuevas
 
-Se limpia el indicador de TARA
+- Se limpia el indicador de TARA
 
-3️⃣ Lectura secuencial de cada galga
 
-El sistema no lee todas las galgas al tiempo.
-Va leyendo una por ciclo, en orden circular:
+3. Lectura secuencial de cada galga
 
-Lectura del HX711
+El sistema no lee todas las galgas al tiempo y va leyendo una por ciclo, en orden circular:
 
-Aplicación del filtro EMA
+- Lectura del HX711
 
-Conversión a texto formateado
+- Aplicación del filtro EMA
 
-Actualización en consola
+- Conversión a texto formateado
+
+- Actualización en consola
 
 Publicación en su tópico MQTT:
-
-in/bascula/peso/<ID>
+(in/bascula/peso/<ID>)
 Esto mantiene alta velocidad y evita saturar la CPU.
 
-4️⃣ Cambio a la siguiente galga
 
-El índice avanza:
-Cyan → Magenta → Yellow → Key → White → Cyan...
+4. Cambio a la siguiente galga
 
-5️⃣ Pequeño delay
+El índice avanza de esta forma:
+- Cyan → Magenta → Yellow → Key → White → Cyan...
+
+5. Pequeño delay
 
 Se espera 10 ms para mejorar estabilidad.
-🔁 Reinicio por errores
+ Reinicio por errores
 
 Si ocurre un error fatal:
 
-Se imprime el mensaje
+- Se imprime el mensaje
 
-El ESP32 espera 10 segundos
+- El ESP32 espera 10 segundos
 
-Luego se reinicia
+- Y luego se reinicia
 
 Esto da robustez al sistema en ambientes reales.
 
