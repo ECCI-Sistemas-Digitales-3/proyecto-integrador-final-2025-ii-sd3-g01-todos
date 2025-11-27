@@ -1,187 +1,193 @@
-import time
-import network
-from machine import Pin
+# CÓDIGO BÁSCULA ESP32 PARA NODE-RED CON TARA INDIVIDUAL v7 (OPTIMIZADO POR EMA)
+
+from machine import Pin, freq, reset
+from time import sleep, time
+import sys
+from hx711 import HX711
 from umqtt.simple import MQTTClient
 
-SSID = "motorola2822"
-PASSWORD = "hellomoto"
-MQTT_BROKER = "4.tcp.ngrok.io"
-MQTT_PORT = 12210
+# Importar WiFi desde archivo externo
+from wafi import conectar_wifi
 
-# Pines válidos ya corregidos (ninguno es 34-39)
-GALGAS = [
-    {"dt": 12, "sck": 13, "topic": b"sensor/peso1", "scale": 350.0},
-    {"dt": 14, "sck": 27, "topic": b"sensor/peso2", "scale": 369.0},
-    {"dt": 25, "sck": 26, "topic": b"sensor/peso3", "scale": 360.0},
-    {"dt": 32, "sck": 33, "topic": b"sensor/peso4", "scale": 380.0},
-    {"dt": 4,  "sck": 16, "topic": b"sensor/peso5", "scale": 370.0}
+# --- Configuración del Sistema ---
+freq(240000000)
+
+# =========================================================================
+# === PARÁMETROS DE RED Y MQTT ===
+# =========================================================================
+MQTT_BROKER = "192.168.94.216" 
+MQTT_PORT = 1883 
+MQTT_CLIENT_ID = "esp32_bascula_casa_01"
+
+# Tópicos Base
+TOPIC_PUB_PESO_BASE = b"in/bascula/peso"
+TOPIC_SUB_COMANDO_WILDCARD = b"bascula/comando/"
+
+# =========================================================================
+# === CONFIGURACIÓN DE LAS 5 GALGAS ===
+# =========================================================================
+GALGAS_CONFIG = [
+    {"nombre": "Cyan", "id": "Cyan", "pin_dt": 12, "pin_sck": 13, "calibracion":400},
+    {"nombre": "Magenta", "id": "Magenta", "pin_dt": 14, "pin_sck": 27, "calibracion": 587},
+    {"nombre": "Yellow", "id": "Yellow", "pin_dt": 25, "pin_sck": 26, "calibracion": 587},
+    {"nombre": "key", "id": "key", "pin_dt": 32, "pin_sck": 33, "calibracion": 587},
+    {"nombre": "White", "id": "White", "pin_dt": 4, "pin_sck": 16, "calibracion": 587},
 ]
 
-class HX711:
-    def __init__(self, dout_pin, pd_sck_pin, gain=128):
-        self.PD_SCK = Pin(pd_sck_pin, Pin.OUT)
-        self.DOUT = Pin(dout_pin, Pin.IN, Pin.PULL_UP)
+# Parámetros generales
+GALGA_TARA_SAMPLES = 200 # Se mantiene alto para la TARA (proceso lento y único)
+PIN_BOTON_TARA = 0
 
-        self.GAIN = 1 if gain == 128 else (3 if gain == 64 else 2)
-        self.OFFSET = 0
-        self.SCALE = 1.0
-        self.PD_SCK.value(0)
-        time.sleep_ms(5)
-
-    def is_ready(self, timeout_ms=500):
-        start = time.ticks_ms()
-        while self.DOUT.value() == 1:
-            if time.ticks_diff(time.ticks_ms(), start) > timeout_ms:
-                return False
-            time.sleep_us(200)
-        return True
-
-    def read_raw(self):
-        if not self.is_ready():
-            return None
-
-        count = 0
-        for _ in range(24):
-            self.PD_SCK.value(1)
-            count = (count << 1) | self.DOUT.value()
-            self.PD_SCK.value(0)
-
-        for _ in range(self.GAIN):
-            self.PD_SCK.value(1)
-            self.PD_SCK.value(0)
-
-        if count & 0x800000:
-            count -= 0x1000000
-
-        return count
-
-    def get_mean_raw(self, times=4):
-        readings = []
-        for _ in range(times):
-            r = self.read_raw()
-            if r is not None:
-                readings.append(r)
-            time.sleep_ms(3)
-
-        if not readings:
-            return None
-
-        readings.sort()
-        if len(readings) > 2:
-            readings = readings[1:-1]
-
-        return sum(readings) // len(readings)
-
-    def tare(self, times=10):
-        vals = []
-        for _ in range(times):
-            r = self.read_raw()
-            if r is not None:
-                vals.append(r)
-            time.sleep_ms(5)
-
-        if not vals:
-            return False
-
-        vals.sort()
-        if len(vals) > 2:
-            vals = vals[1:-1]
-
-        self.OFFSET = sum(vals) // len(vals)
-        return True
-
-    def set_scale(self, scale):
-        self.SCALE = scale if scale != 0 else 1.0
-
-    def get_weight(self, times=4):
-        raw = self.get_mean_raw(times)
-        if raw is None:
-            return None
-        return (raw - self.OFFSET) / self.SCALE
+# =========================================================================
+# === NUEVAS VARIABLES PARA EL FILTRO EXPONENCIAL (EMA) ===
+# =========================================================================
+# FACTOR_SUAVIZADO (Alpha): 0.3 es un buen punto de partida. AJUSTAR según pruebas.
+FACTOR_SUAVIZADO = 0.2
+# Lista global que almacena el ÚLTIMO valor suave de cada báscula (la 'memoria' del filtro)
+# Se inicializa correctamente dentro de bascula_principal_loop
+pesos_suavizados = [] 
 
 
-def conectar_wifi():
-    try:
-        wlan = network.WLAN(network.STA_IF)
-        wlan.active(True)
+# --- Banderas y Variables Globales ---
+tara_solicitada_idx = -1
+galga_activa_idx = 0
 
-        if not wlan.isconnected():
-            wlan.connect(SSID, PASSWORD)
-            timeout = 15
-            while not wlan.isconnected() and timeout > 0:
-                time.sleep(1)
-                timeout -= 1
+# =========================================================================
+# === FUNCIONES DE CALLBACK Y CONEXIÓN ===
+# =========================================================================
 
-        if wlan.isconnected():
-            print("WiFi OK:", wlan.ifconfig()[0])
-            return wlan
-        return None
-    except:
-        return None
+def sub_callback(topic, msg):
+    global tara_solicitada_idx
+    
+    topic_str = topic.decode()
+    msg_str = msg.decode()
+    print(f"\n[MQTT] Mensaje recibido -> Tópico: {topic_str}, Mensaje: {msg_str}")
 
+    if msg_str == "TARA" and topic_str.startswith("bascula/comando/"):
+        id_bascula = topic_str.split('/')[-1]
+        
+        for i, config in enumerate(GALGAS_CONFIG):
+            if config["id"] == id_bascula:
+                print(f"[MQTT] ¡Solicitud de TARA recibida para {config['nombre']} (ID: {id_bascula})!")
+                tara_solicitada_idx = i 
+                return 
 
-def mqtt_connect():
-    try:
-        client = MQTTClient("ESP32_5GALGAS", MQTT_BROKER, port=MQTT_PORT)
-        client.connect()
-        print("MQTT conectado")
-        return client
-    except:
-        print("MQTT ERROR")
-        return None
+def manejador_interrupcion_tara(pin):
+    global tara_solicitada_idx, galga_activa_idx
+    if tara_solicitada_idx == -1:
+        print(f"\n[BOTÓN] ¡Botón físico presionado! Solicitando TARA para la galga activa: {GALGAS_CONFIG[galga_activa_idx]['nombre']}")
+        tara_solicitada_idx = galga_activa_idx
 
+# =========================================================================
+# === FUNCIÓN PRINCIPAL ===
+# =========================================================================
+def bascula_principal_loop():
+    global tara_solicitada_idx, galga_activa_idx, pesos_suavizados
+    
+    # --- Conexiones Iniciales ---
+    conectar_wifi()
+    print(f"Conectando al broker MQTT: {MQTT_BROKER}:{MQTT_PORT}...")
+    client = MQTTClient(MQTT_CLIENT_ID, MQTT_BROKER, port=MQTT_PORT)
+    client.set_callback(sub_callback)
+    client.connect()
+    client.subscribe(TOPIC_SUB_COMANDO_WILDCARD)
+    print(f"Conectado a MQTT y suscrito al tópico: {TOPIC_SUB_COMANDO_WILDCARD.decode()}")
 
-def main():
-    print("Iniciando...")
+    # --- Inicialización de las 5 Galgas ---
+    sensores_hx = []
+    pesos_suavizados = [] # Reinicia la memoria
+    print("\nInicializando galgas...")
+    for config in GALGAS_CONFIG:
+        print(f"   -> Configurando {config['nombre']}...")
+        hx = HX711(Pin(config['pin_dt']), Pin(config['pin_sck']))
+        hx.wakeUp()
+        hx.kanal(1)
+        print(f"     Realizando TARA inicial...")
+        hx.tara(GALGA_TARA_SAMPLES)
+        hx.calFaktor(config['calibracion'])
+        
+        # PRE-CARGA DE LA MEMORIA DEL FILTRO
+        # Leemos 20 muestras estables para iniciar la memoria EMA sin un valor de 0
+        lectura_inicial_suave = hx.masse(20) 
+        pesos_suavizados.append(lectura_inicial_suave)
+        
+        sensores_hx.append(hx)
+    print("¡Todas las galgas listas y memoria EMA precargada!")
 
-    wlan = conectar_wifi()
-    mqtt = mqtt_connect() if wlan else None
+    # --- Configuración del Botón ---
+    boton = Pin(PIN_BOTON_TARA, Pin.IN, Pin.PULL_UP)
+    boton.irq(trigger=Pin.IRQ_FALLING, handler=manejador_interrupcion_tara)
+    print(f"Botón físico configurado en pin {PIN_BOTON_TARA}.")
+    print("------------------------------------------")
 
-    galgas = []
-    for cfg in GALGAS:
-        try:
-            hx = HX711(cfg["dt"], cfg["sck"])
-            if hx.tare():
-                hx.set_scale(cfg["scale"])
-                galgas.append(hx)
-            else:
-                galgas.append(None)
-        except:
-            galgas.append(None)
-
-    ventanas = [[] for _ in range(5)]
+    # --- Bucle Principal de Medición ---
+    ultimas_lecturas = ["0,00"] * len(GALGAS_CONFIG)
 
     while True:
-        pesos = [0.0] * 5
-        valid = [False] * 5
+        # 1. Revisa mensajes MQTT (actualizará tara_solicitada_idx si llega un comando)
+        client.check_msg()
 
-        for i, hx in enumerate(galgas):
-            if hx is not None:
-                p = hx.get_weight()
-                if p is not None:
-                    ventanas[i].append(p)
-                    if len(ventanas[i]) > 5:
-                        ventanas[i].pop(0)
-                    pesos[i] = sum(ventanas[i]) / len(ventanas[i])
-                    valid[i] = True
+        # 2. PROCESO DE TARA PRIORITARIO: 
+        if tara_solicitada_idx != -1:
+            config_tara = GALGAS_CONFIG[tara_solicitada_idx]
+            hx_tara = sensores_hx[tara_solicitada_idx]
+            
+            print(f"\n[TARA] Procesando solicitud para {config_tara['nombre']}...")
+            hx_tara.tara(GALGA_TARA_SAMPLES)
+            
+            # **IMPORTANTE: Actualizar la memoria EMA después de la tara**
+            pesos_suavizados[tara_solicitada_idx] = hx_tara.masse(20)
+            print(f"[TARA] ¡Nueva TARA completada y memoria EMA reiniciada para {config_tara['nombre']}!")
+            
+            tara_solicitada_idx = -1
+            #sleep(0.05) 
+            continue # Volver al inicio del bucle para la lectura normal
 
-        linea = " | ".join(
-            f"G{i+1}:{pesos[i]:.2f}" if valid[i] else f"G{i+1}:--"
-            for i in range(5)
-        )
-        print(linea)
+        # 3. PROCESO DE LECTURA SECUENCIAL: Rápido y con filtro EMA
+        hx_activo = sensores_hx[galga_activa_idx]
+        config_activa = GALGAS_CONFIG[galga_activa_idx]
 
-        if mqtt:
-            try:
-                for i in range(5):
-                    if valid[i]:
-                        mqtt.publish(GALGAS[i]["topic"], f"{pesos[i]:.2f}")
-            except:
-                mqtt = None
+        # Tomamos SOLO 1 muestra: Máxima velocidad.
+        lectura_actual_raw = hx_activo.masse(1) 
 
-        time.sleep(0.15)
+        # Aplicamos el FILTRO EXPONENCIAL (EMA)
+        peso_anterior = pesos_suavizados[galga_activa_idx]
+        
+        nuevo_peso_suave = (lectura_actual_raw * FACTOR_SUAVIZADO) + (peso_anterior * (1.0 - FACTOR_SUAVIZADO))
+        
+        # Actualizamos la memoria del filtro
+        pesos_suavizados[galga_activa_idx] = nuevo_peso_suave
 
+        # Usamos el valor suavizado para el resto del proceso
+        m_str = "{:0.2f}".format(nuevo_peso_suave)
+        
+        # *** CAMBIO: Actualiza la lista con la nueva lectura ***
+        ultimas_lecturas[galga_activa_idx] = m_str.replace('.', ',')
 
-main()
+        # Imprime estado (igual que antes)
+        linea_estado = ""
+        for i, lectura in enumerate(ultimas_lecturas):
+            linea_estado += f"B{i+1}: {lectura} g | "
+        print(linea_estado, end='\r')
 
+        # 4. Publica el valor en su tópico MQTT específico
+        topic_galga_actual = f"{TOPIC_PUB_PESO_BASE.decode()}/{config_activa['id']}".encode()
+        client.publish(topic_galga_actual, m_str.encode())
 
+        # 5. Avanza a la siguiente galga para la próxima iteración
+        galga_activa_idx = (galga_activa_idx + 1) % len(GALGAS_CONFIG)
+
+        # 6. Mínima pausa para evitar saturación de CPU, puede probarse en 0.0
+        sleep(0.01)
+
+# =========================================================================
+# === PUNTO DE ENTRADA ===
+# =========================================================================
+if __name__ == "__main__":
+    try:
+        bascula_principal_loop()
+    except Exception as e:
+        print(f"\nError fatal en el bucle principal: {e}")
+        print("Reiniciando el dispositivo en 10 segundos...")
+        sleep(10)
+        reset()
