@@ -296,7 +296,7 @@ INFORME DE IMPLEMENTACIÓN DEL SISTEMA DE BOMBEO PARA MEZCLADOR DE PINTURAS
 
 1. OBJETIVO DEL PROYECTO
 
-   El objetivo de la implementación, tiene como alcance diseñar y programar el sistema de control para cinco bombas destinadas a la dosificación de pintura en un mezclador automático. Seleccionar y validar los componentes hidráulicos adecuados que garanticen un flujo controlado. Integrar el sistema de bombeo con la plataforma de control basada en micro python, utilizando la ESP32 como microcontrolador y una rapberry Pi como procesador principal. Realizar pruebas funcionales del sistema de bombeo en diferentes condiciones de pintura. Implementar la instalación final de bombas, mangueras, tanques y sistema cisterna elevada, asregurando de esta manera el correcto funcionamiento del proceso de dosificación. 
+ El objetivo de la implementación, tiene como alcance diseñar y programar el sistema de control para cinco bombas destinadas a la dosificación de pintura en un mezclador automático. Seleccionar y validar los componentes hidráulicos adecuados que garanticen un flujo controlado. Integrar el sistema de bombeo con la plataforma de control basada en micro python, utilizando la ESP32 como microcontrolador y una rapberry Pi como procesador principal. Realizar pruebas funcionales del sistema de bombeo en diferentes condiciones de pintura. Implementar la instalación final de bombas, mangueras, tanques y sistema cisterna elevada, asregurando de esta manera el correcto funcionamiento del proceso de dosificación. 
 
 2. Desarrollo del proyecto
 
