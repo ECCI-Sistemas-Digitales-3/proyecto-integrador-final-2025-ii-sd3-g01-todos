@@ -288,3 +288,16 @@ ________________________________________________________________________________
 ![Imagen de WhatsApp 2025-11-12 a las 21 23 26_a00b6747](https://github.com/user-attachments/assets/8a6209b0-3653-4ff0-9e06-0204b86a53f7)
 
 Esta imagen muestra la interfaz de control y la salida del sistema MQTT en funcionamiento, donde se observa el panel completo con botones ON/OFF para cinco bombas de colores (CYAN, MAGENTA, YELLOW, BLACK, WHITE) y simultáneamente la consola que indica el proceso de conexión a los tópicos MQTT específicos para cada bomba ("bombas/CYAN", "bombas/MAGENTA", etc.), demostrando que el sistema está estableciendo las suscripciones individuales para cada canal de control mientras mantiene disponible la interfaz gráfica para que el usuario envíe comandos de activación y desactivación a cada dispositivo de forma independiente.
+
+
+_________________________________________________________________________________________________________________________________________________________
+
+INFORME DE IMPLEMENTACIÓN DEL SISTEMA DE BOMBEO PARA MEZCLADOR DE PINTURAS 
+
+1. OBJETIVO DEL PROYECTO
+
+   El objetivo de la implementación, tiene como alcance diseñar y programar el sistema de control para cinco bombas destinadas a la dosificación de pintura en un mezclador automático. Seleccionar y validar los componentes hidráulicos adecuados que garanticen un flujo controlado. Integrar el sistema de bombeo con la plataforma de control basada en micro python, utilizando la ESP32 como microcontrolador y una rapberry Pi como procesador principal. Realizar pruebas funcionales del sistema de bombeo en diferentes condiciones de pintura. Implementar la instalación final de bombas, mangueras, tanques y sistema cisterna elevada, asregurando de esta manera el correcto funcionamiento del proceso de dosificación. 
+
+2. Desarrollo del proyecto
+
+  El proyecto comenzó con la necesidad de programar e implementar el sistema de bombeo compuesto por cinco bombas para alimentar el mezclador de pintura. El primer intento de control de flujo se realizó utilizando una electroválvula; el caudal obtenido fue demasiado bajo, por lo que este componente se descartó. Luego se realizaron ensayos utilizando una bomba de diafragma, iniciando con agua para evaluar el funcionamiento general. Durante estas pruebas se identificó la presencia de un residual dentro de la manguera de salida, como alternativa, se instaló electroválvulas a la salida de la bomba, pero este residuo permaneció, después de discutirlo con el equipo y el docente Alfredo Becerra, llegamos a la conclusión de considerar este residual com parte de un porcentaje aceptable dentro del sistema.
