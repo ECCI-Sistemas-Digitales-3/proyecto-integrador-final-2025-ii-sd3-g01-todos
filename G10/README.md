@@ -256,8 +256,9 @@ La función conectar_wifi() activa el WiFi del ESP32, conecta usando las credenc
 
 Esto permite recibir órdenes de TARA por MQTT.
 
+![alt text](3pines.png)
 
-* Filtro exponencial EMA para suavizar lecturas
+## Filtro exponencial EMA para suavizar lecturas
 
 Cada lectura cruda del HX711 tiende a ser ruidosa. El programa utiliza un filtro EMA con un factor alpha configurable:
 
@@ -265,15 +266,13 @@ Cada lectura cruda del HX711 tiende a ser ruidosa. El programa utiliza un filtro
 
 Esto reduce variaciones rápidas y produce una lectura más estable para visualizar y publicar en MQTT.
 
-
-* Ciclo principal del programa (main loop)
+## Ciclo principal del programa (main loop)
 
 El corazón del sistema es un bucle que corre continuamente:
 
 1. Revisión de mensajes MQTT
 
 Se verifica si llegó una solicitud de TARA remota.
-
 
 2. Ejecución de TARA
 
@@ -284,7 +283,6 @@ Si una galga tiene TARA pendiente:
 - Se recalcula la memoria del filtro EMA con 20 muestras nuevas
 
 - Se limpia el indicador de TARA
-
 
 3. Lectura secuencial de cada galga
 
@@ -299,9 +297,9 @@ El sistema no lee todas las galgas al tiempo y va leyendo una por ciclo, en orde
 - Actualización en consola
 
 Publicación en su tópico MQTT:
+
 (in/bascula/peso/<ID>)
 Esto mantiene alta velocidad y evita saturar la CPU.
-
 
 4. Cambio a la siguiente galga
 
@@ -328,16 +326,7 @@ Con el equipo de integración se verificó que la información generada por las 
 ![alt text](nodered.png)
 
 
-![alt text](cableado.png)
 
-
-![alt text](1pines.png)
-
-![alt text](code2.png)
-
-![alt text](code3.png)
-
-![alt text](code4.png)
 
 ### 1. [Flujos](/G10/flujos/flows.json)
 
