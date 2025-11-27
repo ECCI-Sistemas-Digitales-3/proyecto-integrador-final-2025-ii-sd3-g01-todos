@@ -176,61 +176,6 @@ Una vez finalizado el montaje de las bases y de las galgas, se procedió con la 
 Posterior a la realización del cableado y las conexiones, se efectuó nuevamente la validación del código, donde se evidenció la necesidad de reemplazar los pines 34 y 35 de la ESP32, debido a que dichos pines estaban generando fallas en la lectura de los datos.
 En consecuencia, se optó por realizar el cambio de pines asignados, con el fin de garantizar la correcta adquisición de señales y proceder con las pruebas finales del sistema.
 
-![alt text](cableado.png)
-
-
-de esta manera se realiza la verificaciones de las lecturas y se realiza el ajuste de valores para la calibracion del sistema, El arreglo de las  GALGAS se hace en una lista de diccionarios en Python, donde cada diccionario representa la configuración individual de una galga (célula de carga) conectada a un módulo HX711.
-
-Cada elemento contiene la información necesaria para:
-
-Identificar los pines de conexión al ESP32
-
-Definir el topic MQTT donde se publicará el peso
-
-Establecer el valor de calibración (scale) para cada sensor
-
-![alt text](1pines.png)
-
- Esta clase HX711 implementa su lectura manualmente usando pines GPIO del ESP32. Esto configura los pines del microcontrolador:
-
-PD_SCK: pin OUT → genera pulsos de reloj
-DOUT: pin IN → recibe los bits del HX711
-Con PULL_UP se activa la resistencia interna.
-
-
-El HX711 selecciona ganancia enviando pulsos adicionales después de la lectura. Como tambien genera valores iniciales como:
-
-OFFSET: valor en cero después de hacer tare.
-
-SCALE: factor de calibración.
-
-Coloca PD_SCK en estado bajo (importante al inicio).
-
-![alt text](code2.png)
-
-
-para la conexion en wifi usa funciones conectar_wifi() el cual Activa el WiFi del ESP32 e intenta conectarse usando SSID y PASSWORD.
-
-y para en la funcion mqtt_connect(), Crea un cliente MQTT con el nombre ESP32_5GALGAS.luego intenta conectarse al broker configurado.
-
-![alt text](code3.png)
-
-y finalizando sigue el main() el cual es la secuencia principal del programa:
-
-el cual  Inicializa WiFi y MQTT, Llama conectar_wifi() → conecta MQTT.
-
-Luego inicializa las galgas, Para cada configuración en GALGAS:
-*Crea el objeto HX711.
-*Realiza tare (poner en cero).
-*Aplica el factor de escala.
-*Guarda el sensor en la lista galgas.
-
-![alt text](code4.png)
-
-Con el equipo de integración se verificó que la información generada por las galgas llega correctamente a la interfaz gráfica en Node-RED. Como se observa, se realizó la implementación y visualización individual de cada galga, incluyendo su lectura inicial antes de ejecutar la tara y comenzar las mediciones. De esta manera, el sistema de galgas realiza las pruebas funcionales finales necesarias para su correcta integración con los demás sistemas del proyecto.
-
-![alt text](nodered.png)
-
 
 # Entrega Final 
 
@@ -238,41 +183,49 @@ El programa inicia importando módulos como machine, time, HX711, el cliente MQT
 También se aumenta la frecuencia del procesador del ESP32 a 240 MHz para garantizar la lectura rápida y estable de los cinco sensores.
 Posteriormente, se definen los parámetros principales:
 
-*Dirección del broker MQTT
-*ID del cliente MQTT
-*Tópicos base para publicación y comandos de TARA
-*Parámetros de suavizado del filtro EMA
+![alt text](2pines.png)
+
+- Dirección del broker MQTT
+- ID del cliente MQTT
+- Tópicos base para publicación y comandos de TARA
+- Parámetros de suavizado del filtro EMA
 
 ## Gestión de las 5 celdas de carga (GALGAS)
 
 El arreglo de galgas se implementa mediante una lista de diccionarios en Python, donde cada diccionario almacena:
 
-*Nombre de la galga
-*Identificador único para su tópico MQTT
-*Pines DT y SCK del módulo HX711
-*Factor de calibración individual
+- Nombre de la galga
+- Identificador único para su tópico MQTT
+- Pines DT y SCK del módulo HX711
+- Factor de calibración individual
 
 Este diseño permite añadir o modificar sensores sin alterar el resto del código.
+
+![alt text](1pines.png)
 
 ## Ejemplo de configuración:
 
 GALGAS_CONFIG = [
     {"nombre": "Cyan", "id": "Cyan", "pin_dt": 12, "pin_sck": 13, "calibracion": 400},
-    ...
-]
+    ...]
+    
 Cada galga se inicializa así:
 
-Se configura el módulo HX711 en sus pines asignados,se realiza una TARA inicial usando 200 muestras para obtener un cero estable, se aplica el factor de calibración configurado, se precarga el filtro EMA tomando 20 lecturas estables del sensor y la clase HX711 realiza la lectura bit a bit controlando manualmente los pines:
+- Se configura el módulo HX711 en sus pines asignados.
+- Se realiza una TARA inicial usando 200 muestras para obtener un cero estable.
+- Se aplica el factor de calibración configurado.
+- Se precarga el filtro EMA tomando 20 lecturas estables del sensor.
 
-*PD_SCK (salida): genera pulsos de reloj
-*DOUT (entrada): recibe los 24 bits del valor medido
+La clase HX711 realiza la lectura bit a bit controlando manualmente los pines:
+
+- PD_SCK (salida): genera pulsos de reloj
+- DOUT (entrada): recibe los 24 bits del valor medido
 
 Además maneja:
 
-*OFFSET: valor base después del tare
-*SCALE: factor usado para convertir la lectura RAW en gramos
-*Callback MQTT para TARA remota
-
+- OFFSET: valor base después del tare
+- SCALE: factor usado para convertir la lectura RAW en gramos
+- 
 El sistema escucha comandos en el tópico:
 
 - (bascula/comando/<ID>)
@@ -369,6 +322,22 @@ Si ocurre un error fatal:
 - Y luego se reinicia
 
 Esto da robustez al sistema en ambientes reales.
+
+Con el equipo de integración se verificó que la información generada por las galgas llega correctamente a la interfaz gráfica en Node-RED. Como se observa, se realizó la implementación y visualización individual de cada galga, incluyendo su lectura inicial antes de ejecutar la tara y comenzar las mediciones. De esta manera, el sistema de galgas realiza las pruebas funcionales finales necesarias para su correcta integración con los demás sistemas del proyecto.
+
+![alt text](nodered.png)
+
+
+![alt text](cableado.png)
+
+
+![alt text](1pines.png)
+
+![alt text](code2.png)
+
+![alt text](code3.png)
+
+![alt text](code4.png)
 
 ### 1. [Flujos](/G10/flujos/flows.json)
 
