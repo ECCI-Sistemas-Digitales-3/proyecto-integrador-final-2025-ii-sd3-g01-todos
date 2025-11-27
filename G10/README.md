@@ -51,29 +51,28 @@ A continuación, se diseñaron los esquemas de comunicación en Node-RED y se re
 
 
 
-#  CONFIGURACIÓN HX711 
-# Pines de conexion HX711 y la esp32
+#  Configuracion de Pines del Modulo HX711 y la esp32
 
 VCC= FUENTE +5V
 GND=GND DE LA FUENTE
 
-# GALGA 1
+## GALGA 1
 DT_PIN = 12    # Pin de datos DT del HX711 pin GPIO 13 de la esp32
 SCK_PIN = 13   # Pin de reloj SCK del HX711 pin GPIO 12 de la esp32
 
-# GALGA 2
+## GALGA 2
 DT_PIN = 14   # Pin de datos DT del HX711 pin GPIO 16 de la esp32
 SCK_PIN = 27   # Pin de reloj SCK del HX711 pin GPIO 17 de la esp32
 
-# GALGA 3
+## GALGA 3
 DT_PIN = 25   # Pin de datos DT del HX711 pin GPIO 5 de la esp32
 SCK_PIN = 28   # Pin de reloj SCK del HX711 pin GPIO 18 de la esp32
 
-# GALGA 4
+## GALGA 4
 DT_PIN = 32   # Pin de datos DT del HX711 pin GPIO 19 de la esp32
 SCK_PIN = 33   # Pin de reloj SCK del HX711 pin GPIO 3 de la esp32
 
-# GALGA 5
+## GALGA 5
 DT_PIN = 4   # Pin de datos DT del HX711 pin GPIO 1 de la esp32
 SCK_PIN = 16   # Pin de reloj SCK del HX711 pin GPIO 23 de la esp32
 
@@ -221,16 +220,154 @@ y finalizando sigue el main() el cual es la secuencia principal del programa:
 el cual  Inicializa WiFi y MQTT, Llama conectar_wifi() → conecta MQTT.
 
 Luego inicializa las galgas, Para cada configuración en GALGAS:
--Crea el objeto HX711.
--Realiza tare (poner en cero).
--Aplica el factor de escala.
--Guarda el sensor en la lista galgas.
+*Crea el objeto HX711.
+*Realiza tare (poner en cero).
+*Aplica el factor de escala.
+*Guarda el sensor en la lista galgas.
 
 ![alt text](code4.png)
 
 Con el equipo de integración se verificó que la información generada por las galgas llega correctamente a la interfaz gráfica en Node-RED. Como se observa, se realizó la implementación y visualización individual de cada galga, incluyendo su lectura inicial antes de ejecutar la tara y comenzar las mediciones. De esta manera, el sistema de galgas realiza las pruebas funcionales finales necesarias para su correcta integración con los demás sistemas del proyecto.
 
 ![alt text](nodered.png)
+
+
+# Entrega Final 
+
+El programa inicia importando módulos como machine, time, HX711, el cliente MQTT y la función conectar_wifi().
+También se aumenta la frecuencia del procesador del ESP32 a 240 MHz para garantizar la lectura rápida y estable de los cinco sensores.
+Posteriormente, se definen los parámetros principales:
+
+*Dirección del broker MQTT
+*ID del cliente MQTT
+*Tópicos base para publicación y comandos de TARA
+*Parámetros de suavizado del filtro EMA
+
+## Gestión de las 5 celdas de carga (GALGAS)
+
+El arreglo de galgas se implementa mediante una lista de diccionarios en Python, donde cada diccionario almacena:
+
+*Nombre de la galga
+*Identificador único para su tópico MQTT
+*Pines DT y SCK del módulo HX711
+*Factor de calibración individual
+
+Este diseño permite añadir o modificar sensores sin alterar el resto del código.
+
+## Ejemplo de configuración:
+
+GALGAS_CONFIG = [
+    {"nombre": "Cyan", "id": "Cyan", "pin_dt": 12, "pin_sck": 13, "calibracion": 400},
+    ...
+]
+Cada galga se inicializa así:
+
+Se configura el módulo HX711 en sus pines asignados,se realiza una TARA inicial usando 200 muestras para obtener un cero estable, se aplica el factor de calibración configurado, se precarga el filtro EMA tomando 20 lecturas estables del sensor y la clase HX711 realiza la lectura bit a bit controlando manualmente los pines:
+
+*PD_SCK (salida): genera pulsos de reloj
+*DOUT (entrada): recibe los 24 bits del valor medido
+
+Además maneja:
+
+*OFFSET: valor base después del tare
+*SCALE: factor usado para convertir la lectura RAW en gramos
+*Callback MQTT para TARA remota
+
+El sistema escucha comandos en el tópico:
+
+*bascula/comando/<ID>
+
+Cuando llega un mensaje con "TARA", Se identifica cuál galga corresponde a ese ID, se marca la solicitud de TARA mediante tara_solicitada_idx
+l sistema ejecutará la TARA en la siguiente iteración del loop principal
+
+Esto permite controlar cada báscula desde Node-RED u otro sistema externo.
+
+🔘 Botón físico de TARA
+
+El pin configurado como entrada permite realizar TARA manual presionando un botón.
+
+Si se presiona:
+
+Se detecta la interrupción
+
+Se marca que la galga activa debe ser tarada
+
+La TARA se ejecuta inmediatamente en el siguiente ciclo
+
+📡 Conexión a WiFi y creación del cliente MQTT
+
+La función conectar_wifi() activa el WiFi del ESP32, conecta usando las credenciales almacenadas y espera hasta obtener una dirección IP.
+
+Luego se crea un cliente MQTT y se suscribe al tópico de comandos:
+
+bascula/comando/#
+
+Esto permite recibir órdenes de TARA por MQTT.
+
+🧮 Filtro exponencial EMA para suavizar lecturas
+
+Cada lectura cruda del HX711 tiende a ser ruidosa.
+El programa utiliza un filtro EMA con un factor alpha configurable:
+
+peso_suave = lectura_raw * α + lectura_anterior * (1 – α)
+
+Esto reduce variaciones rápidas y produce una lectura más estable para visualizar y publicar en MQTT.
+
+▶️ Ciclo principal del programa (main loop)
+
+El corazón del sistema es un bucle que corre continuamente:
+
+1️⃣ Revisión de mensajes MQTT
+
+Se verifica si llegó una solicitud de TARA remota.
+
+2️⃣ Ejecución de TARA
+
+Si una galga tiene TARA pendiente:
+
+Se ejecuta hx.tara()
+
+Se recalcula la memoria del filtro EMA con 20 muestras nuevas
+
+Se limpia el indicador de TARA
+
+3️⃣ Lectura secuencial de cada galga
+
+El sistema no lee todas las galgas al tiempo.
+Va leyendo una por ciclo, en orden circular:
+
+Lectura del HX711
+
+Aplicación del filtro EMA
+
+Conversión a texto formateado
+
+Actualización en consola
+
+Publicación en su tópico MQTT:
+
+in/bascula/peso/<ID>
+Esto mantiene alta velocidad y evita saturar la CPU.
+
+4️⃣ Cambio a la siguiente galga
+
+El índice avanza:
+Cyan → Magenta → Yellow → Key → White → Cyan...
+
+5️⃣ Pequeño delay
+
+Se espera 10 ms para mejorar estabilidad.
+🔁 Reinicio por errores
+
+Si ocurre un error fatal:
+
+Se imprime el mensaje
+
+El ESP32 espera 10 segundos
+
+Luego se reinicia
+
+Esto da robustez al sistema en ambientes reales.
 
 ### 1. [Flujos](/G10/flujos/flows.json)
 
