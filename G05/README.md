@@ -36,9 +36,7 @@ def leer_temperatura(): # Aquí puedes poner lectura real del sensor return 25 +
 ## Programa principal
 def main(): conectar_wifi() client = conectar_mqtt()
 
-# =======================
 # PROGRAMA PRINCIPAL
-# =======================
 
 # Conectar a WiFi
 conectar_wifi()
