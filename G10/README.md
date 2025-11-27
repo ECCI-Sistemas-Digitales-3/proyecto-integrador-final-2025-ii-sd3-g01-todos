@@ -225,7 +225,7 @@ Además maneja:
 
 - OFFSET: valor base después del tare
 - SCALE: factor usado para convertir la lectura RAW en gramos
-- 
+
 El sistema escucha comandos en el tópico:
 
 - (bascula/comando/<ID>)
@@ -248,7 +248,7 @@ Si se presiona:
 - La TARA se ejecuta inmediatamente en el siguiente ciclo
 
 
-*Conexión a WiFi y creación del cliente MQTT:
+## Conexión a WiFi y creación del cliente MQTT:
 
 La función conectar_wifi() activa el WiFi del ESP32, conecta usando las credenciales almacenadas y espera hasta obtener una dirección IP y luego se crea un cliente MQTT y se suscribe al tópico de comandos:
 
