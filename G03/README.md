@@ -265,7 +265,7 @@ Si no llegan datos, todo el flujo queda sin información para procesar.
 
 
 
-### Nodo Template
+### HTML color detectado
 
 ![Image 2](https://github.com/user-attachments/assets/0f40eb46-ca02-4c8a-86d8-b9953604d745)
 
