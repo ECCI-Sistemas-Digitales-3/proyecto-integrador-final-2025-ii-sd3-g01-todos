@@ -340,9 +340,11 @@ Todo el flujo está organizado para **procesar y visualizar los valores RGB** de
 ### COLOR AZUL
 
 <img width="600" alt="Imagen 1" src="https://github.com/user-attachments/assets/e9d752c2-ad74-4641-a56d-c5231911fe10" />
+
 ### COLOR AMARILLO
 
 <img width="600" alt="Imagen 2" src="https://github.com/user-attachments/assets/e6940424-997d-43fe-82e3-bb4cdfcb6de1" />
+
 ### COLOR BLANCO
 
 <img width="600" alt="Imagen 3" src="https://github.com/user-attachments/assets/118096a3-c927-4e66-b57a-009e6b6a7304" />
