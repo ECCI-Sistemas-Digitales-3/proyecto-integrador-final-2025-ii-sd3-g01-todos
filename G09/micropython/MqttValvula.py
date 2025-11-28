@@ -5,7 +5,7 @@ import wifi  # Tu módulo wifi.py
 
 # === 1. Conexión WiFi ===
 if not wifi.conectar():
-    print("❌ Error: no se puede continuar sin conexión WiFi")
+    print(" Error: no se puede continuar sin conexión WiFi")
     while True:
         time.sleep(1)
 
