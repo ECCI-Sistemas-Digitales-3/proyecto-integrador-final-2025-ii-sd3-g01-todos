@@ -325,3 +325,164 @@ INFORME DE IMPLEMENTACIÓN DEL SISTEMA DE BOMBEO PARA MEZCLADOR DE PINTURAS
   4. CONCLUSIONES
 
   El proceso permitió validar diferentes alternativas de bombeo, descartando las electroválvulas por bajo caudal y el vinilo puro por su alta viscosidad. La mezcla de 50 % pintura y 50 % agua fue la solución más adecuada para garantizar un flujo estable sin comprometer la integridad de las bombas. La implementación del sistema de cisterna elevada resolvió el problema del flujo indeseado causado por la presión gravitacional, permitiendo un control preciso del volumen suministrado. La integración del sistema con ESP32, Raspberry Pi y Node-RED demostró ser funcional y estable, logrando comunicación y control efectivo tras resolver las dificultades de red. Se cumplió el objetivo principal: instalar, programar y validar el funcionamiento de las cinco bombas para el mezclador de pinturas, dejando solo ajustes menores derivados de cambios solicitados por el equipo integrador. El trabajo conjunto con docentes, talleres y otros equipos permitió mejorar la calidad técnica del proyecto y garantizar la operatividad del sistema dentro del prototipo final.
+
+  _________________________________________________________________________________________________________________________________________________________
+
+CÓDIGO FINAL 
+
+# ────────────────────────────────────────────────
+# IMPORTACIÓN DE MÓDULOS
+# ────────────────────────────────────────────────
+from machine import Pin, PWM            # Control de pines y PWM para motores
+from time import sleep, time            # Funciones de tiempo
+from umqtt.robust import MQTTClient     # Cliente MQTT para comunicación
+import Wifi                              # Módulo propio para conectar el ESP32 a WiFi
+
+# ────────────────────────────────────────────────
+# 1. CONSTANTES DE CONTROL Y CONFIGURACIÓN
+# ────────────────────────────────────────────────
+
+# Tiempo total (en segundos) que dura succionar el 100% de mezcla
+TIEMPO_100_PORCIENTO = 25
+
+# Frecuencia del PWM que maneja la velocidad de los motores
+MOTOR_PWM_FREQ = 1000
+
+# Pausa entre el uso de cada motor de color
+SEGUNDOS_ENTRE_MOTORES = 2
+
+# Parámetros del tanque final (elevador y agitador)
+TIEMPO_FINAL_MOTOR = 3    # Tiempo fijo por cada acción (bajar, agitar, subir)
+PAUSA_FINAL = 2           # Pausa entre acciones en el proceso final
+
+# ────────────────────────────────────────────────
+# CONFIGURACIÓN MQTT
+# ────────────────────────────────────────────────
+MQTT_BROKER = "192.168.59.216"            # IP del broker MQTT
+MQTT_PORT = 1883                           # Puerto del broker
+MQTT_CLIENT_ID = b"ESP32_BOMBAS"           # ID único del dispositivo
+MQTT_TOPIC_IN = b"esp/out"                 # Tópico donde se reciben órdenes de mezcla
+
+# Tópicos donde se reportan estados al dashboard
+TOPIC_ESTADO_BOMBAS = b"in/esp2/bombas/estado"
+TOPIC_AGITADOR = b"agitador/estado"
+TOPIC_ELEVADOR = b"elevador/estado"
+
+# ────────────────────────────────────────────────
+# 2. DEFINICIÓN DE PINES Y MOTORES
+# ────────────────────────────────────────────────
+
+# Tabla con la configuración de cada uno de los 5 motores de colores
+COLORES_MOTORES = [
+    ("CIAN",    26, 27, 25, 'C'),   # Motor 1
+    ("MAGENTA", 32, 33, 23, 'M'),   # Motor 2
+    ("YELLOW",  13, 19, 14, 'Y'),   # Motor 3
+    ("BLACK",   21, 4,  5,  'K'),   # Motor 4
+    ("WHITE",   12, 22, 2,  'W'),   # Motor 5
+]
+
+MOTORES = []    # Lista donde se guardarán los objetos de cada motor
+
+# Pines del motor elevador final
+ELEVADOR_IN1_PIN = 15
+ELEVADOR_IN2_PIN = 16
+
+# Pines del motor agitador final
+AGITADOR_IN1_PIN = 17
+AGITADOR_IN2_PIN = 18
+
+# Diccionarios para almacenar motores finales
+MOTOR_ELEVADOR = {}
+MOTOR_AGITADOR = {}
+
+# ────────────────────────────────────────────────
+# FUNCIÓN: Inicializar todos los motores
+# ────────────────────────────────────────────────
+def inicializar_motores():
+    """Crea, configura y apaga todos los motores usados en la mezcla."""
+    
+    print("Inicializando 5 motores...")
+
+    # Crear cada motor básico (CIAN, MAGENTA, YELLOW, BLACK, WHITE)
+    for color, pin_in1, pin_in2, pin_ena, clave in COLORES_MOTORES:
+        try:
+            # Crear pines de dirección y PWM
+            IN1 = Pin(pin_in1, Pin.OUT)
+            IN2 = Pin(pin_in2, Pin.OUT)
+            ENA_PWM = PWM(Pin(pin_ena), freq=MOTOR_PWM_FREQ)
+
+            # Asegurar que arranquen apagados
+            IN1.value(0)
+            IN2.value(0)
+            ENA_PWM.duty(0)
+
+            # Guardar el objeto motor en la lista
+            MOTORES.append({
+                'color': color,
+                'clave': clave,
+                'in1': IN1,
+                'in2': IN2,
+                'ena': ENA_PWM
+            })
+
+            print(f"Motor {color} OK.")
+
+        except Exception as e:
+            # Evita que el programa se detenga si falla un motor
+            print(f"Error al inicializar Motor {color}: {e}")
+            pass
+
+    print(f"Total de motores listos: {len(MOTORES)}")
+
+    # ───── Motores del tanque final (Elevador y Agitador) ─────
+    global MOTOR_ELEVADOR, MOTOR_AGITADOR
+    try:
+        # Configurar elevador
+        MOTOR_ELEVADOR['in1'] = Pin(ELEVADOR_IN1_PIN, Pin.OUT)
+        MOTOR_ELEVADOR['in2'] = Pin(ELEVADOR_IN2_PIN, Pin.OUT)
+        MOTOR_ELEVADOR['in1'].value(0)
+        MOTOR_ELEVADOR['in2'].value(0)
+
+        # Configurar agitador
+        MOTOR_AGITADOR['in1'] = Pin(AGITADOR_IN1_PIN, Pin.OUT)
+        MOTOR_AGITADOR['in2'] = Pin(AGITADOR_IN2_PIN, Pin.OUT)
+        MOTOR_AGITADOR['in1'].value(0)
+        MOTOR_AGITADOR['in2'].value(0)
+
+        print("Motores de tanque final (Agitador y Elevador) OK.")
+
+    except Exception as e:
+        print(f"Error al inicializar motores finales: {e}")
+
+# ────────────────────────────────────────────────
+# 3. FUNCIONES DE CONTROL DE MOTOR
+# ────────────────────────────────────────────────
+
+def motor_apagar_total(motor):
+    """Apaga completamente un motor, ya sea bomba o motor final."""
+    if 'ena' in motor:     # Solo motores de color usan PWM
+        motor['ena'].duty(0)
+    motor['in1'].value(0)
+    motor['in2'].value(0)
+
+def motor_succionar(motor, tiempo_segundos):
+    """Enciende una bomba por un tiempo exacto según el porcentaje recibido."""
+    color = motor['color']
+    
+    try:
+        # Publicar que el motor inició
+        msg_on = '{"bomba":"%s","estado":"ON","tiempo":%.2f}' % (color, tiempo_segundos)
+        client.publish(TOPIC_ESTADO_BOMBAS, msg_on)
+
+        # Encender motor
+        motor['in1'].value(1)
+        motor['in2'].value(0)
+        motor['ena'].duty(800)    # PWM fijo
+
+        # Esperar el tiempo indicado
+        sleep(tiempo_segundos)
+
+        # Apagar motor
+        motor_apagar_total(motor)
+
+        # Publicar apagado
