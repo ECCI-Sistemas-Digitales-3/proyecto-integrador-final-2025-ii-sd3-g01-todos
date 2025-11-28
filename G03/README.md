@@ -249,6 +249,20 @@ El flujo principal del programa hace lo siguiente:
 
 ## Node RED
 
+### Flujo general
+
+
+![Image 6](https://github.com/user-attachments/assets/2fd229b1-3abf-4d01-9bae-c8ea19bddfa8)
+
+
+Esta imagen muestra el diagrama completo del flujo en **Node-RED**, donde el nodo MQTT recibe los datos de color enviados desde el **ESP32**.  
+Esos datos pasan a dos nodos función: uno para **dividir** el valor RGB y otro para **agruparlo** nuevamente.
+
+Los valores separados alimentan los **indicadores de color** del dashboard.  
+El objeto agrupado viaja al **nodo template**, encargado de mostrar el color detectado.
+
+Todo el flujo está organizado para **procesar y visualizar los valores RGB** del sensor.
+
 ### Nodo MQTT IN
 
 ![Image 1](https://github.com/user-attachments/assets/b1fc2930-c9a6-4c19-82fc-e1d7a6c3c80a)
@@ -322,19 +336,6 @@ Su propósito es entregar los **tres valores juntos** al template que mostrará 
 Es una etapa de **reconstrucción de datos** para usarlos en el dashboard.
 
 
-### Flujo general
-
-
-![Image 6](https://github.com/user-attachments/assets/2fd229b1-3abf-4d01-9bae-c8ea19bddfa8)
-
-
-Esta imagen muestra el diagrama completo del flujo en **Node-RED**, donde el nodo MQTT recibe los datos de color enviados desde el **ESP32**.  
-Esos datos pasan a dos nodos función: uno para **dividir** el valor RGB y otro para **agruparlo** nuevamente.
-
-Los valores separados alimentan los **indicadores de color** del dashboard.  
-El objeto agrupado viaja al **nodo template**, encargado de mostrar el color detectado.
-
-Todo el flujo está organizado para **procesar y visualizar los valores RGB** del sensor.
 ### COLOR AZUL
 
 <img width="600" alt="Imagen 1" src="https://github.com/user-attachments/assets/e9d752c2-ad74-4641-a56d-c5231911fe10" />
