@@ -70,8 +70,6 @@ En la consola de Thonny aparecen los datos en formato JSON o texto, mostrando la
 
 ---
 
-## Resultados de Lectura
-![Resultados](https://github.com/user-attachments/assets/bac8eb74-b800-4fe1-bf69-726aade8fbf1)
 
 La última imagen muestra la lectura de colores de forma estable y continua, evidenciando que el sistema ha alcanzado su funcionamiento óptimo.  
 Los valores RGB se mantienen dentro de un rango coherente, lo que indica:
