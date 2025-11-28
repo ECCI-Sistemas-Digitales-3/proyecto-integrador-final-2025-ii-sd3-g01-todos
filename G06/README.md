@@ -330,93 +330,98 @@ INFORME DE IMPLEMENTACIÓN DEL SISTEMA DE BOMBEO PARA MEZCLADOR DE PINTURAS
 
 CÓDIGO FINAL 
 
-# ────────────────────────────────────────────────
-# IMPORTACIÓN DE MÓDULOS
-# ────────────────────────────────────────────────
-from machine import Pin, PWM            # Control de pines y PWM para motores
-from time import sleep, time            # Funciones de tiempo
-from umqtt.robust import MQTTClient     # Cliente MQTT para comunicación
-import Wifi                              # Módulo propio para conectar el ESP32 a WiFi
+# ================================================
+#      SISTEMA DE CONTROL DE MEZCLA ESP32
+#   Control de 5 bombas + elevador + agitador
+#   Recibe setpoints por MQTT y ejecuta secuencias
+# ================================================
 
-# ────────────────────────────────────────────────
-# 1. CONSTANTES DE CONTROL Y CONFIGURACIÓN
-# ────────────────────────────────────────────────
+from machine import Pin, PWM
+from time import sleep, time
+from umqtt.robust import MQTTClient
+import Wifi
 
-# Tiempo total (en segundos) que dura succionar el 100% de mezcla
+# ===========================
+# 1. CONSTANTES DE CONTROL
+# ===========================
+
+# Tiempo total para entregar el 100% de mezcla
 TIEMPO_100_PORCIENTO = 25
 
-# Frecuencia del PWM que maneja la velocidad de los motores
+# Frecuencia PWM para motores
 MOTOR_PWM_FREQ = 1000
 
-# Pausa entre el uso de cada motor de color
+# Tiempo de pausa entre bomba y bomba
 SEGUNDOS_ENTRE_MOTORES = 2
 
-# Parámetros del tanque final (elevador y agitador)
-TIEMPO_FINAL_MOTOR = 3    # Tiempo fijo por cada acción (bajar, agitar, subir)
-PAUSA_FINAL = 2           # Pausa entre acciones en el proceso final
+# Tiempo para motores finales (bajar/agitar/subir)
+TIEMPO_FINAL_MOTOR = 3
 
-# ────────────────────────────────────────────────
+# Pausa entre cada acción final
+PAUSA_FINAL = 2
+
+# ===========================
 # CONFIGURACIÓN MQTT
-# ────────────────────────────────────────────────
-MQTT_BROKER = "192.168.59.216"            # IP del broker MQTT
-MQTT_PORT = 1883                           # Puerto del broker
-MQTT_CLIENT_ID = b"ESP32_BOMBAS"           # ID único del dispositivo
-MQTT_TOPIC_IN = b"esp/out"                 # Tópico donde se reciben órdenes de mezcla
+# ===========================
 
-# Tópicos donde se reportan estados al dashboard
+MQTT_BROKER = "192.168.59.216"
+MQTT_PORT = 1883
+MQTT_CLIENT_ID = b"ESP32_BOMBAS"
+MQTT_TOPIC_IN = b"esp/out"   # Setpoint de mezcla
+
+# Tópicos de publicación de estados
 TOPIC_ESTADO_BOMBAS = b"in/esp2/bombas/estado"
 TOPIC_AGITADOR = b"agitador/estado"
 TOPIC_ELEVADOR = b"elevador/estado"
 
-# ────────────────────────────────────────────────
-# 2. DEFINICIÓN DE PINES Y MOTORES
-# ────────────────────────────────────────────────
+# ===========================
+# 2. DEFINICIÓN DE PINES
+# ===========================
 
-# Tabla con la configuración de cada uno de los 5 motores de colores
+# Configuración de los motores principales (bombas)
 COLORES_MOTORES = [
-    ("CIAN",    26, 27, 25, 'C'),   # Motor 1
-    ("MAGENTA", 32, 33, 23, 'M'),   # Motor 2
-    ("YELLOW",  13, 19, 14, 'Y'),   # Motor 3
-    ("BLACK",   21, 4,  5,  'K'),   # Motor 4
-    ("WHITE",   12, 22, 2,  'W'),   # Motor 5
+    ("CIAN",    26, 27, 25, 'C'),
+    ("MAGENTA", 32, 33, 23, 'M'),
+    ("YELLOW",  13, 19, 14, 'Y'),
+    ("BLACK",   21, 4,  5,  'K'),
+    ("WHITE",   12, 22, 2,  'W'),
 ]
 
-MOTORES = []    # Lista donde se guardarán los objetos de cada motor
+# Lista donde se guardarán los motores ya inicializados
+MOTORES = []
 
-# Pines del motor elevador final
+# Pines del elevador (bajar/subir)
 ELEVADOR_IN1_PIN = 15
 ELEVADOR_IN2_PIN = 16
 
-# Pines del motor agitador final
+# Pines del agitador
 AGITADOR_IN1_PIN = 17
 AGITADOR_IN2_PIN = 18
 
-# Diccionarios para almacenar motores finales
 MOTOR_ELEVADOR = {}
 MOTOR_AGITADOR = {}
 
-# ────────────────────────────────────────────────
-# FUNCIÓN: Inicializar todos los motores
-# ────────────────────────────────────────────────
+# ===========================
+# INICIALIZACIÓN DE MOTORES
+# ===========================
+
 def inicializar_motores():
-    """Crea, configura y apaga todos los motores usados en la mezcla."""
-    
+    """
+    Inicializa los 5 motores de bombas y los motores del tanque final.
+    """
     print("Inicializando 5 motores...")
 
-    # Crear cada motor básico (CIAN, MAGENTA, YELLOW, BLACK, WHITE)
+    # Inicializar cada bomba
     for color, pin_in1, pin_in2, pin_ena, clave in COLORES_MOTORES:
         try:
-            # Crear pines de dirección y PWM
             IN1 = Pin(pin_in1, Pin.OUT)
             IN2 = Pin(pin_in2, Pin.OUT)
             ENA_PWM = PWM(Pin(pin_ena), freq=MOTOR_PWM_FREQ)
 
-            # Asegurar que arranquen apagados
             IN1.value(0)
             IN2.value(0)
             ENA_PWM.duty(0)
 
-            # Guardar el objeto motor en la lista
             MOTORES.append({
                 'color': color,
                 'clave': clave,
@@ -426,63 +431,232 @@ def inicializar_motores():
             })
 
             print(f"Motor {color} OK.")
-
         except Exception as e:
-            # Evita que el programa se detenga si falla un motor
-            print(f"Error al inicializar Motor {color}: {e}")
-            pass
+            print(f"Error inicializando motor {color}: {e}")
 
-    print(f"Total de motores listos: {len(MOTORES)}")
+    print(f"Total motores listos: {len(MOTORES)}")
 
-    # ───── Motores del tanque final (Elevador y Agitador) ─────
-    global MOTOR_ELEVADOR, MOTOR_AGITADOR
+    # Inicializar elevador y agitador
     try:
-        # Configurar elevador
         MOTOR_ELEVADOR['in1'] = Pin(ELEVADOR_IN1_PIN, Pin.OUT)
         MOTOR_ELEVADOR['in2'] = Pin(ELEVADOR_IN2_PIN, Pin.OUT)
         MOTOR_ELEVADOR['in1'].value(0)
         MOTOR_ELEVADOR['in2'].value(0)
 
-        # Configurar agitador
         MOTOR_AGITADOR['in1'] = Pin(AGITADOR_IN1_PIN, Pin.OUT)
         MOTOR_AGITADOR['in2'] = Pin(AGITADOR_IN2_PIN, Pin.OUT)
         MOTOR_AGITADOR['in1'].value(0)
         MOTOR_AGITADOR['in2'].value(0)
 
-        print("Motores de tanque final (Agitador y Elevador) OK.")
+        print("Motores finales (Elevador y Agitador) OK.")
 
     except Exception as e:
-        print(f"Error al inicializar motores finales: {e}")
+        print(f"Error inicializando motores finales: {e}")
 
-# ────────────────────────────────────────────────
-# 3. FUNCIONES DE CONTROL DE MOTOR
-# ────────────────────────────────────────────────
+
+# ===========================
+# 3. CONTROL DE MOTORES
+# ===========================
 
 def motor_apagar_total(motor):
-    """Apaga completamente un motor, ya sea bomba o motor final."""
-    if 'ena' in motor:     # Solo motores de color usan PWM
+    """
+    Apaga cualquier motor (bomba o motor final).
+    """
+    if 'ena' in motor:
         motor['ena'].duty(0)
+
     motor['in1'].value(0)
     motor['in2'].value(0)
 
 def motor_succionar(motor, tiempo_segundos):
-    """Enciende una bomba por un tiempo exacto según el porcentaje recibido."""
+    """
+    Activa un motor de bomba durante el tiempo correspondiente
+    al porcentaje recibido por MQTT.
+    """
     color = motor['color']
-    
+
     try:
-        # Publicar que el motor inició
-        msg_on = '{"bomba":"%s","estado":"ON","tiempo":%.2f}' % (color, tiempo_segundos)
+        msg_on = '{"bomba":"%s", "estado":"ON", "tiempo":%.2f}' % (color, tiempo_segundos)
         client.publish(TOPIC_ESTADO_BOMBAS, msg_on)
 
-        # Encender motor
         motor['in1'].value(1)
         motor['in2'].value(0)
-        motor['ena'].duty(800)    # PWM fijo
+        motor['ena'].duty(800)
 
-        # Esperar el tiempo indicado
         sleep(tiempo_segundos)
 
-        # Apagar motor
         motor_apagar_total(motor)
 
-        # Publicar apagado
+        msg_off = '{"bomba":"%s", "estado":"OFF"}' % color
+        client.publish(TOPIC_ESTADO_BOMBAS, msg_off)
+
+    except Exception as e:
+        print(f"ERROR succion motor {color}: {e}")
+        motor_apagar_total(motor)
+
+def Elevador_agitador():
+    """
+    Ejecuta la secuencia:
+    1. Bajar elevador
+    2. Agitar mezcla
+    3. Subir elevador
+    """
+    print("\nIniciando secuencia final...")
+
+    # Bajar
+    try:
+        client.publish(TOPIC_ELEVADOR, b"DOWN")
+        MOTOR_ELEVADOR['in1'].value(1)
+        MOTOR_ELEVADOR['in2'].value(0)
+        sleep(TIEMPO_FINAL_MOTOR)
+        motor_apagar_total(MOTOR_ELEVADOR)
+        client.publish(TOPIC_ELEVADOR, b"STOP")
+    except Exception as e:
+        print(f"Error bajando elevador: {e}")
+
+    sleep(PAUSA_FINAL)
+
+    # Agitar
+    try:
+        client.publish(TOPIC_AGITADOR, b"ON")
+        MOTOR_AGITADOR['in1'].value(1)
+        MOTOR_AGITADOR['in2'].value(0)
+        sleep(TIEMPO_FINAL_MOTOR)
+        motor_apagar_total(MOTOR_AGITADOR)
+        client.publish(TOPIC_AGITADOR, b"OFF")
+    except Exception as e:
+        print(f"Error agitador: {e}")
+
+    sleep(PAUSA_FINAL)
+
+    # Subir
+    try:
+        client.publish(TOPIC_ELEVADOR, b"UP")
+        MOTOR_ELEVADOR['in1'].value(0)
+        MOTOR_ELEVADOR['in2'].value(1)
+        sleep(TIEMPO_FINAL_MOTOR)
+        motor_apagar_total(MOTOR_ELEVADOR)
+        client.publish(TOPIC_ELEVADOR, b"STOP")
+    except Exception as e:
+        print(f"Error subiendo elevador: {e}")
+
+    print("Secuencia final completada.")
+
+# ===========================
+# 4. PARSEO DE MENSAJES MQTT
+# ===========================
+
+def parse_mqtt_message(msg):
+    """
+    Convierte un mensaje como:
+       'C:10 M:20 Y:30 K:20 W:20'
+    en:
+       {'C':2.5, 'M':5.0, ...}
+    Los tiempos se calculan según TIEMPO_100_PORCIENTO.
+    """
+    msg_str = msg.decode().strip()
+    componentes = msg_str.split()
+    tiempos = {}
+    suma_total = 0
+
+    try:
+        for item in componentes:
+            if ':' not in item:
+                continue
+
+            key, value = item.split(':')
+            porcentaje = int(value)
+            suma_total += porcentaje
+
+            tiempo = (porcentaje / 100) * TIEMPO_100_PORCIENTO
+            tiempos[key.upper()] = tiempo
+
+        if suma_total != 100:
+            print(f"ERROR: La suma debe ser 100%, llega {suma_total}%")
+            return None
+
+        return tiempos
+
+    except Exception as e:
+        print(f"Error procesando mensaje MQTT: {e}")
+        return None
+
+def on_message(topic, msg):
+    """
+    Procesa el setpoint recibido y ejecuta la mezcla completa.
+    """
+    if topic != MQTT_TOPIC_IN:
+        return
+
+    tiempos_succion = parse_mqtt_message(msg)
+    if tiempos_succion is None:
+        return
+
+    print("\n--- Iniciando mezcla ---")
+
+    try:
+        for i, motor in enumerate(MOTORES):
+
+            clave = motor['clave']
+            tiempo = tiempos_succion.get(clave, 0)
+
+            if tiempo > 0:
+                motor_succionar(motor, tiempo)
+                sleep(SEGUNDOS_ENTRE_MOTORES)
+            else:
+                print(f"Motor {motor['color']} omitido.")
+
+    except Exception as e:
+        print(f"Error en mezcla: {e}")
+        for m in MOTORES:
+            motor_apagar_total(m)
+
+    print("--- Fin mezcla ---")
+
+    Elevador_agitador()
+
+# ===========================
+# 5. INICIALIZACIÓN PRINCIPAL
+# ===========================
+
+try:
+    if not Wifi.conectar():
+        print("ERROR de WiFi.")
+        while True:
+            sleep(1)
+except Exception as e:
+    print(f"Error al inicializar WiFi: {e}")
+    while True:
+        sleep(1)
+
+inicializar_motores()
+
+client = MQTTClient(MQTT_CLIENT_ID, MQTT_BROKER, port=MQTT_PORT)
+client.set_callback(on_message)
+
+try:
+    client.connect()
+    client.subscribe(MQTT_TOPIC_IN)
+    print("MQTT conectado.")
+except Exception as e:
+    print(f"Error MQTT: {e}")
+
+print("ESP32 LISTO y escuchando mensajes...")
+
+# ===========================
+# 6. LOOP PRINCIPAL
+# ===========================
+
+while True:
+    try:
+        client.check_msg()
+    except OSError as e:
+        print("MQTT desconectado, reintentando...")
+        sleep(5)
+        try:
+            client.connect()
+            client.subscribe(MQTT_TOPIC_IN)
+        except:
+            pass
+
+    sleep(0.1)
