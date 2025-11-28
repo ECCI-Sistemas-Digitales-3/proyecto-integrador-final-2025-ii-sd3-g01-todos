@@ -66,25 +66,24 @@ El objetivo de este diagrama es representar de forma visual la **secuencia lógi
    - Si la temperatura es correcta, continúa el proceso.
 
 4. **Activación de la bomba:**  
-   Una vez que la tinta está lista, se activa la **bomba peristáltica** asociada al color actual. El líquido comienza a fluir hacia el tanque principal.
+   Se activa la bomba peristáltica del color actual.
 
 5. **Lectura del peso del tanque principal:**  
-   La galga de carga mide constantemente el peso del tanque principal para verificar el volumen transferido de tinta.
+   La galga de carga mide el peso para saber cuánto líquido se ha transferido.
 
 6. **Control por peso objetivo:**  
-   - Si el peso **no ha alcanzado** el valor objetivo, el sistema mantiene activa la bomba.  
-   - Si el peso **alcanza el valor esperado**, la bomba se detiene automáticamente.
+   - Si el peso **no ha alcanzado** el valor objetivo, la bomba continúa.  
+   - Si el peso **alcanza el valor esperado**, la bomba se detiene.
 
 7. **Cambio de color:**  
-   El sistema incrementa el contador (`color actual = color actual + 1`) para continuar con el siguiente color base.
+   `color actual = color actual + 1`
 
 8. **Verificación del número total de colores:**  
-   - Si aún quedan colores por dosificar (`color actual < 5`), el proceso se repite desde el paso 2.  
-   - Si se han completado los cinco colores (C, M, Y, K, W), el proceso termina.
+   - Si `color actual < 5`, se repite el proceso.  
+   - Si se completan los cinco colores, el ciclo termina.
 
 9. **Fin del proceso:**  
-   El sistema detiene todas las bombas y finaliza el ciclo de mezcla.  
-   En este punto, el tanque principal contiene la proporción deseada de los cinco colores base, lista para el uso o empaquetado.
+   Todas las bombas se detienen y la mezcla queda lista.
 
 ---
 
@@ -95,50 +94,94 @@ El objetivo de este diagrama es representar de forma visual la **secuencia lógi
 - **Verificación cíclica:** el proceso continúa hasta completar todas las tintas configuradas.  
 
 ---
-
 ## Resumen del ciclo de control
 
 | Etapa | Descripción | Acción del sistema |
 |--------|--------------|--------------------|
 | Inicialización | Se define el color inicial (C) | Color actual = 1 |
-| Lectura de temperatura | Sensor lee el tanque de tinta | Verifica rango de temperatura |
-| Bombeo | Bomba activa según color | Transfiere tinta al tanque principal |
-| Control por peso | Galga monitorea peso objetivo | Detiene bomba al alcanzar el valor |
-| Cambio de color | Incremento de variable de color | Repite proceso para siguiente tinta |
-| Finalización | Último color completado | Proceso de mezcla finalizado |
+| Lectura de temperatura | Sensor del tanque | Verifica rango |
+| Bombeo | Bomba activa | Transfiere tinta |
+| Control por peso | Galga de carga | Detiene bomba |
+| Cambio de color | Siguiente tinta | Incrementa contador |
+| Finalización | Último color completado | Proceso terminado |
 
+---
 
 ## Comunicación MQTT
-- El ESP32 se comunica con un servidor MQTT que recibe y envía los datos en tiempo real.  
-- Los tópicos principales utilizados son:  
-  - `bomba/inicio`: activa o detiene la bomba.  
-  - `sensor/S`, `sensor/M`, `sensor/Y`, `sensor/K`, `sensor/W`: envían los valores de los sensores.  
-  - `estado/sistema`: reporta el estado general (activo, detenido, error).  
-- Esta comunicación permite visualizar el estado del proceso desde cualquier dispositivo conectado a la red.
 
-## Visualización y monitoreo
-- Los datos se pueden observar desde un panel MQTT o una interfaz desarrollada en Node-RED.  
-- El sistema muestra el estado de los sensores y la bomba en tiempo real.  
-- Esto permite verificar si la mezcla de colores y la cantidad dosificada son correctas.
+- El ESP32 se comunica con un servidor MQTT enviando y recibiendo datos en tiempo real.  
+- Tópicos:  
+  - `bomba/inicio`  
+  - `sensor/S`, `sensor/M`, `sensor/Y`, `sensor/K`, `sensor/W`  
+  - `estado/sistema`  
+
+---
+
+## Visualización y Monitoreo
+
+- Panel MQTT / Node-RED con estados de sensores y bombas.  
+- Vista en tiempo real del proceso de mezcla.  
+
+---
+
+### Node-RED: Explicación del último intento
+
+En esta etapa se realizó el flujo final de Node-RED, el cual permite:
+
+- Recibir los porcentajes ingresados por el usuario (C, M, Y, K, W).  
+- Formar el mensaje en el formato requerido por el ESP32 (por ejemplo: `C:20 M:30 Y:10 K:40`).  
+- Enviar el mensaje mediante MQTT al tema `esp/out`.  
+- Mostrar el estado de cada bomba durante el proceso.  
+- Visualizar los mensajes publicados por el ESP32 (ON, OFF, UP, DOWN) para verificar cada etapa del sistema.
+
+### Componentes del flujo
+
+- **Dashboard UI**  
+- **Nodo function (crea el mensaje)**  
+- **Nodo MQTT out**  
+- **Nodo MQTT in**  
+- **Indicadores del dashboard**  
+
+### Flujo de funcionamiento
+
+1. El usuario ingresa los porcentajes.  
+2. Node-RED crea la cadena de texto.  
+3. Se envía por MQTT.  
+4. El ESP32 ejecuta la secuencia completa.  
+5. Node-RED muestra el estado de cada etapa.
+
+### Evidencia del flujo final
+
+<p align="center">
+  <img src="./Intento_ Node_red_final.jpeg" width="800">
+</p>
+
+<p align="center">
+  <img src="./Intento_final.jpeg" width="800">
+</p>
+
+<p align="center">
+  <img src="./Colores.jpg" alt="Logo" width="800"/>
+</p>
+
+---
 
 ## Variables Principales
 
 | Variable        | Descripción                                       |
 |-----------------|---------------------------------------------------|
-| `sensor1`, `sensor2` | Entradas digitales conectadas al nivel del tanque |
-| `bomba`         | Salida digital para el control de la bomba        |
-| `led`           | LED indicador de estado de la bomba               |
-| `modo_manual`   | Indica si el control es manual o automático       |
-| `bomba_estado`  | Estado actual de la bomba (ON / OFF)              |
+| `sensor1`, `sensor2` | Entradas digitales nivel del tanque |
+| `bomba`         | Control bomba |
+| `led`           | Indica estado |
+| `modo_manual`   | Manual/automático |
+| `bomba_estado`  | ON / OFF |
+
+---
 
 ## Explicación del código
-El código está dividido en bloques principales:
 
-1. Configuración de red WiFi y MQTT
-2. Definición de pines y variables
-3. Funciones de conexión WiFi y MQTT
-4. Funciones de control de la bomba
-5. Bucle principal de ejecución
+Esta sección describe cómo funciona el código del ESP32 encargado de controlar la bomba peristáltica.
+El programa está desarrollado en MicroPython, usando conexión WiFi, comunicación MQTT y control digital de entradas y salidas.
 
 ### Conexión WiFi
 
@@ -146,44 +189,31 @@ El código está dividido en bloques principales:
 SSID = "TIGO-E325"
 PASSWORD = "7989956371"
 ```
-Estas líneas almacenan las credenciales de la red WiFi a la que se conectará el ESP32.
-La función conectar_wifi() activa el modo estación (network.STA_IF), inicia la conexión y espera hasta que el dispositivo obtenga una dirección IP válida:
 
-```
-def conectar_wifi():
-    wlan = network.WLAN(network.STA_IF)
-    wlan.active(True)
-    wlan.connect(SSID, PASSWORD)
-    while not wlan.isconnected():
-        time.sleep(0.5)
-```
-Una vez conectado, imprime la IP asignada. Esto permite la comunicación posterior con el broker MQTT.
+- En esta parte del código se definen el nombre de la red WiFi (SSID) y la contraseña que el ESP32 utilizará para conectarse.
+
+Esta conexión es indispensable, ya que sin acceso a la red local el dispositivo no podría comunicarse con el broker MQTT, que es el encargado de recibir y enviar los mensajes de control de la bomba.
 
 ### Configuración del broker MQTT
-```
+
+```python
 BROKER = "192.168.1.9"
 CLIENT_ID = "esp32_bomba"
 TOPIC_BOMBA_CONTROL = b'bomba/control'
 TOPIC_BOMBA_ESTADO = b'bomba/estado'
 ```
-El broker MQTT (en este caso la Raspberry Pi) actúa como el servidor de mensajería.
-El ESP32 se conecta a él y se suscribe al tema bomba/control, donde recibe los comandos desde Node-RED.
-También publica su estado (encendido o apagado) en el tema bomba/estado.
 
-La conexión y suscripción se realizan mediante la función:
+- Aquí se especifica la dirección IP del broker MQTT, al que el ESP32 debe conectarse para enviar y recibir datos.
 
-```
-def conectar_mqtt():
-    client = MQTTClient(CLIENT_ID, BROKER)
-    client.set_callback(callback_mqtt)
-    client.connect()
-    client.subscribe(TOPIC_BOMBA_CONTROL)
-```
-## Callback MQTT
+- CLIENT_ID identifica al dispositivo dentro del servidor MQTT.
 
-La función callback_mqtt() recibe los mensajes enviados al ESP32.
-Dependiendo del comando (ON, OFF o AUTO), se activa o desactiva la bomba, o se cambia el modo de control:
-```
+- Los tópicos (TOPIC_BOMBA_CONTROL y TOPIC_BOMBA_ESTADO) determinan los canales por donde se transmitirá la información.
+
+- El tópico de control recibe comandos como ON, OFF o AUTO, mientras que el tópico de estado permite que el ESP32 informe si la bomba está activa o no.
+
+### Callback MQTT
+
+```python
 def callback_mqtt(topic, msg):
     comando = msg.decode().strip().upper()
 
@@ -195,14 +225,18 @@ def callback_mqtt(topic, msg):
         elif comando == "AUTO":
             modo_manual = False
 ```
-Esto permite controlar el dispositivo directamente desde el dashboard en Node-RED.
 
-## Control de la bomba
+- Esta función se ejecuta automáticamente cada vez que llega un mensaje desde el broker MQTT.
 
-Las funciones encender_bomba() y apagar_bomba() controlan la salida GPIO25 (donde está conectada la bomba) y un LED indicador.
-Además, publican el estado actual al broker para mantener sincronizado el panel de control.
+- Primero se convierte el mensaje a texto legible (decode) y se normaliza a mayúsculas.
 
-```
+- Según el comando recibido, el sistema decide si debe encender, apagar o pasar a modo automático.
+
+- Esta función es el puente directo entre Node-RED (o cualquier cliente MQTT) y el actuador físico de la bomba.
+
+### Control de la bomba
+
+```python
 def encender_bomba():
     bomba.value(1)
     led.value(1)
@@ -213,13 +247,15 @@ def apagar_bomba():
     led.value(0)
     client.publish(TOPIC_BOMBA_ESTADO, b"OFF")
 ```
+- Estas funciones controlan directamente el pin del ESP32 que enciende o apaga la bomba peristáltica.
 
-## Lógica del modo automático
+- Cuando la bomba se activa, también se enciende un LED que sirve como indicador visual del estado.
 
-En el bucle principal main(), el ESP32 revisa continuamente el estado de los sensores (sensor1, sensor2).
-Si ambos sensores están activos, se enciende la bomba; si alguno cambia, se apaga.
+- Después de cambiar el estado físico, el ESP32 publica un mensaje informando a Node-RED si la bomba está en ON o en OFF, manteniendo el sistema sincronizado.
 
-```
+### Modo automático
+
+```python
 if not modo_manual:
     if sensor1.value() == 1 and sensor2.value() == 1:
         if not bomba_estado:
@@ -228,63 +264,14 @@ if not modo_manual:
         if bomba_estado:
             apagar_bomba()
 ```
-Esto permite automatizar el proceso según las condiciones físicas del sistema (por ejemplo, el nivel o peso del tanque).
 
-## Node-RED: Monitoreo y Control del Sistema
+- En esta parte se controla el funcionamiento automático del sistema según los valores de los sensores conectados.
 
-En esta etapa se integró Node-RED para visualizar las temperaturas de las cinco bombas y controlar el modo de operación mediante MQTT. El Dashboard permite observar en tiempo real el estado térmico y activar funciones manuales o automáticas según el requerimiento.
+- Si ambos sensores indican el nivel esperado, la bomba se enciende automáticamente.
 
-### Funcionamiento General
+- Si alguno cambia de estado (por ejemplo, se detecta que el tanque ya alcanzó el nivel deseado), la bomba se detiene inmediatamente.
 
-### Control del Modo de Operación
-- El usuario modifica el estado mediante el interruptor **Cambiar Modo** en el Dashboard.
-- El valor enviado se publica en un tópico MQTT que el ESP32 recibe.
-- El ESP32 ajusta su comportamiento según el modo seleccionado (manual o automático).
-
-### Recepción de Temperaturas
-- Cada bomba publica su temperatura mediante un tópico MQTT independiente.
-- Node-RED recibe estas temperaturas mediante nodos **MQTT In**.
-- Los valores alimentan indicadores LED en el Dashboard.
-- Los LED cambian según el estado térmico definido.
-
-### Publicación del Estado Final de las Bombas
-- Cada LED está conectado a un nodo **MQTT Out**.
-- Se publica el estado procesado: “normal”, “advertencia” o “crítico”.
-- Otros sistemas pueden suscribirse a estos tópicos.
-
-## Arquitectura del Flujo Node-RED
-
-### Componentes Principales
-- Nodo UI **Cambiar Modo**  
-- Cinco nodos **MQTT In** (temperaturas)  
-- Cinco indicadores LED del Dashboard  
-- Cinco nodos **MQTT Out** (estados finales)
-
-### Flujo General de Datos
-- El ESP32 envía temperatura → Node-RED la recibe.  
-- Node-RED determina estado → LED indica estado.  
-- LED → MQTT Out publica estado final.  
-- Usuario cambia modo desde el Dashboard → valor enviado al ESP32.
-
-## Interfaz del Dashboard
-
-### Elementos del Dashboard
-- Interruptor UI para cambiar modo.
-- Cinco indicadores LED para los estados térmicos.
-- Flujo visual que muestra el estado de cada bomba.
-
-## Evidencia del Flujo y Dashboard
-
-### Flujo en Node-RED
-
-<p align="center">
-  <img src="./Intento_ Node_red_final.jpeg" alt="Logo" width="800"/>
-</p>
-
-<p align="center">
-  <img src="./Intento_final.jpeg" alt="Logo" width="800"/>
-</p>
-
+- Este comportamiento evita derrames, errores de dosificación y garantiza que la mezcla siempre se mantenga dentro del rango especificado.
 
 ##  Video del funcionamiento
 
@@ -326,4 +313,15 @@ En esta etapa se integró Node-RED para visualizar las temperaturas de las cinco
   <img src="./imagen.jpeg" alt="Logo" width="800"/>
 </p>
 
+<p align="center">
+  <img src="./Final.jpeg" alt="Logo" width="800"/>
+</p>
 
+
+### Conclusiones
+
+- Durante el desarrollo del sistema de bombeo se presentaron diversas dificultades relacionadas con el caudal, la viscosidad del vinilo y el paso no deseado de fluido, lo que obligó al equipo a realizar varias modificaciones técnicas tanto en la selección de bombas como en la mezcla utilizada.
+
+- La implementación de Node-RED y la instalación física del sistema requirieron ajustes y soporte adicional, especialmente al migrar al servidor general y al integrar las mangueras, acoples y motores, lo que permitió afinar la operación del sistema.
+
+- La solución más efectiva frente al flujo continuo no deseado fue la instalación de una cisterna elevada, lo cual permitió un control estable y preciso. A pesar de los cambios de cableado solicitados al final, el sistema logró cumplir con los requerimientos del proyecto y dejó aprendizajes importantes sobre integración y pruebas en campo.
