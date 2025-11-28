@@ -57,7 +57,7 @@ Este indicador confirma que el microcontrolador está recibiendo correctamente e
 
 ---
 
-##  Resultados de Lecturaa
+##  Resultados de Lectura
 ![Montaje del sistema](https://github.com/user-attachments/assets/25b38edc-eac0-4150-b84c-cf4a1eba454c)
 
 En esta segunda imagen se visualizan los valores de color capturados por el sensor TCS34725.  
@@ -70,8 +70,6 @@ En la consola de Thonny aparecen los datos en formato JSON o texto, mostrando la
 
 ---
 
-## Resultados de Lectura
-![Resultados](https://github.com/user-attachments/assets/bac8eb74-b800-4fe1-bf69-726aade8fbf1)
 
 La última imagen muestra la lectura de colores de forma estable y continua, evidenciando que el sistema ha alcanzado su funcionamiento óptimo.  
 Los valores RGB se mantienen dentro de un rango coherente, lo que indica:
@@ -265,7 +263,7 @@ Si no llegan datos, todo el flujo queda sin información para procesar.
 
 
 
-### Nodo Template
+### HTML color detectado
 
 ![Image 2](https://github.com/user-attachments/assets/0f40eb46-ca02-4c8a-86d8-b9953604d745)
 
