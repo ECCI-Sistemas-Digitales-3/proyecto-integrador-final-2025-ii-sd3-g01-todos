@@ -330,333 +330,176 @@ INFORME DE IMPLEMENTACIÓN DEL SISTEMA DE BOMBEO PARA MEZCLADOR DE PINTURAS
 
 CÓDIGO FINAL 
 
-# ================================================
-#      SISTEMA DE CONTROL DE MEZCLA ESP32
-#   Control de 5 bombas + elevador + agitador
-#   Recibe setpoints por MQTT y ejecuta secuencias
-# ================================================
-
 from machine import Pin, PWM
 from time import sleep, time
 from umqtt.robust import MQTTClient
 import Wifi
 
-# ===========================
-# 1. CONSTANTES DE CONTROL
-# ===========================
+# Constantes del sistema
+TIEMPO_100_PORCIENTO = 25          # Tiempo total para succión del 100%
+MOTOR_PWM_FREQ = 1000              # Frecuencia PWM para los motores
+SEGUNDOS_ENTRE_MOTORES = 2         # Pausa entre motores
 
-# Tiempo total para entregar el 100% de mezcla
-TIEMPO_100_PORCIENTO = 25
+# Variables de motores del tanque final
+TIEMPO_FINAL_MOTOR = 3             # Tiempo para bajar/agitar/subir
+PAUSA_FINAL = 2                    # Pausa entre secuencias
 
-# Frecuencia PWM para motores
-MOTOR_PWM_FREQ = 1000
-
-# Tiempo de pausa entre bomba y bomba
-SEGUNDOS_ENTRE_MOTORES = 2
-
-# Tiempo para motores finales (bajar/agitar/subir)
-TIEMPO_FINAL_MOTOR = 3
-
-# Pausa entre cada acción final
-PAUSA_FINAL = 2
-
-# ===========================
-# CONFIGURACIÓN MQTT
-# ===========================
-
+# MQTT - Configuración del broker
 MQTT_BROKER = "192.168.59.216"
 MQTT_PORT = 1883
 MQTT_CLIENT_ID = b"ESP32_BOMBAS"
-MQTT_TOPIC_IN = b"esp/out"   # Setpoint de mezcla
+MQTT_TOPIC_IN = b"esp/out"         # Topic donde llega el setpoint de mezcla
 
-# Tópicos de publicación de estados
+# Topics de estado para actualizar el dashboard
 TOPIC_ESTADO_BOMBAS = b"in/esp2/bombas/estado"
 TOPIC_AGITADOR = b"agitador/estado"
 TOPIC_ELEVADOR = b"elevador/estado"
 
-# ===========================
-# 2. DEFINICIÓN DE PINES
-# ===========================
-
-# Configuración de los motores principales (bombas)
+# Configuración de motores base (bombas)
 COLORES_MOTORES = [
     ("CIAN",    26, 27, 25, 'C'),
     ("MAGENTA", 32, 33, 23, 'M'),
     ("YELLOW",  13, 19, 14, 'Y'),
-    ("BLACK",   21, 4,  5,  'K'),
-    ("WHITE",   12, 22, 2,  'W'),
+    ("BLACK",   21, 4, 5, 'K'),
+    ("WHITE",   12, 22, 2, 'W'),
 ]
 
-# Lista donde se guardarán los motores ya inicializados
-MOTORES = []
+MOTORES = []  # Contendrá todos los motores inicializados
 
-# Pines del elevador (bajar/subir)
+# Pines de motores del tanque final
 ELEVADOR_IN1_PIN = 15
 ELEVADOR_IN2_PIN = 16
-
-# Pines del agitador
 AGITADOR_IN1_PIN = 17
 AGITADOR_IN2_PIN = 18
 
 MOTOR_ELEVADOR = {}
 MOTOR_AGITADOR = {}
 
-# ===========================
-# INICIALIZACIÓN DE MOTORES
-# ===========================
-
 def inicializar_motores():
-    """
-    Inicializa los 5 motores de bombas y los motores del tanque final.
-    """
-    print("Inicializando 5 motores...")
-
-    # Inicializar cada bomba
+    # Inicialización de las 5 bombas dosificadoras
     for color, pin_in1, pin_in2, pin_ena, clave in COLORES_MOTORES:
         try:
             IN1 = Pin(pin_in1, Pin.OUT)
             IN2 = Pin(pin_in2, Pin.OUT)
             ENA_PWM = PWM(Pin(pin_ena), freq=MOTOR_PWM_FREQ)
-
             IN1.value(0)
             IN2.value(0)
             ENA_PWM.duty(0)
-
-            MOTORES.append({
-                'color': color,
-                'clave': clave,
-                'in1': IN1,
-                'in2': IN2,
-                'ena': ENA_PWM
-            })
-
-            print(f"Motor {color} OK.")
+            MOTORES.append({'color': color, 'clave': clave, 'in1': IN1, 'in2': IN2, 'ena': ENA_PWM})
         except Exception as e:
-            print(f"Error inicializando motor {color}: {e}")
+            print(f"Error en motor {color}: {e}")
 
-    print(f"Total motores listos: {len(MOTORES)}")
-
-    # Inicializar elevador y agitador
+    # Motores del tanque final
     try:
         MOTOR_ELEVADOR['in1'] = Pin(ELEVADOR_IN1_PIN, Pin.OUT)
         MOTOR_ELEVADOR['in2'] = Pin(ELEVADOR_IN2_PIN, Pin.OUT)
-        MOTOR_ELEVADOR['in1'].value(0)
-        MOTOR_ELEVADOR['in2'].value(0)
-
         MOTOR_AGITADOR['in1'] = Pin(AGITADOR_IN1_PIN, Pin.OUT)
         MOTOR_AGITADOR['in2'] = Pin(AGITADOR_IN2_PIN, Pin.OUT)
+        MOTOR_ELEVADOR['in1'].value(0)
+        MOTOR_ELEVADOR['in2'].value(0)
         MOTOR_AGITADOR['in1'].value(0)
         MOTOR_AGITADOR['in2'].value(0)
-
-        print("Motores finales (Elevador y Agitador) OK.")
-
     except Exception as e:
-        print(f"Error inicializando motores finales: {e}")
-
-
-# ===========================
-# 3. CONTROL DE MOTORES
-# ===========================
+        print(f"Error al inicializar tanque final: {e}")
 
 def motor_apagar_total(motor):
-    """
-    Apaga cualquier motor (bomba o motor final).
-    """
+    # Apaga PWM si el motor lo usa
     if 'ena' in motor:
         motor['ena'].duty(0)
-
     motor['in1'].value(0)
     motor['in2'].value(0)
 
 def motor_succionar(motor, tiempo_segundos):
-    """
-    Activa un motor de bomba durante el tiempo correspondiente
-    al porcentaje recibido por MQTT.
-    """
-    color = motor['color']
-
-    try:
-        msg_on = '{"bomba":"%s", "estado":"ON", "tiempo":%.2f}' % (color, tiempo_segundos)
-        client.publish(TOPIC_ESTADO_BOMBAS, msg_on)
-
-        motor['in1'].value(1)
-        motor['in2'].value(0)
-        motor['ena'].duty(800)
-
-        sleep(tiempo_segundos)
-
-        motor_apagar_total(motor)
-
-        msg_off = '{"bomba":"%s", "estado":"OFF"}' % color
-        client.publish(TOPIC_ESTADO_BOMBAS, msg_off)
-
-    except Exception as e:
-        print(f"ERROR succion motor {color}: {e}")
-        motor_apagar_total(motor)
+    # Publica estado ON
+    msg_on = '{"bomba":"%s", "estado":"ON", "tiempo":%.2f}' % (motor['color'], tiempo_segundos)
+    client.publish(TOPIC_ESTADO_BOMBAS, msg_on)
+    # Activa motor (gira en una dirección)
+    motor['in1'].value(1)
+    motor['in2'].value(0)
+    motor['ena'].duty(800)
+    # Tiempo succión
+    sleep(tiempo_segundos)
+    # Apaga motor y publica OFF
+    motor_apagar_total(motor)
+    msg_off = '{"bomba":"%s", "estado":"OFF"}' % motor['color']
+    client.publish(TOPIC_ESTADO_BOMBAS, msg_off)
 
 def Elevador_agitador():
-    """
-    Ejecuta la secuencia:
-    1. Bajar elevador
-    2. Agitar mezcla
-    3. Subir elevador
-    """
-    print("\nIniciando secuencia final...")
-
-    # Bajar
-    try:
-        client.publish(TOPIC_ELEVADOR, b"DOWN")
-        MOTOR_ELEVADOR['in1'].value(1)
-        MOTOR_ELEVADOR['in2'].value(0)
-        sleep(TIEMPO_FINAL_MOTOR)
-        motor_apagar_total(MOTOR_ELEVADOR)
-        client.publish(TOPIC_ELEVADOR, b"STOP")
-    except Exception as e:
-        print(f"Error bajando elevador: {e}")
-
+    # 1. Bajada del elevador
+    client.publish(TOPIC_ELEVADOR, b"DOWN")
+    MOTOR_ELEVADOR['in1'].value(1)
+    MOTOR_ELEVADOR['in2'].value(0)
+    sleep(TIEMPO_FINAL_MOTOR)
+    motor_apagar_total(MOTOR_ELEVADOR)
+    client.publish(TOPIC_ELEVADOR, b"STOP")
     sleep(PAUSA_FINAL)
 
-    # Agitar
-    try:
-        client.publish(TOPIC_AGITADOR, b"ON")
-        MOTOR_AGITADOR['in1'].value(1)
-        MOTOR_AGITADOR['in2'].value(0)
-        sleep(TIEMPO_FINAL_MOTOR)
-        motor_apagar_total(MOTOR_AGITADOR)
-        client.publish(TOPIC_AGITADOR, b"OFF")
-    except Exception as e:
-        print(f"Error agitador: {e}")
-
+    # 2. Agitación
+    client.publish(TOPIC_AGITADOR, b"ON")
+    MOTOR_AGITADOR['in1'].value(1)
+    MOTOR_AGITADOR['in2'].value(0)
+    sleep(TIEMPO_FINAL_MOTOR)
+    motor_apagar_total(MOTOR_AGITADOR)
+    client.publish(TOPIC_AGITADOR, b"OFF")
     sleep(PAUSA_FINAL)
 
-    # Subir
-    try:
-        client.publish(TOPIC_ELEVADOR, b"UP")
-        MOTOR_ELEVADOR['in1'].value(0)
-        MOTOR_ELEVADOR['in2'].value(1)
-        sleep(TIEMPO_FINAL_MOTOR)
-        motor_apagar_total(MOTOR_ELEVADOR)
-        client.publish(TOPIC_ELEVADOR, b"STOP")
-    except Exception as e:
-        print(f"Error subiendo elevador: {e}")
-
-    print("Secuencia final completada.")
-
-# ===========================
-# 4. PARSEO DE MENSAJES MQTT
-# ===========================
+    # 3. Subida del elevador
+    client.publish(TOPIC_ELEVADOR, b"UP")
+    MOTOR_ELEVADOR['in1'].value(0)
+    MOTOR_ELEVADOR['in2'].value(1)
+    sleep(TIEMPO_FINAL_MOTOR)
+    motor_apagar_total(MOTOR_ELEVADOR)
+    client.publish(TOPIC_ELEVADOR, b"STOP")
 
 def parse_mqtt_message(msg):
-    """
-    Convierte un mensaje como:
-       'C:10 M:20 Y:30 K:20 W:20'
-    en:
-       {'C':2.5, 'M':5.0, ...}
-    Los tiempos se calculan según TIEMPO_100_PORCIENTO.
-    """
+    # Convierte el mensaje tipo "C:20 M:30 Y:50" en tiempos de succión
     msg_str = msg.decode().strip()
-    componentes = msg_str.split()
     tiempos = {}
-    suma_total = 0
-
-    try:
-        for item in componentes:
-            if ':' not in item:
-                continue
-
-            key, value = item.split(':')
-            porcentaje = int(value)
-            suma_total += porcentaje
-
-            tiempo = (porcentaje / 100) * TIEMPO_100_PORCIENTO
-            tiempos[key.upper()] = tiempo
-
-        if suma_total != 100:
-            print(f"ERROR: La suma debe ser 100%, llega {suma_total}%")
+    suma = 0
+    for item in msg_str.split():
+        if ":" not in item:
+            continue
+        clave, valor = item.split(":")
+        try:
+            porcentaje = int(valor)
+        except:
             return None
-
-        return tiempos
-
-    except Exception as e:
-        print(f"Error procesando mensaje MQTT: {e}")
-        return None
+        suma += porcentaje
+        tiempos[clave.upper()] = (porcentaje / 100) * TIEMPO_100_PORCIENTO
+    return tiempos if suma == 100 else None
 
 def on_message(topic, msg):
-    """
-    Procesa el setpoint recibido y ejecuta la mezcla completa.
-    """
+    # Procesa el setpoint recibido
     if topic != MQTT_TOPIC_IN:
         return
-
-    tiempos_succion = parse_mqtt_message(msg)
-    if tiempos_succion is None:
+    tiempos = parse_mqtt_message(msg)
+    if tiempos is None:
         return
 
-    print("\n--- Iniciando mezcla ---")
-
-    try:
-        for i, motor in enumerate(MOTORES):
-
-            clave = motor['clave']
-            tiempo = tiempos_succion.get(clave, 0)
-
-            if tiempo > 0:
-                motor_succionar(motor, tiempo)
+    # Ejecución de succión
+    for i, motor in enumerate(MOTORES):
+        t = tiempos.get(motor['clave'], 0)
+        if t > 0:
+            motor_succionar(motor, t)
+            if i < len(MOTORES) - 1:
                 sleep(SEGUNDOS_ENTRE_MOTORES)
-            else:
-                print(f"Motor {motor['color']} omitido.")
 
-    except Exception as e:
-        print(f"Error en mezcla: {e}")
-        for m in MOTORES:
-            motor_apagar_total(m)
-
-    print("--- Fin mezcla ---")
-
+    # Secuencia final
     Elevador_agitador()
 
-# ===========================
-# 5. INICIALIZACIÓN PRINCIPAL
-# ===========================
-
-try:
-    if not Wifi.conectar():
-        print("ERROR de WiFi.")
-        while True:
-            sleep(1)
-except Exception as e:
-    print(f"Error al inicializar WiFi: {e}")
+# Conexión WiFi
+if not Wifi.conectar():
     while True:
         sleep(1)
 
+# Inicialización
 inicializar_motores()
-
 client = MQTTClient(MQTT_CLIENT_ID, MQTT_BROKER, port=MQTT_PORT)
 client.set_callback(on_message)
+client.connect()
+client.subscribe(MQTT_TOPIC_IN)
 
-try:
-    client.connect()
-    client.subscribe(MQTT_TOPIC_IN)
-    print("MQTT conectado.")
-except Exception as e:
-    print(f"Error MQTT: {e}")
-
-print("ESP32 LISTO y escuchando mensajes...")
-
-# ===========================
-# 6. LOOP PRINCIPAL
-# ===========================
-
+# Loop principal
 while True:
-    try:
-        client.check_msg()
-    except OSError as e:
-        print("MQTT desconectado, reintentando...")
-        sleep(5)
-        try:
-            client.connect()
-            client.subscribe(MQTT_TOPIC_IN)
-        except:
-            pass
-
+    client.check_msg()
     sleep(0.1)
