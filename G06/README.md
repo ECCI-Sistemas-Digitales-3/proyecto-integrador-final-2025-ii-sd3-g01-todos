@@ -288,3 +288,218 @@ ________________________________________________________________________________
 ![Imagen de WhatsApp 2025-11-12 a las 21 23 26_a00b6747](https://github.com/user-attachments/assets/8a6209b0-3653-4ff0-9e06-0204b86a53f7)
 
 Esta imagen muestra la interfaz de control y la salida del sistema MQTT en funcionamiento, donde se observa el panel completo con botones ON/OFF para cinco bombas de colores (CYAN, MAGENTA, YELLOW, BLACK, WHITE) y simultáneamente la consola que indica el proceso de conexión a los tópicos MQTT específicos para cada bomba ("bombas/CYAN", "bombas/MAGENTA", etc.), demostrando que el sistema está estableciendo las suscripciones individuales para cada canal de control mientras mantiene disponible la interfaz gráfica para que el usuario envíe comandos de activación y desactivación a cada dispositivo de forma independiente.
+
+
+_________________________________________________________________________________________________________________________________________________________
+
+INFORME DE IMPLEMENTACIÓN DEL SISTEMA DE BOMBEO PARA MEZCLADOR DE PINTURAS 
+
+1. OBJETIVO DEL PROYECTO
+
+ El objetivo de la implementación, tiene como alcance diseñar y programar el sistema de control para cinco bombas destinadas a la dosificación de pintura en un mezclador automático. Seleccionar y validar los componentes hidráulicos adecuados que garanticen un flujo controlado. Integrar el sistema de bombeo con la plataforma de control basada en micro python, utilizando la ESP32 como microcontrolador y una rapberry Pi como procesador principal. Realizar pruebas funcionales del sistema de bombeo en diferentes condiciones de pintura. Implementar la instalación final de bombas, mangueras, tanques y sistema cisterna elevada, asregurando de esta manera el correcto funcionamiento del proceso de dosificación. 
+
+ 
+![integrador 1](https://github.com/user-attachments/assets/9c9e24ba-7e81-4d7c-95b3-446d8502b861)
+
+2. Desarrollo del proyecto
+
+  El proyecto comenzó con la necesidad de programar e implementar el sistema de bombeo compuesto por cinco bombas para alimentar el mezclador de pintura. El primer intento de control de flujo se realizó utilizando una electroválvula; el caudal obtenido fue demasiado bajo, por lo que este componente se descartó. Luego se realizaron ensayos utilizando una bomba de diafragma, iniciando con agua para evaluar el funcionamiento general. Durante estas pruebas se identificó la presencia de un residual dentro de la manguera de salida, como alternativa, se instaló electroválvulas a la salida de la bomba, pero este residuo permaneció, después de discutirlo con el equipo y el docente Alfredo Becerra, llegamos a la conclusión de considerar este residual com parte de un porcentaje aceptable dentro del sistema. Luego se procedió a trabajar directamente con vinilo al 100% Se evidenció nuevamente un flujo lento y un alto riesgo de estancamiento debido a la viscosidad, lo cual podría generar daños en el sistema. Por esta razón, se deidió modificar la mezcla, empleando una porción de 50% pintura y 50% agua, permitiendo así un flujo más adecuado. El grupo acordó la ocmpra de vinilos necesarios y se informó a los demás equipos sobre la materia prima de la pintura a utilizar.En cuanto al control, se desarrolló una implementación en Node-RED con un servidor propio, obteniendo un funcionamiento satisfactorio. Al pasar al servidor general, se presentaron problemas de conexión que fueron solucionados con el apoyo de la docente Diana Maldonado. Superada esta etapa, se inició la instalación física de bombas y mangueras. Con apoyo del taller de mecánica de la universidad, se realizaron perforaciones en los tanques y se instalaron acoples para conectar las mangueras tanto a los tanques como a los motores de las bombas. Estos motores fueron conectados a sus respectivos puentes H, previamente programados para su control. Una vez ensamblado el mezclador por el otro equipo, se completó la instalación de las mangueras. Sin embargo, durante las primeras pruebas se identificó que las bombas no sellaban completamente, permitiendo el flujo de pintura aun cuando no estaban activas. Esto impedía un control preciso del volumen suministrado. Se probaron otros modelos de bombas, pero el problema persistía debido a la diferencia de presión generada por la gravedad desde los tanques superiores. Como solución, se instaló un sistema de cisterna elevada, eliminando el flujo continuo causado por la presión gravitacional. Tras implementar esta modificación, las pruebas con varias bombas operando simultáneamente dieron resultados satisfactorios, cumpliendo con los requerimientos iniciales. Finalmente, debido a un cambio de último momento solicitado por el equipo encargado de integrar todo el sistema, fue necesario modificar el cableado de conexión de las bombas. Este nuevo cableado no corresponde a la lógica originalmente programada, por lo que se dejó abierto a realizar adaptaciones adicionales en caso de ser requeridas.
+
+  
+![integrador 2](https://github.com/user-attachments/assets/d8f006fe-d5bd-4b31-b18d-bf64acb838d1)
+
+3. TECNOLOGÍAS USADAS
+
+   Lenguaje de programación: Python
+
+  Microcontrolador: ESP32
+
+  Procesador central / servidor: Raspberry Pi
+
+  Interfaz de control: Node-RED
+
+  Componentes de potencia: Puentes H para control de motores
+
+  Componentes hidráulicos: Bombas de diafragma, mangueras, acoples, electroválvulas (en fase de   pruebas)
+
+  4. CONCLUSIONES
+
+  El proceso permitió validar diferentes alternativas de bombeo, descartando las electroválvulas por bajo caudal y el vinilo puro por su alta viscosidad. La mezcla de 50 % pintura y 50 % agua fue la solución más adecuada para garantizar un flujo estable sin comprometer la integridad de las bombas. La implementación del sistema de cisterna elevada resolvió el problema del flujo indeseado causado por la presión gravitacional, permitiendo un control preciso del volumen suministrado. La integración del sistema con ESP32, Raspberry Pi y Node-RED demostró ser funcional y estable, logrando comunicación y control efectivo tras resolver las dificultades de red. Se cumplió el objetivo principal: instalar, programar y validar el funcionamiento de las cinco bombas para el mezclador de pinturas, dejando solo ajustes menores derivados de cambios solicitados por el equipo integrador. El trabajo conjunto con docentes, talleres y otros equipos permitió mejorar la calidad técnica del proyecto y garantizar la operatividad del sistema dentro del prototipo final.
+
+  _________________________________________________________________________________________________________________________________________________________
+
+CÓDIGO FINAL 
+
+from machine import Pin, PWM
+from time import sleep, time
+from umqtt.robust import MQTTClient
+import Wifi
+
+# Constantes del sistema
+TIEMPO_100_PORCIENTO = 25          # Tiempo total para succión del 100%
+MOTOR_PWM_FREQ = 1000              # Frecuencia PWM para los motores
+SEGUNDOS_ENTRE_MOTORES = 2         # Pausa entre motores
+
+# Variables de motores del tanque final
+TIEMPO_FINAL_MOTOR = 3             # Tiempo para bajar/agitar/subir
+PAUSA_FINAL = 2                    # Pausa entre secuencias
+
+# MQTT - Configuración del broker
+MQTT_BROKER = "192.168.59.216"
+MQTT_PORT = 1883
+MQTT_CLIENT_ID = b"ESP32_BOMBAS"
+MQTT_TOPIC_IN = b"esp/out"         # Topic donde llega el setpoint de mezcla
+
+# Topics de estado para actualizar el dashboard
+TOPIC_ESTADO_BOMBAS = b"in/esp2/bombas/estado"
+TOPIC_AGITADOR = b"agitador/estado"
+TOPIC_ELEVADOR = b"elevador/estado"
+
+# Configuración de motores base (bombas)
+COLORES_MOTORES = [
+    ("CIAN",    26, 27, 25, 'C'),
+    ("MAGENTA", 32, 33, 23, 'M'),
+    ("YELLOW",  13, 19, 14, 'Y'),
+    ("BLACK",   21, 4, 5, 'K'),
+    ("WHITE",   12, 22, 2, 'W'),
+]
+
+MOTORES = []  # Contendrá todos los motores inicializados
+
+# Pines de motores del tanque final
+ELEVADOR_IN1_PIN = 15
+ELEVADOR_IN2_PIN = 16
+AGITADOR_IN1_PIN = 17
+AGITADOR_IN2_PIN = 18
+
+MOTOR_ELEVADOR = {}
+MOTOR_AGITADOR = {}
+
+def inicializar_motores():
+    # Inicialización de las 5 bombas dosificadoras
+    for color, pin_in1, pin_in2, pin_ena, clave in COLORES_MOTORES:
+        try:
+            IN1 = Pin(pin_in1, Pin.OUT)
+            IN2 = Pin(pin_in2, Pin.OUT)
+            ENA_PWM = PWM(Pin(pin_ena), freq=MOTOR_PWM_FREQ)
+            IN1.value(0)
+            IN2.value(0)
+            ENA_PWM.duty(0)
+            MOTORES.append({'color': color, 'clave': clave, 'in1': IN1, 'in2': IN2, 'ena': ENA_PWM})
+        except Exception as e:
+            print(f"Error en motor {color}: {e}")
+
+    # Motores del tanque final
+    try:
+        MOTOR_ELEVADOR['in1'] = Pin(ELEVADOR_IN1_PIN, Pin.OUT)
+        MOTOR_ELEVADOR['in2'] = Pin(ELEVADOR_IN2_PIN, Pin.OUT)
+        MOTOR_AGITADOR['in1'] = Pin(AGITADOR_IN1_PIN, Pin.OUT)
+        MOTOR_AGITADOR['in2'] = Pin(AGITADOR_IN2_PIN, Pin.OUT)
+        MOTOR_ELEVADOR['in1'].value(0)
+        MOTOR_ELEVADOR['in2'].value(0)
+        MOTOR_AGITADOR['in1'].value(0)
+        MOTOR_AGITADOR['in2'].value(0)
+    except Exception as e:
+        print(f"Error al inicializar tanque final: {e}")
+
+def motor_apagar_total(motor):
+    # Apaga PWM si el motor lo usa
+    if 'ena' in motor:
+        motor['ena'].duty(0)
+    motor['in1'].value(0)
+    motor['in2'].value(0)
+
+def motor_succionar(motor, tiempo_segundos):
+    # Publica estado ON
+    msg_on = '{"bomba":"%s", "estado":"ON", "tiempo":%.2f}' % (motor['color'], tiempo_segundos)
+    client.publish(TOPIC_ESTADO_BOMBAS, msg_on)
+    # Activa motor (gira en una dirección)
+    motor['in1'].value(1)
+    motor['in2'].value(0)
+    motor['ena'].duty(800)
+    # Tiempo succión
+    sleep(tiempo_segundos)
+    # Apaga motor y publica OFF
+    motor_apagar_total(motor)
+    msg_off = '{"bomba":"%s", "estado":"OFF"}' % motor['color']
+    client.publish(TOPIC_ESTADO_BOMBAS, msg_off)
+
+def Elevador_agitador():
+    # 1. Bajada del elevador
+    client.publish(TOPIC_ELEVADOR, b"DOWN")
+    MOTOR_ELEVADOR['in1'].value(1)
+    MOTOR_ELEVADOR['in2'].value(0)
+    sleep(TIEMPO_FINAL_MOTOR)
+    motor_apagar_total(MOTOR_ELEVADOR)
+    client.publish(TOPIC_ELEVADOR, b"STOP")
+    sleep(PAUSA_FINAL)
+
+    # 2. Agitación
+    client.publish(TOPIC_AGITADOR, b"ON")
+    MOTOR_AGITADOR['in1'].value(1)
+    MOTOR_AGITADOR['in2'].value(0)
+    sleep(TIEMPO_FINAL_MOTOR)
+    motor_apagar_total(MOTOR_AGITADOR)
+    client.publish(TOPIC_AGITADOR, b"OFF")
+    sleep(PAUSA_FINAL)
+
+    # 3. Subida del elevador
+    client.publish(TOPIC_ELEVADOR, b"UP")
+    MOTOR_ELEVADOR['in1'].value(0)
+    MOTOR_ELEVADOR['in2'].value(1)
+    sleep(TIEMPO_FINAL_MOTOR)
+    motor_apagar_total(MOTOR_ELEVADOR)
+    client.publish(TOPIC_ELEVADOR, b"STOP")
+
+def parse_mqtt_message(msg):
+    # Convierte el mensaje tipo "C:20 M:30 Y:50" en tiempos de succión
+    msg_str = msg.decode().strip()
+    tiempos = {}
+    suma = 0
+    for item in msg_str.split():
+        if ":" not in item:
+            continue
+        clave, valor = item.split(":")
+        try:
+            porcentaje = int(valor)
+        except:
+            return None
+        suma += porcentaje
+        tiempos[clave.upper()] = (porcentaje / 100) * TIEMPO_100_PORCIENTO
+    return tiempos if suma == 100 else None
+
+def on_message(topic, msg):
+    # Procesa el setpoint recibido
+    if topic != MQTT_TOPIC_IN:
+        return
+    tiempos = parse_mqtt_message(msg)
+    if tiempos is None:
+        return
+
+    # Ejecución de succión
+    for i, motor in enumerate(MOTORES):
+        t = tiempos.get(motor['clave'], 0)
+        if t > 0:
+            motor_succionar(motor, t)
+            if i < len(MOTORES) - 1:
+                sleep(SEGUNDOS_ENTRE_MOTORES)
+
+    # Secuencia final
+    Elevador_agitador()
+
+# Conexión WiFi
+if not Wifi.conectar():
+    while True:
+        sleep(1)
+
+# Inicialización
+inicializar_motores()
+client = MQTTClient(MQTT_CLIENT_ID, MQTT_BROKER, port=MQTT_PORT)
+client.set_callback(on_message)
+client.connect()
+client.subscribe(MQTT_TOPIC_IN)
+
+# Loop principal
+while True:
+    client.check_msg()
+    sleep(0.1)
