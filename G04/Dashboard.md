@@ -63,7 +63,7 @@ Recepción de datos desde tópicos como:
     * Control de válvulas y bombas
     * Mostrar estados en widgets
 3.	Salida (MQTT-OUT)
-Publicación hacia dispositivos (ej. esp2/out, esp1/in).
+Publicación hacia dispositivos (ej. `esp2/out`, `esp1/in`).
 <!-- Aquí insertar DIAGRAMA ARQUITECTURA --> 
 
 ## 4. Metodología
@@ -91,15 +91,15 @@ Publicación hacia dispositivos (ej. esp2/out, esp1/in).
     Encendido/apagado, tiempos y control del sistema de llenado.
 
 4.	Integración de nodos clave
-    * mqtt in/out
+    * mqtt `in/out`
     * function (cálculos de RGB, lógica por color, etc.)
-    * ui_text, ui_gauge, ui_led, ui_button, ui_switch
+    * `ui_text`, `ui_gauge`, `ui_led`, `ui_button`, `ui_switch`
     * Nodos image para cámara
 
 5.	Implementación del reenvío esp2 → esp1
-    *	Lectura del tópico esp/out
+    *	Lectura del tópico `esp/out`
     *	Visualización en dashboard
-    *	Publicación hacia esp1/in
+    *	Publicación hacia `esp1/in`
     Esto nos permitió comprobar si realmente la esp32 estaba enviando datos.
 
 4.2 Problemas Encontrados
@@ -112,18 +112,20 @@ Publicación hacia dispositivos (ej. esp2/out, esp1/in).
 | Node-RED no cargaba imágenes | Ruta incorrecta en widgets | Faltaban elementos visuales |
 
 4.3 Soluciones Aplicadas
+
 * Reinstalación de node-red-dashboard.
-* Corrección de todos los tópicos (esp1/in, esp2/out, etc.).
+* Corrección de todos los tópicos (`esp1/in`, `esp2/out`, etc.).
 * Revisión física de la cámara (conector CSI).
 * Reinicio de la Raspberry después de conectar el módulo.
 * Verificación del servicio Mosquitto y túnel ngrok activo.
 
 4.4 Cosas Importantes a Tener en Cuenta
+
 * Los tópicos deben estar correctamente escritos:
 mayúsculas/minúsculas cambian totalmente el comportamiento.
 * Ngrok cambia de puerto cada vez si no se usa token autenticado.
 * La ESP32 debe reconectarse si el broker cambia de IP o puerto.
-* Cuando publiques imágenes en el dashboard, Node-RED solo acepta rutas accesibles desde /home/pi/.node-red/public/.
+* Cuando publiques imágenes en el dashboard, Node-RED solo acepta rutas accesibles desde `/home/pi/.node-red/public/`.
 
 ## 5. Diseño del Dashboard
 5.1 Estructura del Dashboard
@@ -136,29 +138,52 @@ mayúsculas/minúsculas cambian totalmente el comportamiento.
 
 
 5.2 Widgets Utilizados
+
 Widget	Uso
-ui_text	Mostrar mensajes de esp2/out
-ui_gauge	Sensores (temp, distancia, etc.)
-ui_image	Mostrar fotografías de cámara
-ui_button	Control manual
-ui_switch	Encendido/apagado de actuadores
-ui_chart	Gráficas históricas
+
+`ui_text`	Mostrar mensajes de esp2/out
+`ui_gauge`	Sensores (temp, distancia, etc.)
+`ui_image`	Mostrar fotografías de cámara
+`ui_button`	Control manual
+
+`ui_switch`	Encendido/apagado de actuadores
+`ui_chart`	Gráficas históricas
+
+5.3 Distribución del Layout y Visualización
+
+La arquitectura de la interfaz se basa en una disposición de múltiples grupos y pestañas dentro del flujo de Node-RED, mejorando la distribución para la visualización.
+
+* Distribución del Layout:  Se utilizó una disposición de columnas y filas para organizar los Grupos, como se observa en la colocación vertical de las Básculas (Galgas) junto a la disposición horizontal de los medidores de Temperatura y Color Detectado. 
+
+![](2.Image/Layout_dash.JPG)
+
+* Visualización General del Dashboard: La captura final representa la integración total del sistema,  del Dashboard para manejar visualizar  (imágenes, valores de balanzas, control del estado de las bombas).
+
+![](2.Image/Dashboard_Final.jpeg)
+
+![](2.Image/Dashboard_Final_Motores.jpeg)
+
  
 
-5.3 Integración MQTT
-•	Subscripción principal para depuración:
-esp2/out  →  Node-RED  → esp1/in
-•	Esto permite verificar prestación de datos cruzados entre ESPs.
-________________________________________
+5.4 Integración MQTT
+
+* Subscripción principal para depuración:
+`esp2/out`  →  Node-RED  → `esp1/in`
+
+* Esto permite verificar prestación de datos cruzados entre ESP32.
+
+-------------- 
+
 ## 6. Resultados
 * El dashboard quedó totalmente operativo.
+
 * Todos los sensores se muestran en tiempo real.
 * Control completo sobre actuadores.
 * La cámara funciona de manera estable en el dashboard.
 * Integración MQTT estable y sin pérdida de datos.
 * El sistema puede supervisarse desde PC y desde móvil.
-![Dash_completo](2.Image/Dashboard_completo.JPG)
 
+----
 ## 7. Conclusiones
 * Node-RED demostró ser una plataforma flexible y robusta para integrar múltiples ESP32 y sensores.
 * La correcta organización de pestañas y widgets hace que el sistema sea intuitivo incluso con módulos complejos como RGB o la galga.
